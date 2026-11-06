@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { ArrowRight, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Timer, Video } from "lucide-react";
 import { AuctionCard, DemoTag, ProductCard, UpcomingCard } from "@/components/cards";
+import { MarketProductCard } from "@/components/market";
 import { ButtonLink } from "@/components/ui/button";
+import { listProducts } from "@/lib/market/queries";
 import { categories, endingSoon, liveAuctions, offers, stores, upcoming } from "@/lib/demo-data";
 import { site } from "@/lib/site";
 
@@ -29,6 +32,29 @@ function SectionHeader({
         {cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
       </Link>
     </div>
+  );
+}
+
+/** Produtos reais do Market; enquanto não houver nenhum, mostra a vitrine de demonstração. */
+async function FeaturedProducts() {
+  const { items } = await listProducts({ limit: 10 });
+  if (!items.length) {
+    return (
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+        {offers.map((p) => (
+          <ProductCard key={p.id} product={p} />
+        ))}
+      </div>
+    );
+  }
+  return (
+    <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+      {items.map((p) => (
+        <li key={p.id}>
+          <MarketProductCard product={p} />
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -215,11 +241,9 @@ export default function HomePage() {
             href="/market"
             cta="Ir ao Market"
           />
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-            {offers.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          <Suspense fallback={<div className="h-72 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
+            <FeaturedProducts />
+          </Suspense>
         </section>
 
         <section>

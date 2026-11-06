@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 import { Gavel, Home, Radio, ShoppingBag, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,8 +14,20 @@ const items = [
   { href: "/conta", label: "Conta", icon: UserRound },
 ];
 
+/** Mostra a barra imediatamente; o item ativo é marcado quando o endereço atual chega. */
 export function BottomNav() {
-  const pathname = usePathname();
+  return (
+    <Suspense fallback={<BottomNavView pathname="" />}>
+      <BottomNavWithPath />
+    </Suspense>
+  );
+}
+
+function BottomNavWithPath() {
+  return <BottomNavView pathname={usePathname()} />;
+}
+
+function BottomNavView({ pathname }: { pathname: string }) {
   return (
     <nav
       aria-label="Navegação do aplicativo"

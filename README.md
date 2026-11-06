@@ -12,7 +12,7 @@
 
 Domínio pretendido: `livelance.com.br` (ainda não configurado — ver [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
-Status: **Fase 1 — Fundação** concluída e marca migrada para LIVELANCE. Lives, leilões, produtos e lojas da home são **demonstrações**.
+Status: **Fase 2 — LIVELANCE MARKET + SELLER** concluída: lojas, produtos com fotos, busca, carrinho, checkout e pedidos (sem pagamento real até a Fase 4). Lives e leilões da home ainda são **demonstrações**.
 
 ## Rodar localmente
 
@@ -30,7 +30,9 @@ npm run dev                  # http://localhost:3000
 | `npm run build` | Build de produção (também checa tipos) |
 | `npm run lint` | ESLint |
 | `npm test` | Testes unitários (Vitest) |
-| `npm run test:e2e` | Testes no navegador (Playwright, 1440 px e 375 px) |
+| `npm run test:e2e` | Testes no navegador (Playwright, 1440 px e 375 px); antes, `npm run build:e2e` |
+| `npm run test:integration` | Concorrência no checkout contra o banco de desenvolvimento |
+| `npm run typecheck` | Gera os tipos de rotas do Next e roda o TypeScript |
 
 Os testes e2e usam o projeto Supabase de desenvolvimento e o usuário `e2e@livelance.test`
 (ver `docs/TESTING.md`). Em máquinas atrás de proxy, rode com `NODE_USE_ENV_PROXY=1`.

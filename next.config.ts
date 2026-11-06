@@ -4,6 +4,15 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  experimental: {
+    // Fotos de produto têm até 5 MB (limite do bucket); folga para os outros campos do formulário.
+    serverActions: { bodySizeLimit: "6mb" },
+  },
+  images: {
+    // NEXT_IMAGE_UNOPTIMIZED=1 serve as fotos direto do Supabase (útil em máquinas atrás de proxy, como nos testes).
+    unoptimized: process.env.NEXT_IMAGE_UNOPTIMIZED === "1",
+    remotePatterns: [{ protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" }],
+  },
   turbopack: {
     rules: {
       "*.css": {
@@ -16,6 +25,8 @@ const nextConfig: NextConfig = {
     return [
       // Endereço antigo do módulo de leilões
       { source: "/lances", destination: "/leiloes", permanent: true },
+      // Busca do cabeçalho → catálogo do Market (a query ?q= é repassada)
+      { source: "/busca", destination: "/market", permanent: false },
       // www → domínio principal (só tem efeito quando o domínio estiver apontado para a Vercel)
       {
         source: "/:path*",

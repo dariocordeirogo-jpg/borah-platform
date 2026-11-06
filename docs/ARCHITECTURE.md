@@ -23,6 +23,20 @@
 - Cronômetros da home são só de exibição. Na Fase 3, o fim do leilão vem do banco (pg_cron + função `place_bid`).
 - Cabeçalhos de segurança básicos em `next.config.ts` (nosniff, frame DENY, referrer, permissions).
 
+## LIVELANCE MARKET + SELLER (Fase 2)
+
+| Parte | Onde |
+| --- | --- |
+| Consultas (sempre na requisição, com `connection()`) | `src/lib/market/queries.ts` |
+| Ações do comprador (carrinho, endereço, pedido, cancelamento) | `src/lib/market/actions.ts` |
+| Ações do vendedor (loja, produto, fotos, cancelamento) | `src/app/seller/actions.ts` |
+| Validação (Zod), preço em centavos, slug, erros | `src/lib/market/schemas.ts`, `format.ts` |
+| Tipos do banco | `src/lib/supabase/database.types.ts` (regenerar após migrations) |
+| Páginas | `/market`, `/produto/[id]`, `/loja/[slug]`, `/carrinho`, `/checkout`, `/conta/pedidos`, `/vender`, `/seller/*` |
+
+Regras: o preço e o estoque do pedido vêm do banco no momento do `checkout` (nunca do navegador); um pedido por loja;
+frete "a combinar" até a integração de logística; nenhum pagamento real até a Fase 4.
+
 ## Marca e SEO
 
 - Nome, slogan, título, descrição e módulos: `src/lib/site.ts` (fonte única).
