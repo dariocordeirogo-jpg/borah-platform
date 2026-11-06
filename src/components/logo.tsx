@@ -1,37 +1,68 @@
+import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-/** Símbolo provisório: "B" em verde metálico com faísca dourada (lance). Logo definitivo é entrega separada. */
-export function LogoMark({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 48 48" aria-hidden="true" className={cn("h-9 w-9", className)}>
-      <defs>
-        <linearGradient id="borah-g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#1fa35a" />
-          <stop offset="0.5" stopColor="#168447" />
-          <stop offset="1" stopColor="#105b35" />
-        </linearGradient>
-        <linearGradient id="borah-o" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#f3dc8f" />
-          <stop offset="0.5" stopColor="#d6a52d" />
-          <stop offset="1" stopColor="#b8891e" />
-        </linearGradient>
-      </defs>
-      <rect width="48" height="48" rx="12" fill="url(#borah-g)" />
-      <path
-        d="M15 11h11.5c5.2 0 8.5 2.7 8.5 7 0 2.6-1.3 4.6-3.5 5.6 3 .9 4.8 3.2 4.8 6.3 0 4.8-3.7 7.6-9.4 7.6H15V11Zm6 10.3h4.7c2 0 3.2-1 3.2-2.6s-1.2-2.6-3.2-2.6H21v5.2Zm0 10.9h5.3c2.2 0 3.5-1.1 3.5-2.8s-1.3-2.8-3.5-2.8H21v5.6Z"
-        fill="#fff"
+/**
+ * Símbolo LIVELANCE: play 3D vermelho com martelo de leilão, órbita e ondas de transmissão.
+ * Arquivos em public/brand/. `mono` usa a versão de uma cor, pintada com currentColor.
+ */
+export function LogoMark({ className, mono = false }: { className?: string; mono?: boolean }) {
+  if (mono) {
+    return (
+      <span
+        aria-hidden="true"
+        className={cn("inline-block aspect-[92/72] h-9 bg-current", className)}
+        style={{
+          WebkitMask: "url(/brand/livelance-simbolo-mono.svg) center / contain no-repeat",
+          mask: "url(/brand/livelance-simbolo-mono.svg) center / contain no-repeat",
+        }}
       />
-      <path d="M38.5 6.5l1.6 3.6 3.6 1.6-3.6 1.6-1.6 3.6-1.6-3.6-3.6-1.6 3.6-1.6 1.6-3.6Z" fill="url(#borah-o)" />
-    </svg>
+    );
+  }
+  return (
+    <Image
+      src="/brand/livelance-simbolo.svg"
+      alt=""
+      aria-hidden="true"
+      width={92}
+      height={72}
+      priority
+      unoptimized
+      className={cn("h-9 w-auto", className)}
+    />
   );
 }
 
-export function Logo({ className }: { className?: string }) {
+function Wordmark({ className, mono = false }: { className?: string; mono?: boolean }) {
   return (
-    <Link href="/" aria-label="BORAH — página inicial" className={cn("flex items-center gap-2", className)}>
-      <LogoMark />
-      <span className="font-display text-2xl font-extrabold tracking-tight text-metal-green">BORAH</span>
+    <span className={cn("inline-block -skew-x-[10deg] font-display font-extrabold leading-none tracking-tight", className)}>
+      <span className={mono ? undefined : "text-brand"}>LIVE</span>
+      <span className={mono ? undefined : "text-navy"}>LANCE</span>
+    </span>
+  );
+}
+
+/** Versão horizontal (cabeçalho). */
+export function Logo({ className, mono = false }: { className?: string; mono?: boolean }) {
+  return (
+    <Link href="/" aria-label="LIVELANCE — página inicial" className={cn("flex items-center gap-1.5", className)}>
+      <LogoMark mono={mono} />
+      <Wordmark mono={mono} className="text-[1.45rem]" />
     </Link>
+  );
+}
+
+/** Versão vertical com slogan (login, cadastro, telas de abertura). */
+export function LogoStacked({ className }: { className?: string }) {
+  return (
+    <span className={cn("flex flex-col items-center gap-2", className)} role="img" aria-label="LIVELANCE — Tudo acontece ao vivo.">
+      <LogoMark className="h-14" />
+      <Wordmark className="text-3xl" />
+      <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-navy">
+        <span className="h-0.5 w-5 rounded bg-brand" aria-hidden="true" />
+        Tudo acontece ao vivo.
+        <span className="h-0.5 w-5 rounded bg-brand" aria-hidden="true" />
+      </span>
+    </span>
   );
 }

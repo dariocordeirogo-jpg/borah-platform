@@ -1,12 +1,40 @@
 import { expect, test } from "@playwright/test";
 
-test("home mostra BORAH LANCES em destaque e o aviso de demonstração", async ({ page }) => {
+test("home LIVELANCE: slogan, três modalidades e aviso de demonstração", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Entre na disputa");
-  await expect(page.getByText("BORAH LANCES").first()).toBeVisible();
+  await expect(page).toHaveTitle("LIVELANCE | Marketplace, Vendas ao Vivo e Leilões Online");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Tudo acontece");
+  for (const name of [/Compre agora/, /Assista e compre/, /Dê seu lance/]) {
+    await expect(page.getByRole("link", { name }).first()).toBeVisible();
+  }
   await expect(page.getByText(/são demonstrações/).first()).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Ao vivo agora" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Terminando em breve" })).toBeVisible();
+  for (const h of ["Transmissões ao vivo", "Leilões em andamento", "Produtos em destaque e ofertas"]) {
+    await expect(page.getByRole("heading", { name: h })).toBeVisible();
+  }
+});
+
+test("nenhuma menção à marca antiga na página", async ({ page }) => {
+  for (const path of ["/", "/entrar", "/cadastro", "/recuperar-senha", "/leiloes", "/ao-vivo", "/market", "/vender", "/termos"]) {
+    await page.goto(path);
+    const html = await page.content();
+    expect(html, path).not.toMatch(/b[o0]r[aλΛ]h/i);
+  }
+});
+
+test("/lances redireciona para /leiloes", async ({ page }) => {
+  await page.goto("/lances");
+  await expect(page).toHaveURL(/\/leiloes$/);
+});
+
+test("SEO: robots, sitemap, manifest e imagem de compartilhamento", async ({ request }) => {
+  expect((await request.get("/robots.txt")).status()).toBe(200);
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  expect(sitemap).toContain("/leiloes");
+  const manifest = await (await request.get("/manifest.webmanifest")).json();
+  expect(manifest.name).toBe("LIVELANCE");
+  const og = await request.get("/opengraph-image");
+  expect(og.status()).toBe(200);
+  expect(og.headers()["content-type"]).toContain("image/png");
 });
 
 test("cronômetro anda no navegador", async ({ page }) => {

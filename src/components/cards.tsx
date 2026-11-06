@@ -6,12 +6,12 @@ import { formatBRL } from "@/lib/format";
 import type { DemoAuction, DemoProduct, DemoUpcoming } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
 
-function ProductArt({ icon: Icon, tone = "green", className }: { icon: LucideIcon; tone?: "green" | "gold"; className?: string }) {
+/** Espaço da foto do produto (ícone neutro enquanto não há fotos reais). */
+function ProductArt({ icon: Icon, className }: { icon: LucideIcon; className?: string }) {
   return (
     <div
       className={cn(
-        "flex aspect-[4/3] items-center justify-center rounded-t-[var(--radius-card)]",
-        tone === "green" ? "bg-green-soft text-green" : "bg-gold-soft text-gold-ink",
+        "flex aspect-[4/3] items-center justify-center rounded-t-[var(--radius-card)] bg-surface text-navy-2",
         className,
       )}
     >
@@ -33,13 +33,13 @@ export function AuctionCard({ auction }: { auction: DemoAuction }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white text-ink shadow-[var(--shadow-card)]">
       <div className="relative">
-        <ProductArt icon={auction.icon} tone={auction.live ? "gold" : "green"} />
+        <ProductArt icon={auction.icon} />
         {auction.live ? (
-          <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-danger px-2.5 py-1 text-xs font-bold text-white">
+          <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-brand px-2.5 py-1 text-xs font-bold text-white">
             <Radio className="h-3.5 w-3.5" aria-hidden="true" /> AO VIVO
           </span>
         ) : (
-          <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-green-deep">
+          <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-navy">
             <Gavel className="h-3.5 w-3.5" aria-hidden="true" /> Leilão
           </span>
         )}
@@ -58,8 +58,8 @@ export function AuctionCard({ auction }: { auction: DemoAuction }) {
         </div>
         <div className="flex items-end justify-between gap-2">
           <div>
-            <p className="text-xs text-muted">Maior lance</p>
-            <p className="text-xl font-bold text-green-deep">{formatBRL(auction.currentBidCents)}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-navy-2">Maior lance</p>
+            <p className="text-2xl font-extrabold tracking-tight text-navy">{formatBRL(auction.currentBidCents)}</p>
             <p className="text-xs text-muted">{auction.bids} lances</p>
           </div>
           <div className="text-right">
@@ -68,10 +68,10 @@ export function AuctionCard({ auction }: { auction: DemoAuction }) {
           </div>
         </div>
         <Link
-          href="/lances"
-          className="metal-gold mt-auto flex h-11 items-center justify-center rounded-full text-sm font-bold text-ink hover:brightness-105"
+          href="/leiloes"
+          className="btn-buy mt-auto flex h-11 items-center justify-center gap-1.5 rounded-full text-sm font-bold"
         >
-          Lance mínimo {formatBRL(next)}
+          <Gavel className="h-4 w-4" aria-hidden="true" /> Dar lance · {formatBRL(next)}
         </Link>
       </div>
     </article>
@@ -81,7 +81,7 @@ export function AuctionCard({ auction }: { auction: DemoAuction }) {
 export function UpcomingCard({ item }: { item: DemoUpcoming }) {
   return (
     <article className="flex gap-3 rounded-[var(--radius-card)] border border-line bg-white p-3 shadow-[var(--shadow-card)]">
-      <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-green-soft text-green">
+      <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-surface text-navy-2">
         <item.icon className="h-9 w-9" strokeWidth={1.4} aria-hidden="true" />
       </div>
       <div className="min-w-0 flex-1">
@@ -93,7 +93,7 @@ export function UpcomingCard({ item }: { item: DemoUpcoming }) {
         <p className="mt-1 text-xs text-muted">
           Lance inicial <span className="font-semibold text-ink">{formatBRL(item.startPriceCents)}</span>
         </p>
-        <p className="text-xs text-gold-ink">
+        <p className="text-xs text-navy-2">
           Abre em <Countdown endsInSeconds={item.startsInSeconds} urgentBelow={0} className="font-semibold" />
         </p>
       </div>
@@ -117,15 +117,15 @@ export function ProductCard({ product }: { product: DemoProduct }) {
           <p className="mt-2 text-xs text-muted line-through">{formatBRL(product.oldPriceCents)}</p>
         )}
         <p className="flex items-baseline gap-2">
-          <span className="text-xl font-bold">{formatBRL(product.priceCents)}</span>
-          {discount && <span className="text-sm font-semibold text-green">{discount}% OFF</span>}
+          <span className="text-xl font-bold text-navy">{formatBRL(product.priceCents)}</span>
+          {discount && <span className="text-sm font-semibold text-brand">{discount}% OFF</span>}
         </p>
         <p className="text-xs text-muted">
           em até {product.installments}x de {formatBRL(Math.round(product.priceCents / product.installments))}
         </p>
         <Link
           href="/market"
-          className="mt-3 flex h-10 items-center justify-center rounded-full border border-green text-sm font-semibold text-green-deep hover:bg-green-soft"
+          className="btn-buy mt-3 flex h-10 items-center justify-center rounded-full text-sm font-bold"
         >
           Comprar agora
         </Link>
