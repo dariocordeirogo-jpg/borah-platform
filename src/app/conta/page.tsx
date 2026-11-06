@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { BadgeCheck, Gavel, LogOut, Megaphone, ShieldAlert, Store } from "lucide-react";
+import Link from "next/link";
+import { BadgeCheck, Gavel, LogOut, Megaphone, Receipt, ShieldAlert, Store } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth";
@@ -65,18 +66,29 @@ async function Account() {
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-3">
+      <section className="grid gap-3 sm:grid-cols-2">
         {[
-          { icon: Gavel, title: "Meus lances", text: "LIVELANCE LEILÕES · Fase 3" },
-          { icon: Store, title: "Minha loja", text: "LIVELANCE SELLER · Fase 2" },
-          { icon: Megaphone, title: "Minhas indicações", text: "Indique e ganhe · Fase 5" },
-        ].map((c) => (
-          <div key={c.title} className="rounded-[var(--radius-card)] border border-line bg-white p-4">
-            <c.icon className="h-6 w-6 text-brand" aria-hidden="true" />
-            <p className="mt-2 font-semibold">{c.title}</p>
-            <p className="text-xs text-muted">Em breve · {c.text}</p>
-          </div>
-        ))}
+          { icon: Receipt, title: "Meus pedidos", text: "Acompanhe suas compras", href: "/conta/pedidos" },
+          user.roles.includes("seller")
+            ? { icon: Store, title: "Minha loja", text: "Painel LIVELANCE SELLER", href: "/seller" }
+            : { icon: Store, title: "Abrir minha loja", text: "Venda na LIVELANCE", href: "/vender" },
+          { icon: Gavel, title: "Meus lances", text: "Em breve · LIVELANCE LEILÕES (Fase 3)", href: null },
+          { icon: Megaphone, title: "Minhas indicações", text: "Em breve · Indique e ganhe (Fase 5)", href: null },
+        ].map((c) =>
+          c.href ? (
+            <Link key={c.title} href={c.href} className="rounded-[var(--radius-card)] border border-line bg-white p-4 hover:border-navy-2">
+              <c.icon className="h-6 w-6 text-brand" aria-hidden="true" />
+              <p className="mt-2 font-semibold text-navy">{c.title}</p>
+              <p className="text-xs text-muted">{c.text}</p>
+            </Link>
+          ) : (
+            <div key={c.title} className="rounded-[var(--radius-card)] border border-line bg-surface p-4">
+              <c.icon className="h-6 w-6 text-muted" aria-hidden="true" />
+              <p className="mt-2 font-semibold text-navy">{c.title}</p>
+              <p className="text-xs text-muted">{c.text}</p>
+            </div>
+          ),
+        )}
       </section>
 
       <form action={signOut}>

@@ -4,6 +4,7 @@ import { Gavel, Radio, Search, ShoppingBag, ShoppingCart, UserRound } from "luci
 import { Logo } from "@/components/logo";
 import { getCurrentUser } from "@/lib/auth";
 import { categories } from "@/lib/demo-data";
+import { getCartCount } from "@/lib/market/queries";
 
 /** Os três modos de negociar ficam sempre visíveis e com ícone próprio. */
 const mainLinks = [
@@ -25,6 +26,27 @@ async function AccountLink() {
       <span className="sr-only sm:hidden">{user ? "Minha conta" : "Entrar"}</span>
     </Link>
   );
+}
+
+function CartLinkView({ count }: { count: number }) {
+  return (
+    <Link
+      href="/carrinho"
+      aria-label={count ? `Carrinho, ${count} ${count === 1 ? "item" : "itens"}` : "Carrinho"}
+      className="relative flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface"
+    >
+      <ShoppingCart className="h-5 w-5 text-brand" aria-hidden="true" />
+      {count > 0 && (
+        <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-navy px-1 text-[11px] font-bold text-white">
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
+    </Link>
+  );
+}
+
+async function CartLink() {
+  return <CartLinkView count={await getCartCount()} />;
 }
 
 function AccountFallback() {
@@ -62,9 +84,9 @@ export function Header() {
           <Suspense fallback={<AccountFallback />}>
             <AccountLink />
           </Suspense>
-          <Link href="/carrinho" aria-label="Carrinho" className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface">
-            <ShoppingCart className="h-5 w-5 text-brand" aria-hidden="true" />
-          </Link>
+          <Suspense fallback={<CartLinkView count={0} />}>
+            <CartLink />
+          </Suspense>
         </div>
       </div>
 

@@ -20,7 +20,7 @@ insert into r select 'A NÃO edita perfil de B', count(*)=0 from u;
 with u as (update public.profiles set bio='oi' where id='00000000-0000-0000-0000-00000000000a' returning 1)
 insert into r select 'A edita o próprio perfil', count(*)=1 from u;
 insert into r select 'A NÃO lê auditoria', count(*)=0 from public.audit_logs;
-insert into r select 'flags visíveis', count(*)=5 from public.feature_flags;
+insert into r select 'flags visíveis', count(*)=6 from public.feature_flags;
 
 do $$ begin
   begin insert into public.user_roles(user_id, role) values ('00000000-0000-0000-0000-00000000000a','admin_super');
@@ -54,7 +54,7 @@ do $$ begin
     insert into r values ('anônimo NÃO lê endereços', (select count(*) from public.addresses)=0);
   exception when others then insert into r values ('anônimo NÃO lê endereços', true); end;
 end $$;
-insert into r select 'anônimo lê flags', count(*)=5 from public.feature_flags;
+insert into r select 'anônimo lê flags', count(*)=6 from public.feature_flags;
 reset role;
 select * from r;
 rollback;
