@@ -3,19 +3,31 @@ import { Inter, Sora } from "next/font/google";
 import { BottomNav } from "@/components/bottom-nav";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { site } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const sora = Sora({ variable: "--font-sora", subsets: ["latin"], weight: ["600", "700", "800"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
   title: {
-    default: "BORAH — Assista. Compre. Venda. Ganhe.",
-    template: "%s · BORAH",
+    default: site.title,
+    template: `%s · ${site.name}`,
   },
-  description:
-    "Plataforma brasileira de comércio social: leilões, lives, vídeos, marketplace e afiliados em um só lugar.",
-  applicationName: "BORAH",
+  description: site.description,
+  applicationName: site.name,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: site.name,
+    title: site.title,
+    description: site.description,
+    url: "/",
+  },
+  twitter: { card: "summary_large_image", title: site.title, description: site.description },
+  appleWebApp: { title: site.name, capable: true, statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

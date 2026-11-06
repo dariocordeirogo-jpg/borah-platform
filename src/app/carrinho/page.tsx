@@ -8,7 +8,7 @@ export default function Page() {
     <ComingSoon
       phase="Fase 2"
       title="Seu carrinho"
-      description="O carrinho chega junto com o Market. Pagamentos reais só depois da homologação, na Fase 4."
+      description="O carrinho chega junto com o LIVELANCE MARKET. Pagamentos reais (LIVELANCE PAY) só depois da homologação, na Fase 4."
     />
   );
 }

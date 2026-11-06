@@ -2,8 +2,8 @@
 -- Uso: cole no SQL Editor do Supabase (ou rode via psql). Todas as linhas devem vir com ok = true.
 begin;
 insert into auth.users (id, email, raw_user_meta_data, aud, role) values
- ('00000000-0000-0000-0000-00000000000a','a@teste.borah','{"full_name":"Ana Teste"}','authenticated','authenticated'),
- ('00000000-0000-0000-0000-00000000000b','b@teste.borah','{}','authenticated','authenticated');
+ ('00000000-0000-0000-0000-00000000000a','a@teste.livelance','{"full_name":"Ana Teste"}','authenticated','authenticated'),
+ ('00000000-0000-0000-0000-00000000000b','b@teste.livelance','{}','authenticated','authenticated');
 
 create temp table r(test text, ok boolean) on commit drop;
 grant all on r to authenticated, anon;

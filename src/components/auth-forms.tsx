@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { signIn, signInWithGoogle, signUp, type AuthState } from "@/app/(auth)/actions";
+import {
+  requestPasswordReset,
+  signIn,
+  signInWithGoogle,
+  signUp,
+  updatePassword,
+  type AuthState,
+} from "@/app/(auth)/actions";
 import { Button } from "@/components/ui/button";
 
 const inputClass =
@@ -18,12 +25,22 @@ function FieldError({ id, errors }: { id: string; errors?: string[] }) {
   );
 }
 
-function PasswordField({ name, autoComplete, errors }: { name: string; autoComplete: string; errors?: string[] }) {
+function PasswordField({
+  name,
+  autoComplete,
+  errors,
+  label = "Senha",
+}: {
+  name: string;
+  autoComplete: string;
+  errors?: string[];
+  label?: string;
+}) {
   const [visible, setVisible] = useState(false);
   return (
     <div>
       <label htmlFor={name} className="mb-1 block text-sm font-medium">
-        Senha
+        {label}
       </label>
       <div className="relative">
         <input
@@ -117,6 +134,9 @@ export function SignInForm({ next }: { next: string }) {
           <FieldError id="email-erro" errors={state.fieldErrors?.email} />
         </div>
         <PasswordField name="password" autoComplete="current-password" errors={state.fieldErrors?.password} />
+        <Link href="/recuperar-senha" className="-mt-2 block text-right text-sm font-medium text-green-deep hover:underline">
+          Esqueci minha senha
+        </Link>
         <Button type="submit" size="lg" className="w-full" disabled={pending}>
           {pending && <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />}
           Entrar
@@ -217,5 +237,63 @@ export function SignUpForm() {
         </Link>
       </p>
     </>
+  );
+}
+
+export function ResetRequestForm() {
+  const [state, action, pending] = useActionState(requestPasswordReset, {});
+  if (state.message) {
+    return (
+      <div className="space-y-6">
+        <Alert state={state} />
+        <Link href="/entrar" className="block text-center text-sm font-semibold text-green-deep hover:underline">
+          Voltar para o login
+        </Link>
+      </div>
+    );
+  }
+  return (
+    <form action={action} className="space-y-4" noValidate>
+      <Alert state={state} />
+      <div>
+        <label htmlFor="email" className="mb-1 block text-sm font-medium">
+          E-mail da conta
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          aria-invalid={state.fieldErrors?.email ? true : undefined}
+          aria-describedby={state.fieldErrors?.email ? "email-erro" : undefined}
+          className={inputClass}
+        />
+        <FieldError id="email-erro" errors={state.fieldErrors?.email} />
+      </div>
+      <Button type="submit" size="lg" className="w-full" disabled={pending}>
+        {pending && <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />}
+        Enviar link
+      </Button>
+      <Link href="/entrar" className="block text-center text-sm text-muted hover:text-green-deep">
+        Lembrei a senha
+      </Link>
+    </form>
+  );
+}
+
+export function NewPasswordForm() {
+  const [state, action, pending] = useActionState(updatePassword, {});
+  return (
+    <form action={action} className="space-y-4" noValidate>
+      <Alert state={state} />
+      <PasswordField name="password" label="Nova senha" autoComplete="new-password" errors={state.fieldErrors?.password} />
+      <p className="-mt-2 text-xs text-muted">Mínimo de 8 caracteres, com letras e números.</p>
+      <PasswordField name="confirm" label="Repita a nova senha" autoComplete="new-password" errors={state.fieldErrors?.confirm} />
+      <Button type="submit" size="lg" className="w-full" disabled={pending}>
+        {pending && <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />}
+        Salvar nova senha
+      </Button>
+    </form>
   );
 }

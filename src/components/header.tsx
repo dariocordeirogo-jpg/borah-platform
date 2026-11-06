@@ -1,17 +1,22 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { Search, ShoppingCart, UserRound } from "lucide-react";
+import { Gavel, Radio, Search, ShoppingBag, ShoppingCart, UserRound } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { getCurrentUser } from "@/lib/auth";
 import { categories } from "@/lib/demo-data";
 
+/** Os três modos de negociar ficam sempre visíveis e com ícone próprio. */
 const mainLinks = [
-  { href: "/lances", label: "Lances", highlight: true },
-  { href: "/ao-vivo", label: "Ao vivo" },
-  { href: "/videos", label: "Vídeos" },
-  { href: "/market", label: "Market" },
-  { href: "/indique", label: "Indique e ganhe" },
-];
+  { href: "/market", label: "Comprar", icon: ShoppingBag, tone: "green" },
+  { href: "/ao-vivo", label: "Ao vivo", icon: Radio, tone: "live" },
+  { href: "/leiloes", label: "Leilões", icon: Gavel, tone: "gold" },
+] as const;
+
+const toneClass = {
+  green: "text-green-deep hover:bg-green-soft",
+  live: "text-danger hover:bg-red-50",
+  gold: "bg-gold-soft text-gold-ink hover:bg-gold-light/50",
+} as const;
 
 async function AccountLink() {
   const user = await getCurrentUser();
@@ -44,14 +49,14 @@ export function Header() {
         <Logo />
         <form action="/busca" role="search" className="hidden flex-1 md:block">
           <label htmlFor="busca-desktop" className="sr-only">
-            Buscar na BORAH
+            Buscar na LIVELANCE
           </label>
           <div className="flex h-11 items-center rounded-full border border-line bg-surface pl-4 focus-within:border-green">
             <input
               id="busca-desktop"
               name="q"
               type="search"
-              placeholder="Buscar produtos, leilões e lojas"
+              placeholder="Buscar produtos, lives e leilões"
               className="h-full flex-1 bg-transparent text-sm outline-none placeholder:text-muted"
             />
             <button type="submit" aria-label="Buscar" className="mr-1 flex h-9 w-9 items-center justify-center rounded-full bg-green text-white hover:bg-green-deep">
@@ -71,7 +76,7 @@ export function Header() {
 
       <form action="/busca" role="search" className="px-4 pb-3 md:hidden">
         <label htmlFor="busca-mobile" className="sr-only">
-          Buscar na BORAH
+          Buscar na LIVELANCE
         </label>
         <div className="flex h-11 items-center rounded-full border border-line bg-surface pl-4 focus-within:border-green">
           <Search className="h-4 w-4 text-muted" aria-hidden="true" />
@@ -91,15 +96,15 @@ export function Header() {
             <Link
               key={l.href}
               href={l.href}
-              className={
-                l.highlight
-                  ? "my-1.5 rounded-full bg-gold-soft px-3 py-1.5 text-sm font-bold text-gold-ink hover:bg-gold-light/50"
-                  : "my-1.5 rounded-full px-3 py-1.5 text-sm font-medium hover:bg-green-soft"
-              }
+              className={`my-1.5 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold ${toneClass[l.tone]}`}
             >
+              <l.icon className="h-4 w-4" aria-hidden="true" />
               {l.label}
             </Link>
           ))}
+          <Link href="/vender" className="my-1.5 rounded-full px-3 py-1.5 text-sm font-medium hover:bg-green-soft">
+            Venda na LIVELANCE
+          </Link>
           <span className="mx-2 h-5 w-px bg-line" aria-hidden="true" />
           <div className="flex gap-1 overflow-x-auto">
             {categories.slice(0, 6).map((c) => (

@@ -8,11 +8,12 @@ export default function Page() {
       <p className="rounded-xl bg-gold-soft px-4 py-3 text-sm font-semibold">
         RASCUNHO — este texto ainda não foi revisado por advogado e não vale como termo definitivo.
       </p>
-      <h1 className="mt-6 font-display text-3xl font-extrabold">Termos de uso da BORAH</h1>
+      <h1 className="mt-6 font-display text-3xl font-extrabold">Termos de uso da LIVELANCE</h1>
       <div className="mt-6 space-y-4 text-sm leading-relaxed text-ink/90">
         <p>
-          A BORAH é uma plataforma de intermediação que conecta compradores, vendedores, criadores e afiliados por meio
-          de marketplace, leilões, vídeos e transmissões ao vivo.
+          A LIVELANCE (livelance.com.br) é uma plataforma de intermediação que conecta compradores e vendedores em três
+          modalidades: marketplace (LIVELANCE MARKET), vendas em transmissões ao vivo (LIVELANCE LIVE) e leilões
+          digitais (LIVELANCE LEILÕES).
         </p>
         <h2 className="pt-2 text-lg font-bold">Pontos que a versão final precisa cobrir</h2>
         <ul className="list-disc space-y-1 pl-5">
@@ -22,7 +23,7 @@ export default function Page() {
           <li>Exigência de CPF e telefone verificados para dar lances.</li>
           <li>Programa de afiliados: atribuição, comissões, prazos e cancelamentos.</li>
           <li>Conteúdo de vídeos e lives, moderação e publicidade identificada.</li>
-          <li>Pagamentos processados por provedor autorizado; a BORAH não mantém saldo em custódia.</li>
+          <li>Pagamentos processados por provedor autorizado (LIVELANCE PAY); a LIVELANCE não mantém saldo em custódia.</li>
           <li>Enquadramento das modalidades de leilão perante as regras da profissão de leiloeiro.</li>
         </ul>
       </div>

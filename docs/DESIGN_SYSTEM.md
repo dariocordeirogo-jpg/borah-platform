@@ -1,4 +1,4 @@
-# Design system BORAH
+# Design system LIVELANCE
 
 Fundo branco predominante, verde metálico como cor principal, amarelo metálico como secundária.
 Tokens em `src/app/globals.css` (`@theme`), usados como classes Tailwind (`bg-green`, `text-gold-ink`…).
@@ -15,6 +15,8 @@ Tokens em `src/app/globals.css` (`@theme`), usados como classes Tailwind (`bg-gr
 | `muted` | #5B6B5E | Texto secundário |
 | `surface` | #F5F7F4 | Fundos alternativos |
 | `danger` | #B42318 | Erros, AO VIVO, cronômetro urgente |
+| `green-night` | #0D3B24 | Rodapé e áreas institucionais (texto branco 12,6:1) |
+| `live` | #E5484D | Ponto "ao vivo" (só decorativo, nunca texto) |
 
 Utilitários metálicos: `metal-green`, `metal-gold`, `text-metal-green` — só em elementos de marca.
 
@@ -30,10 +32,27 @@ Utilitários metálicos: `metal-green`, `metal-gold`, `text-metal-green` — só
 
 ## Tipografia
 
-Sora (títulos, `font-display`) e Inter (texto). Logo provisório: símbolo "B" com faísca dourada em `src/components/logo.tsx` — o logo definitivo é entrega separada.
+Sora (títulos, `font-display`) e Inter (texto).
+
+## Logomarca
+
+Símbolo: **play** de transmissão (branco) + **seta de lance subindo** (dourado) + **ponto "ao vivo"** (vermelho),
+sobre quadrado verde metálico. Wordmark: LIVE em verde profundo, LANCE em dourado escuro (≥ 3:1, texto grande).
+
+| Versão | Componente | Arquivo |
+| --- | --- | --- |
+| Horizontal | `<Logo />` | `public/brand/livelance-horizontal.svg` |
+| Vertical | `<LogoStacked />` | `public/brand/livelance-vertical.svg` |
+| Reduzida (símbolo) | `<LogoMark />` | `public/brand/livelance-simbolo.svg`, `src/app/icon.svg` (favicon) |
+| Monocromática | `<Logo mono />`, `<LogoMark mono />` | `public/brand/livelance-simbolo-mono.svg`, `livelance-horizontal-mono-branco.svg` |
+| App / PWA | — | `src/app/apple-icon.png`, `public/brand/icon-192.png`, `icon-512.png`, `icon-maskable-512.png` |
+
+Os SVGs de wordmark usam texto com fonte Sora; para impressão e gráfica, converter o texto em curvas.
+Esta é a versão inicial da marca, feita em código: vale uma revisão por designer antes de materiais impressos.
 
 ## Componentes
 
 `Button`/`ButtonLink` (variantes primary, gold, outline, ghost, light), `AuctionCard`, `UpcomingCard`, `ProductCard`,
-`Countdown`, `Header`, `BottomNav` (celular), `Footer`, `ComingSoon`, formulários de login em `auth-forms.tsx`.
+`Countdown`, `Header` (Comprar · Ao vivo · Leilões sempre visíveis), `BottomNav` (Início, Market, Ao vivo, Leilões, Conta),
+`Footer` (verde escuro), `ComingSoon`, formulários de login e recuperação de senha em `auth-forms.tsx`.
 No celular as fileiras de leilão viram carrossel deslizante.

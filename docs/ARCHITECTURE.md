@@ -1,4 +1,4 @@
-# Arquitetura — Fase 1
+# Arquitetura — LIVELANCE (Fase 1)
 
 | Camada | Tecnologia | Onde |
 | --- | --- | --- |
@@ -12,6 +12,7 @@
 
 - **E-mail e senha:** `signUp` → Supabase envia e-mail de confirmação → link volta em `/auth/callback?code=…` → sessão criada → `/conta`.
 - **Google:** `signInWithGoogle` gera a URL do Supabase (`/auth/v1/authorize?provider=google`) → Google → `/auth/callback`.
+- **Recuperação de senha:** `/recuperar-senha` → `requestPasswordReset` (resposta igual exista ou não a conta) → e-mail → `/auth/callback?next=/nova-senha` → `updatePassword`.
 - **Novo usuário:** o trigger `private.handle_new_user` cria o perfil, dá o papel `buyer` e grava auditoria.
 - **Proteção:** o proxy redireciona `/conta` sem sessão para `/entrar` (checagem otimista); a página confere de novo no servidor.
 - **Redirecionamento seguro:** `safeNextPath` só aceita caminhos internos (bloqueia open redirect).
@@ -22,8 +23,13 @@
 - Cronômetros da home são só de exibição. Na Fase 3, o fim do leilão vem do banco (pg_cron + função `place_bid`).
 - Cabeçalhos de segurança básicos em `next.config.ts` (nosniff, frame DENY, referrer, permissions).
 
-## Configuração pendente no painel do Supabase
+## Marca e SEO
 
-1. **Authentication → URL Configuration:** Site URL e Redirect URLs (`http://localhost:3000/**` e a URL da Vercel).
-2. **Authentication → Providers → Google:** Client ID e Secret do Google Cloud. Sem isso o botão do Google leva a um erro do Supabase.
-3. **Authentication → Emails:** SMTP próprio antes do lançamento (o servidor de e-mail padrão tem limite baixo por hora).
+- Nome, slogan, título, descrição e módulos: `src/lib/site.ts` (fonte única).
+- `metadataBase`, canonical, Open Graph e Twitter: `src/app/layout.tsx`; imagem de compartilhamento: `src/app/opengraph-image.tsx`.
+- `src/app/robots.ts` (bloqueia indexação fora de `https://livelance.com.br`), `src/app/sitemap.ts`, `src/app/manifest.ts` (PWA).
+- Redirecionamentos: `/lances` → `/leiloes`; `www.livelance.com.br` → `livelance.com.br`.
+
+## Configuração pendente
+
+Ver [DEPLOYMENT.md](DEPLOYMENT.md).

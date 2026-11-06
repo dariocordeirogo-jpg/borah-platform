@@ -11,7 +11,7 @@ async function Results({ searchParams }: { searchParams: Promise<{ q?: string | 
     <ComingSoon
       phase="Fase 2"
       title={term ? `Busca por “${term}”` : "Busca"}
-      description="A busca de produtos, leilões e lojas chega junto com o catálogo do Market."
+      description="A busca de produtos, lives, leilões e lojas chega junto com o catálogo do LIVELANCE MARKET."
     />
   );
 }

@@ -68,7 +68,7 @@ export function AuctionCard({ auction }: { auction: DemoAuction }) {
           </div>
         </div>
         <Link
-          href="/lances"
+          href="/leiloes"
           className="metal-gold mt-auto flex h-11 items-center justify-center rounded-full text-sm font-bold text-ink hover:brightness-105"
         >
           Lance mínimo {formatBRL(next)}

@@ -12,6 +12,19 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async redirects() {
+    return [
+      // Endereço antigo do módulo de leilões
+      { source: "/lances", destination: "/leiloes", permanent: true },
+      // www → domínio principal (só tem efeito quando o domínio estiver apontado para a Vercel)
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.livelance.com.br" }],
+        destination: "https://livelance.com.br/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

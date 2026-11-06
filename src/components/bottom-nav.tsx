@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Gavel, Home, PlaySquare, Radio, UserRound } from "lucide-react";
+import { Gavel, Home, Radio, ShoppingBag, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/", label: "Início", icon: Home },
-  { href: "/lances", label: "Lances", icon: Gavel },
+  { href: "/market", label: "Market", icon: ShoppingBag },
   { href: "/ao-vivo", label: "Ao vivo", icon: Radio },
-  { href: "/videos", label: "Vídeos", icon: PlaySquare },
+  { href: "/leiloes", label: "Leilões", icon: Gavel },
   { href: "/conta", label: "Conta", icon: UserRound },
 ];
 

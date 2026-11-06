@@ -67,9 +67,9 @@ async function Account() {
 
       <section className="grid gap-3 sm:grid-cols-3">
         {[
-          { icon: Gavel, title: "Meus lances", text: "Fase 3" },
-          { icon: Store, title: "Minha loja", text: "Fase 2" },
-          { icon: Megaphone, title: "Minhas indicações", text: "Fase 5" },
+          { icon: Gavel, title: "Meus lances", text: "LIVELANCE LEILÕES · Fase 3" },
+          { icon: Store, title: "Minha loja", text: "LIVELANCE SELLER · Fase 2" },
+          { icon: Megaphone, title: "Minhas indicações", text: "Indique e ganhe · Fase 5" },
         ].map((c) => (
           <div key={c.title} className="rounded-[var(--radius-card)] border border-line bg-white p-4">
             <c.icon className="h-6 w-6 text-green" aria-hidden="true" />

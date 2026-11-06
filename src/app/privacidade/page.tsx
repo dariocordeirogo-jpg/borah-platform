@@ -11,7 +11,7 @@ export default function Page() {
       <h1 className="mt-6 font-display text-3xl font-extrabold">Política de privacidade</h1>
       <div className="mt-6 space-y-4 text-sm leading-relaxed text-ink/90">
         <p>
-          Nesta fase a BORAH guarda apenas: nome, e-mail, foto de perfil (quando vem do Google), endereços que você
+          Nesta fase a LIVELANCE guarda apenas: nome, e-mail, foto de perfil (quando vem do Google), endereços que você
           cadastrar e o registro da criação da conta.
         </p>
         <h2 className="pt-2 text-lg font-bold">Pontos que a versão final precisa cobrir (LGPD)</h2>

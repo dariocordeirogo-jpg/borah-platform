@@ -1,4 +1,4 @@
-# BORAH — instruções para o Claude Code
+# LIVELANCE — instruções para o Claude Code
 
 @AGENTS.md
 
@@ -13,6 +13,9 @@
 - Dados de demonstração ficam em `src/lib/demo-data.ts` e são sempre marcados como "Demonstração" na tela.
 - Uma fase só fecha com build, lint, testes unitários, e2e e o teste de RLS (`supabase/tests/`) passando.
 - Toda migration aplicada no Supabase precisa existir em `supabase/migrations/` com o mesmo conteúdo.
+- Marca: o nome público é **LIVELANCE** (slogan "Tudo acontece ao vivo."). Nome, slogan, SEO e módulos vêm de `src/lib/site.ts`.
+  A marca antiga só pode aparecer em migrations já aplicadas e no relatório `docs/BRAND_MIGRATION.md`.
+- Módulos: LIVELANCE MARKET (`/market`), LIVE (`/ao-vivo`), LEILÕES (`/leiloes`), SELLER (`/vender`), PAY.
 
 ## Next.js 16
 
