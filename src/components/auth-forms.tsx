@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 const inputClass =
-  "h-12 w-full rounded-xl border border-line bg-white px-4 text-base outline-none focus:border-green focus:ring-2 focus:ring-green/20 aria-[invalid=true]:border-danger";
+  "h-12 w-full rounded-xl border border-line bg-white px-4 text-base outline-none focus:border-navy-2 focus:ring-2 focus:ring-navy-2/20 aria-[invalid=true]:border-danger";
 
 function FieldError({ id, errors }: { id: string; errors?: string[] }) {
   if (!errors?.length) return null;
@@ -101,7 +101,7 @@ function Alert({ state }: { state: AuthState }) {
     );
   if (state.message)
     return (
-      <p role="status" className="rounded-xl bg-green-soft px-4 py-3 text-sm text-green-deep">
+      <p role="status" className="rounded-xl bg-success-soft px-4 py-3 text-sm text-success">
         {state.message}
       </p>
     );
@@ -134,7 +134,7 @@ export function SignInForm({ next }: { next: string }) {
           <FieldError id="email-erro" errors={state.fieldErrors?.email} />
         </div>
         <PasswordField name="password" autoComplete="current-password" errors={state.fieldErrors?.password} />
-        <Link href="/recuperar-senha" className="-mt-2 block text-right text-sm font-medium text-green-deep hover:underline">
+        <Link href="/recuperar-senha" className="-mt-2 block text-right text-sm font-medium text-navy hover:underline">
           Esqueci minha senha
         </Link>
         <Button type="submit" size="lg" className="w-full" disabled={pending}>
@@ -144,7 +144,7 @@ export function SignInForm({ next }: { next: string }) {
       </form>
       <p className="mt-6 text-center text-sm text-muted">
         Ainda não tem conta?{" "}
-        <Link href="/cadastro" className="font-semibold text-green-deep hover:underline">
+        <Link href="/cadastro" className="font-semibold text-navy hover:underline">
           Criar conta grátis
         </Link>
       </p>
@@ -158,7 +158,7 @@ export function SignUpForm() {
     return (
       <div className="space-y-6">
         <Alert state={state} />
-        <Link href="/entrar" className="block text-center text-sm font-semibold text-green-deep hover:underline">
+        <Link href="/entrar" className="block text-center text-sm font-semibold text-navy hover:underline">
           Já confirmei, quero entrar
         </Link>
       </div>
@@ -208,16 +208,16 @@ export function SignUpForm() {
             <input
               type="checkbox"
               name="acceptTerms"
-              className="mt-0.5 h-5 w-5 rounded accent-[#168447]"
+              className="mt-0.5 h-5 w-5 rounded accent-[#D71920]"
               aria-describedby={state.fieldErrors?.acceptTerms ? "terms-erro" : undefined}
             />
             <span>
               Li e aceito os{" "}
-              <Link href="/termos" className="font-semibold text-green-deep underline">
+              <Link href="/termos" className="font-semibold text-navy underline">
                 Termos de uso
               </Link>{" "}
               e a{" "}
-              <Link href="/privacidade" className="font-semibold text-green-deep underline">
+              <Link href="/privacidade" className="font-semibold text-navy underline">
                 Política de privacidade
               </Link>
               .
@@ -232,7 +232,7 @@ export function SignUpForm() {
       </form>
       <p className="mt-6 text-center text-sm text-muted">
         Já tem conta?{" "}
-        <Link href="/entrar" className="font-semibold text-green-deep hover:underline">
+        <Link href="/entrar" className="font-semibold text-navy hover:underline">
           Entrar
         </Link>
       </p>
@@ -246,7 +246,7 @@ export function ResetRequestForm() {
     return (
       <div className="space-y-6">
         <Alert state={state} />
-        <Link href="/entrar" className="block text-center text-sm font-semibold text-green-deep hover:underline">
+        <Link href="/entrar" className="block text-center text-sm font-semibold text-navy hover:underline">
           Voltar para o login
         </Link>
       </div>
@@ -275,7 +275,7 @@ export function ResetRequestForm() {
         {pending && <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />}
         Enviar link
       </Button>
-      <Link href="/entrar" className="block text-center text-sm text-muted hover:text-green-deep">
+      <Link href="/entrar" className="block text-center text-sm text-muted hover:text-navy">
         Lembrei a senha
       </Link>
     </form>

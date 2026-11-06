@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Termos de uso (rascunho)" };
 export default function Page() {
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
-      <p className="rounded-xl bg-gold-soft px-4 py-3 text-sm font-semibold">
+      <p className="rounded-xl bg-brand-soft text-brand-dark px-4 py-3 text-sm font-semibold">
         RASCUNHO — este texto ainda não foi revisado por advogado e não vale como termo definitivo.
       </p>
       <h1 className="mt-6 font-display text-3xl font-extrabold">Termos de uso da LIVELANCE</h1>

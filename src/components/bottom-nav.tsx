@@ -30,10 +30,10 @@ export function BottomNav() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium",
-                  active ? "text-green-deep" : "text-muted",
+                  active ? "text-brand" : "text-muted",
                 )}
               >
-                <Icon className={cn("h-5 w-5", active && "text-green")} aria-hidden="true" />
+                <Icon className={cn("h-5 w-5", active && "text-brand")} aria-hidden="true" />
                 {label}
               </Link>
             </li>

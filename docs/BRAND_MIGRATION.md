@@ -12,7 +12,7 @@ Data: 2026-11-06. Objetivo: trocar toda a identidade pública para LIVELANCE sem
 | Módulos | LANCES, AO VIVO, MARKET, INDICA, NEGÓCIOS, PAY, VÍDEOS | MARKET, LIVE, LEILÕES, SELLER, PAY (+ "Indique e ganhe" sem marca de módulo) |
 | Rota de leilões | `/lances` | `/leiloes` (antiga redireciona, 308) |
 | Navegação | Lances em destaque | Comprar · Ao vivo · Leilões sempre visíveis, com ícone e cor próprios |
-| Rodapé | Cinza claro | Verde escuro institucional |
+| Rodapé | Cinza claro | Claro, com texto azul-marinho (ver seção 5) |
 | SEO | Título simples | Título, descrição, canonical, Open Graph, Twitter, robots, sitemap, manifest PWA |
 | Pacote npm | `borah-platform` | `livelance` |
 
@@ -39,3 +39,11 @@ O único usuário existente (de teste) teve só o e-mail trocado para `e2e@livel
 Painéis administrativos, painel do vendedor, páginas de produto, páginas de leilão, salas de live, notificações e
 e-mails transacionais além de confirmação e senha ainda não foram construídos (fases 2 a 8). Eles nascem já com a marca
 LIVELANCE e os nomes de módulo de `src/lib/site.ts`.
+
+## 5. Atualização visual (paleta vermelho · azul-marinho · branco)
+
+- Verde removido de toda a interface; tokens novos em `src/app/globals.css` (ver `docs/DESIGN_SYSTEM.md`).
+- Dourado restrito aos botões de compra e lance (`btn-buy`), com teste automático que garante a regra.
+- Logo redesenhada a partir da referência enviada: play 3D vermelho com martelo, órbita e ondas; ícone do app em 3D.
+- Rodapé, topo da home e área do vendedor passaram a ser claros (sem grandes áreas escuras).
+- Templates de e-mail e imagem de compartilhamento na nova paleta. Banco de dados não foi alterado nesta etapa.

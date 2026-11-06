@@ -7,16 +7,10 @@ import { categories } from "@/lib/demo-data";
 
 /** Os três modos de negociar ficam sempre visíveis e com ícone próprio. */
 const mainLinks = [
-  { href: "/market", label: "Comprar", icon: ShoppingBag, tone: "green" },
-  { href: "/ao-vivo", label: "Ao vivo", icon: Radio, tone: "live" },
-  { href: "/leiloes", label: "Leilões", icon: Gavel, tone: "gold" },
+  { href: "/market", label: "Comprar", icon: ShoppingBag },
+  { href: "/ao-vivo", label: "Ao vivo", icon: Radio },
+  { href: "/leiloes", label: "Leilões", icon: Gavel },
 ] as const;
-
-const toneClass = {
-  green: "text-green-deep hover:bg-green-soft",
-  live: "text-danger hover:bg-red-50",
-  gold: "bg-gold-soft text-gold-ink hover:bg-gold-light/50",
-} as const;
 
 async function AccountLink() {
   const user = await getCurrentUser();
@@ -24,9 +18,9 @@ async function AccountLink() {
   return (
     <Link
       href={user ? "/conta" : "/entrar"}
-      className="flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium hover:bg-green-soft"
+      className="flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium hover:bg-surface"
     >
-      <UserRound className="h-5 w-5 text-green" aria-hidden="true" />
+      <UserRound className="h-5 w-5 text-brand" aria-hidden="true" />
       <span className="hidden sm:inline">{user ? `Olá, ${firstName}` : "Entrar"}</span>
       <span className="sr-only sm:hidden">{user ? "Minha conta" : "Entrar"}</span>
     </Link>
@@ -36,7 +30,7 @@ async function AccountLink() {
 function AccountFallback() {
   return (
     <span className="flex items-center gap-2 px-3 py-2 text-sm text-muted">
-      <UserRound className="h-5 w-5 text-green" aria-hidden="true" />
+      <UserRound className="h-5 w-5 text-brand" aria-hidden="true" />
       <span className="hidden sm:inline">Conta</span>
     </span>
   );
@@ -51,7 +45,7 @@ export function Header() {
           <label htmlFor="busca-desktop" className="sr-only">
             Buscar na LIVELANCE
           </label>
-          <div className="flex h-11 items-center rounded-full border border-line bg-surface pl-4 focus-within:border-green">
+          <div className="flex h-11 items-center rounded-full border border-line bg-surface pl-4 focus-within:border-navy-2">
             <input
               id="busca-desktop"
               name="q"
@@ -59,7 +53,7 @@ export function Header() {
               placeholder="Buscar produtos, lives e leilões"
               className="h-full flex-1 bg-transparent text-sm outline-none placeholder:text-muted"
             />
-            <button type="submit" aria-label="Buscar" className="mr-1 flex h-9 w-9 items-center justify-center rounded-full bg-green text-white hover:bg-green-deep">
+            <button type="submit" aria-label="Buscar" className="mr-1 flex h-9 w-9 items-center justify-center rounded-full bg-brand text-white hover:bg-brand-dark">
               <Search className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
@@ -68,8 +62,8 @@ export function Header() {
           <Suspense fallback={<AccountFallback />}>
             <AccountLink />
           </Suspense>
-          <Link href="/carrinho" aria-label="Carrinho" className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-green-soft">
-            <ShoppingCart className="h-5 w-5 text-green" aria-hidden="true" />
+          <Link href="/carrinho" aria-label="Carrinho" className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface">
+            <ShoppingCart className="h-5 w-5 text-brand" aria-hidden="true" />
           </Link>
         </div>
       </div>
@@ -78,7 +72,7 @@ export function Header() {
         <label htmlFor="busca-mobile" className="sr-only">
           Buscar na LIVELANCE
         </label>
-        <div className="flex h-11 items-center rounded-full border border-line bg-surface pl-4 focus-within:border-green">
+        <div className="flex h-11 items-center rounded-full border border-line bg-surface pl-4 focus-within:border-navy-2">
           <Search className="h-4 w-4 text-muted" aria-hidden="true" />
           <input
             id="busca-mobile"
@@ -96,13 +90,13 @@ export function Header() {
             <Link
               key={l.href}
               href={l.href}
-              className={`my-1.5 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold ${toneClass[l.tone]}`}
+              className="my-1.5 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-navy hover:bg-brand-soft hover:text-brand-dark"
             >
-              <l.icon className="h-4 w-4" aria-hidden="true" />
+              <l.icon className="h-4 w-4 text-brand" aria-hidden="true" />
               {l.label}
             </Link>
           ))}
-          <Link href="/vender" className="my-1.5 rounded-full px-3 py-1.5 text-sm font-medium hover:bg-green-soft">
+          <Link href="/vender" className="my-1.5 rounded-full px-3 py-1.5 text-sm font-medium hover:bg-surface">
             Venda na LIVELANCE
           </Link>
           <span className="mx-2 h-5 w-px bg-line" aria-hidden="true" />

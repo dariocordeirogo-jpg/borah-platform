@@ -28,15 +28,15 @@ async function Account() {
   return (
     <div className="space-y-6">
       <section className="flex items-center gap-4 rounded-[var(--radius-card)] border border-line bg-white p-5">
-        <span className="metal-green flex h-14 w-14 items-center justify-center rounded-full font-display text-xl font-bold text-white">
+        <span className="flex h-14 w-14 bg-brand items-center justify-center rounded-full font-display text-xl font-bold text-white">
           {user.displayName.charAt(0).toUpperCase()}
         </span>
         <div className="min-w-0 flex-1">
-          <h1 className="truncate font-display text-xl font-bold">{user.displayName}</h1>
+          <h1 className="truncate font-display text-xl font-bold text-navy">{user.displayName}</h1>
           <p className="truncate text-sm text-muted">{user.email}</p>
           <ul className="mt-2 flex flex-wrap gap-1.5">
             {user.roles.map((r) => (
-              <li key={r} className="rounded-full bg-green-soft px-2.5 py-0.5 text-xs font-semibold text-green-deep">
+              <li key={r} className="rounded-full bg-navy-soft px-2.5 py-0.5 text-xs font-semibold text-navy">
                 {roleLabels[r] ?? r}
               </li>
             ))}
@@ -44,11 +44,11 @@ async function Account() {
         </div>
       </section>
 
-      <section className="rounded-[var(--radius-card)] border border-gold/40 bg-gold-soft p-5">
+      <section className="rounded-[var(--radius-card)] border border-line bg-navy-soft p-5">
         <div className="flex items-start gap-3">
-          <ShieldAlert className="h-6 w-6 shrink-0 text-gold-ink" aria-hidden="true" />
+          <ShieldAlert className="h-6 w-6 shrink-0 text-brand" aria-hidden="true" />
           <div>
-            <h2 className="font-semibold">Verificação para dar lances</h2>
+            <h2 className="font-semibold text-navy">Verificação para dar lances</h2>
             <p className="mt-1 text-sm">
               Para participar dos leilões você vai precisar confirmar CPF e telefone. A verificação chega junto com os
               leilões, na Fase 3.
@@ -72,7 +72,7 @@ async function Account() {
           { icon: Megaphone, title: "Minhas indicações", text: "Indique e ganhe · Fase 5" },
         ].map((c) => (
           <div key={c.title} className="rounded-[var(--radius-card)] border border-line bg-white p-4">
-            <c.icon className="h-6 w-6 text-green" aria-hidden="true" />
+            <c.icon className="h-6 w-6 text-brand" aria-hidden="true" />
             <p className="mt-2 font-semibold">{c.title}</p>
             <p className="text-xs text-muted">Em breve · {c.text}</p>
           </div>

@@ -7,11 +7,13 @@ Resultado em 2026-11-06, depois da migração para LIVELANCE:
 | Build + tipos | `npm run build` | ok |
 | Lint | `npm run lint` | ok, 0 avisos |
 | Unitários | `npm test` | 13/13 |
-| Navegador (1440 px e 375 px) | `npm run test:e2e` | 30/30 |
+| Navegador (1440 px e 375 px) | `npm run test:e2e` | 34/34 |
 | RLS | `supabase/tests/rls_fase1.sql` | 17/17 |
 | Marca antiga no código público | `grep -rniE "b[o0]r[aλΛ]h" src public tests` | 0 ocorrências |
 
 ## O que os testes e2e cobrem
+
+- Paleta: nenhum verde residual (exceto status) e dourado só em botões de comprar/dar lance, em 9 páginas.
 
 - Home LIVELANCE: título SEO, slogan, os três modos (Compre agora, Assista e compre, Dê seu lance), aviso de demonstração e seções.
 - Nenhuma menção à marca antiga no HTML de 9 páginas.
