@@ -2,7 +2,9 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ArrowRight, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Timer, Video } from "lucide-react";
 import { AuctionCard, DemoTag, ProductCard, UpcomingCard } from "@/components/cards";
+import { AuctionCardLive } from "@/components/auctions/auction-card";
 import { MarketProductCard } from "@/components/market";
+import { listAuctions } from "@/lib/auctions/queries";
 import { ButtonLink } from "@/components/ui/button";
 import { listProducts } from "@/lib/market/queries";
 import { categories, endingSoon, liveAuctions, offers, stores, upcoming } from "@/lib/demo-data";
@@ -32,6 +34,47 @@ function SectionHeader({
         {cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
       </Link>
     </div>
+  );
+}
+
+/** Leilões reais em andamento; enquanto não houver nenhum, mostra a vitrine de demonstração. */
+async function LiveAuctions() {
+  const { items, serverNow } = await listAuctions("andamento", 8);
+  if (!items.length) {
+    return (
+      <Rail>
+        {endingSoon.map((a) => (
+          <AuctionCard key={a.id} auction={a} />
+        ))}
+      </Rail>
+    );
+  }
+  return (
+    <Rail>
+      {items.map((a) => (
+        <AuctionCardLive key={a.id} a={a} serverNow={serverNow} />
+      ))}
+    </Rail>
+  );
+}
+
+async function ScheduledAuctions() {
+  const { items, serverNow } = await listAuctions("programados", 6);
+  if (!items.length) {
+    return (
+      <div className="grid gap-3 md:grid-cols-3">
+        {upcoming.map((u) => (
+          <UpcomingCard key={u.id} item={u} />
+        ))}
+      </div>
+    );
+  }
+  return (
+    <Rail>
+      {items.map((a) => (
+        <AuctionCardLive key={a.id} a={a} serverNow={serverNow} />
+      ))}
+    </Rail>
   );
 }
 
@@ -203,11 +246,9 @@ export default function HomePage() {
             href="/leiloes"
             cta="Todos os leilões"
           />
-          <Rail>
-            {endingSoon.map((a) => (
-              <AuctionCard key={a.id} auction={a} />
-            ))}
-          </Rail>
+          <Suspense fallback={<div className="h-80 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
+            <LiveAuctions />
+          </Suspense>
         </section>
 
         <section>
@@ -222,11 +263,9 @@ export default function HomePage() {
             href="/leiloes"
             cta="Ver agenda"
           />
-          <div className="grid gap-3 md:grid-cols-3">
-            {upcoming.map((u) => (
-              <UpcomingCard key={u.id} item={u} />
-            ))}
-          </div>
+          <Suspense fallback={<div className="h-40 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
+            <ScheduledAuctions />
+          </Suspense>
         </section>
 
         <section>

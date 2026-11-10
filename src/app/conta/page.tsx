@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BadgeCheck, Gavel, LogOut, Megaphone, Receipt, ShieldAlert, Store } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions";
 import { Button } from "@/components/ui/button";
+import { getMyVerification } from "@/lib/auctions/queries";
 import { getCurrentUser } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Minha conta" };
@@ -25,6 +26,7 @@ const roleLabels: Record<string, string> = {
 async function Account() {
   const user = await getCurrentUser();
   if (!user) redirect("/entrar?next=/conta");
+  const verification = (await getMyVerification())?.verification;
 
   return (
     <div className="space-y-6">
@@ -47,21 +49,21 @@ async function Account() {
 
       <section className="rounded-[var(--radius-card)] border border-line bg-navy-soft p-5">
         <div className="flex items-start gap-3">
-          <ShieldAlert className="h-6 w-6 shrink-0 text-brand" aria-hidden="true" />
-          <div>
+          {verification ? (
+            <BadgeCheck className="h-6 w-6 shrink-0 text-success" aria-hidden="true" />
+          ) : (
+            <ShieldAlert className="h-6 w-6 shrink-0 text-brand" aria-hidden="true" />
+          )}
+          <div className="flex-1">
             <h2 className="font-semibold text-navy">Verificação para dar lances</h2>
-            <p className="mt-1 text-sm">
-              Para participar dos leilões você vai precisar confirmar CPF e telefone. A verificação chega junto com os
-              leilões, na Fase 3.
-            </p>
-            <ul className="mt-3 space-y-1 text-sm">
-              <li className="flex items-center gap-2">
-                <BadgeCheck className="h-4 w-4 text-muted" aria-hidden="true" /> CPF: não verificado
-              </li>
-              <li className="flex items-center gap-2">
-                <BadgeCheck className="h-4 w-4 text-muted" aria-hidden="true" /> Telefone: não verificado
-              </li>
-            </ul>
+            {verification ? (
+              <p className="mt-1 text-sm">CPF {verification.cpf_masked} confirmado. Você já pode dar lances nos leilões.</p>
+            ) : (
+              <p className="mt-1 text-sm">Para participar dos leilões, confirme seu CPF e celular. Leva menos de 1 minuto.</p>
+            )}
+            <Link href="/conta/verificacao" className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
+              {verification ? "Ver ou atualizar dados" : "Confirmar CPF e celular"}
+            </Link>
           </div>
         </div>
       </section>
@@ -72,7 +74,7 @@ async function Account() {
           user.roles.includes("seller")
             ? { icon: Store, title: "Minha loja", text: "Painel LIVELANCE SELLER", href: "/seller" }
             : { icon: Store, title: "Abrir minha loja", text: "Venda na LIVELANCE", href: "/vender" },
-          { icon: Gavel, title: "Meus lances", text: "Em breve · LIVELANCE LEILÕES (Fase 3)", href: null },
+          { icon: Gavel, title: "Meus lances", text: "Leilões em que você participa", href: "/conta/lances" },
           { icon: Megaphone, title: "Minhas indicações", text: "Em breve · Indique e ganhe (Fase 5)", href: null },
         ].map((c) =>
           c.href ? (

@@ -1,4 +1,4 @@
-// Gerado a partir do banco (Supabase → generate_typescript_types) em 2026-11-06, após a migração fase2_market.
+// Gerado a partir do banco (Supabase → generate_typescript_types) em 2026-11-06, após a migração fase3_leiloes (tabelas de leilão adicionadas à mão, conferidas com a migration).
 // Regenerar sempre que uma migration mudar tabelas, enums ou funções.
 
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
@@ -41,6 +41,99 @@ export type Database = {
           user_id: string;
         };
         Update: Partial<Database["public"]["Tables"]["addresses"]["Insert"]>;
+        Relationships: [];
+      };
+      auctions: {
+        Row: {
+          id: string;
+          lineage_id: string;
+          relist_count: number;
+          store_id: string;
+          product_id: string;
+          title: string;
+          starting_price_cents: number;
+          min_increment_cents: number;
+          reserve_price_cents: number | null;
+          current_price_cents: number | null;
+          leader_id: string | null;
+          leader_alias: string | null;
+          bids_count: number;
+          starts_at: string;
+          ends_at: string;
+          duration: unknown;
+          snipe_window_s: number;
+          snipe_extend_s: number;
+          max_extensions: number;
+          extensions_count: number;
+          status: Database["public"]["Enums"]["auction_status"];
+          outcome: "sold" | "no_bids" | "reserve_not_met" | "unpaid" | "cancelled" | null;
+          winner_id: string | null;
+          winning_bid_cents: number | null;
+          ended_at: string | null;
+          payment_due_at: string | null;
+          order_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: { [k: string]: never };
+        Update: { [k: string]: never };
+        Relationships: [
+          {
+            foreignKeyName: "auctions_store_id_fkey";
+            columns: ["store_id"];
+            isOneToOne: false;
+            referencedRelation: "stores";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "auctions_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      auction_bids: {
+        Row: {
+          id: number;
+          auction_id: string;
+          bidder_id: string;
+          bidder_alias: string;
+          amount_cents: number;
+          idempotency_key: string;
+          created_at: string;
+        };
+        Insert: { [k: string]: never };
+        Update: { [k: string]: never };
+        Relationships: [
+          {
+            foreignKeyName: "auction_bids_auction_id_fkey";
+            columns: ["auction_id"];
+            isOneToOne: false;
+            referencedRelation: "auctions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      bid_blocks: {
+        Row: { user_id: string; blocked_until: string; reason: string; created_at: string };
+        Insert: { [k: string]: never };
+        Update: { [k: string]: never };
+        Relationships: [];
+      };
+      user_verifications: {
+        Row: {
+          user_id: string;
+          cpf_hash: string;
+          cpf_masked: string;
+          phone: string;
+          phone_verified_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: { [k: string]: never };
+        Update: { [k: string]: never };
         Relationships: [];
       };
       audit_logs: {
@@ -331,6 +424,38 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      submit_verification: { Args: { _cpf: string; _phone: string }; Returns: undefined };
+      create_auction: {
+        Args: {
+          _product_id: string;
+          _starting_cents: number;
+          _increment_cents: number;
+          _reserve_cents: number | null;
+          _starts_at: string | null;
+          _duration_minutes: number;
+        };
+        Returns: string;
+      };
+      cancel_auction: { Args: { _auction_id: string }; Returns: undefined };
+      place_bid: { Args: { _auction_id: string; _amount_cents: number; _idempotency_key: string }; Returns: Json };
+      confirm_auction_win: { Args: { _auction_id: string; _address_id: string }; Returns: string };
+      my_auction_status: { Args: { _auction_id: string }; Returns: Json };
+      my_bids: {
+        Args: Record<string, never>;
+        Returns: {
+          auction_id: string;
+          title: string;
+          status: Database["public"]["Enums"]["auction_status"];
+          outcome: string | null;
+          ends_at: string;
+          current_price_cents: number | null;
+          my_max_cents: number;
+          is_leader: boolean;
+          is_winner: boolean;
+          payment_due_at: string | null;
+          order_id: string | null;
+        }[];
+      };
       cancel_order: { Args: { _order_id: string; _reason?: string }; Returns: undefined };
       checkout: { Args: { _address_id: string }; Returns: string[] };
       create_store: { Args: { _description?: string; _name: string; _slug: string }; Returns: string };
@@ -347,6 +472,7 @@ export type Database = {
         | "moderator"
         | "support"
         | "analyst";
+      auction_status: "active" | "ended" | "cancelled";
       order_status: "pending_payment" | "paid" | "shipped" | "delivered" | "cancelled";
       product_condition: "new" | "used" | "refurbished";
       product_status: "draft" | "active" | "paused";

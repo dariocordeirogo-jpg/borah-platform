@@ -71,7 +71,9 @@ export async function removeFromCart(formData: FormData) {
 }
 
 export async function saveAddress(_prev: FormState, formData: FormData): Promise<FormState> {
-  const parsed = addressSchema.safeParse(Object.fromEntries(formData));
+  const { next: _next, ...fields } = Object.fromEntries(formData);
+  void _next;
+  const parsed = addressSchema.safeParse(fields);
   if (!parsed.success) return { fieldErrors: parsed.error.flatten().fieldErrors };
   const { supabase, user } = await requireUser("/checkout");
   const { count } = await supabase.from("addresses").select("id", { count: "exact", head: true }).eq("user_id", user.id);
@@ -79,8 +81,9 @@ export async function saveAddress(_prev: FormState, formData: FormData): Promise
     .from("addresses")
     .insert({ ...parsed.data, user_id: user.id, label: "Entrega", is_default: !count });
   if (error) return { error: "Não foi possível salvar o endereço." };
-  // Recarrega o checkout para a lista de endereços (componente do servidor) incluir o novo.
-  redirect("/checkout");
+  // Recarrega a página de origem (checkout ou arremate) para a lista de endereços incluir o novo.
+  const next = formData.get("next");
+  redirect(typeof next === "string" && /^\/leilao\/[0-9a-f-]{36}\/arremate$/.test(next) ? next : "/checkout");
 }
 
 export async function placeOrder(_prev: FormState, formData: FormData): Promise<FormState> {

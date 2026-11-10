@@ -35,7 +35,8 @@ test("login, conta, sair — e ignora redirecionamento externo", async ({ page }
   await expect(page).toHaveURL(/\/conta$/);
   await expect(page.getByRole("heading", { name: "Teste Automático" })).toBeVisible();
   await expect(page.getByText("Comprador")).toBeVisible();
-  await expect(page.getByText("CPF: não verificado")).toBeVisible();
+  // a usuária de teste pode já ter feito a verificação (teste de leilões)
+  await expect(page.getByRole("link", { name: /Confirmar CPF e celular|Ver ou atualizar dados/ })).toBeVisible();
 
   await page.goto("/");
   await expect(page.getByRole("link", { name: /Olá, Teste|Minha conta/ }).first()).toBeAttached();

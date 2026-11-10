@@ -7,7 +7,7 @@ Plano completo: https://claude.ai/artifact/WBDmP5nMpUWFYPPh3GLm6R
 | 1 Fundação | Projeto, design system, home, login (e-mail e Google), perfis, papéis, RLS | Feita |
 | 1.1 Marca LIVELANCE | Nova marca, logo, SEO, PWA, recuperação de senha, módulos MARKET/LIVE/LEILÕES/SELLER | Feita (aguardando domínio, Vercel e config do Supabase) |
 | 2 LIVELANCE MARKET + SELLER | Lojas, produtos com fotos, busca, carrinho, checkout, pedidos sem pagamento real, painel do vendedor | Feita |
-| 3 LIVELANCE LEILÕES | Verificação de CPF/telefone, `place_bid`, anti-sniping, encerramento por pg_cron, regra de inadimplência | — |
+| 3 LIVELANCE LEILÕES | Verificação de CPF/telefone, `place_bid`, anti-sniping, encerramento por pg_cron, regra de inadimplência, tempo real | Feita (SMS e parecer jurídico pendentes) |
 | 4 LIVELANCE PAY | Provedor com split, Pix, cartão, webhooks, ledger | — |
 | 5 Afiliados | Links, cupons, atribuição, comissões | — |
 | 6 Vídeos | Feed vertical com produto marcado | — |

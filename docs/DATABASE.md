@@ -35,6 +35,31 @@ Funções expostas (validam `auth.uid()` internamente; o aviso do verificador do
 Storage: bucket público `product-images` (JPG/PNG/WebP, até 5 MB); só o dono envia/apaga na pasta da própria loja.
 O servidor confere a assinatura real do arquivo antes de enviar.
 
+## Tabelas (Fase 3 — LIVELANCE LEILÕES)
+
+| Tabela | Conteúdo | Quem lê | Quem escreve |
+| --- | --- | --- | --- |
+| `user_verifications` | CPF (só hash SHA-256 + versão mascarada), celular, data de confirmação por SMS | Dono | Função `submit_verification` |
+| `auctions` | Lote (produto da loja), lance inicial, incremento, reserva, horários, maior lance, líder (apelido), resultado | Todos (exceto cancelados) | Só funções |
+| `auction_bids` | Lances (apelido mascarado, valor, chave de idempotência) | Todos | Só `place_bid` |
+| `auction_events` | Histórico de eventos (criação, lances, prorrogação, encerramento) | Loja dona | Só funções |
+| `auction_bans` / `auction_defaults` / `bid_blocks` | Regra de inadimplência | O próprio usuário | Só funções |
+
+Funções:
+
+| Função | O que faz |
+| --- | --- |
+| `submit_verification(cpf, celular)` | Valida dígitos do CPF, garante um CPF por conta |
+| `create_auction(...)` | Reserva 1 unidade do produto e abre o leilão (agora ou programado, 1 h a 7 dias) |
+| `place_bid(leilão, valor, chave)` | Trava o leilão, confere verificação/bloqueios/incremento/horário, grava o lance, prorroga 2 min se faltar menos de 2 min (máx. 10) |
+| `cancel_auction(leilão)` | Loja cancela só sem lances; estoque volta |
+| `confirm_auction_win(leilão, endereço)` | Vencedor cria o pedido em até 48 h |
+| `my_auction_status`, `my_bids` | Situação do usuário |
+| `private.run_auction_jobs()` (pg_cron, a cada minuto) | Encerra leilões vencidos (vencedor / sem lances / reserva não atingida) e trata arremates não confirmados: perde o lote, banimento daquele lote, lote relançado; 3ª vez → 7 dias sem lances |
+
+Tempo real: `auctions` e `auction_bids` estão na publicação `supabase_realtime`.
+Flag `require_phone_sms` (desligada): quando houver provedor de SMS, exige telefone confirmado para dar lance.
+
 Funções em `private` (fora da API): `has_role`, `is_admin`, `handle_new_user`, `set_updated_at`.
 
 ## Testes de RLS
@@ -49,7 +74,7 @@ Só no projeto de desenvolvimento: `e2e@livelance.test` (comprador), `e2e-compra
 concorrência) e `e2e-vendedor@livelance.test` (vendedor, "Loja E2E LIVELANCE"). Senha `Teste12345`.
 Antes de produção, remover os três, a loja e os produtos de teste.
 
-Testes SQL: `supabase/tests/rls_fase1.sql` (17/17) e `supabase/tests/market_fase2.sql` (21/21).
+Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) e `supabase/tests/leiloes_fase3.sql` (36/36).
 
 ## Migrations aplicadas
 
@@ -62,5 +87,6 @@ Testes SQL: `supabase/tests/rls_fase1.sql` (17/17) e `supabase/tests/market_fase
 | 20261106135733 | fase2_market | Lojas, produtos, fotos, carrinho, pedidos, estoque, funções e bucket |
 | 20261106135747 | fase2_indices_fk | Índices das chaves estrangeiras |
 | 20261106135914 | fase2_catalogo_publico | Visitantes conseguem ler o catálogo (correção achada no teste) |
+| 20261106144634 | fase3_leiloes | Verificação, leilões, lances, inadimplência, pg_cron, tempo real |
 
 As duas primeiras ainda citam a marca antiga em comentários e textos: são histórico já aplicado e não são editadas.

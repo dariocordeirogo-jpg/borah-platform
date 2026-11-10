@@ -32,12 +32,13 @@ function Field({
   );
 }
 
-export function AddressForm({ open }: { open: boolean }) {
+export function AddressForm({ open, next }: { open: boolean; next?: string }) {
   const [state, action, pending] = useActionState(saveAddress, {});
   return (
     <details open={open} className="rounded-[var(--radius-card)] border border-line bg-white p-4">
       <summary className="cursor-pointer text-sm font-semibold text-navy">+ Novo endereço</summary>
       <form action={action} className="mt-4 grid grid-cols-6 gap-3" noValidate>
+        {next && <input type="hidden" name="next" value={next} />}
         {state.error && <p className="col-span-6 rounded-xl bg-red-50 px-3 py-2 text-sm text-danger">{state.error}</p>}
         {state.message && <p role="status" className="col-span-6 rounded-xl bg-success-soft px-3 py-2 text-sm text-success">{state.message}</p>}
         <Field name="recipient" label="Quem vai receber" state={state} autoComplete="name" className="col-span-6" />

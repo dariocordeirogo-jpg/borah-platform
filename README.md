@@ -12,7 +12,7 @@
 
 Domínio pretendido: `livelance.com.br` (ainda não configurado — ver [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
-Status: **Fase 2 — LIVELANCE MARKET + SELLER** concluída: lojas, produtos com fotos, busca, carrinho, checkout e pedidos (sem pagamento real até a Fase 4). Lives e leilões da home ainda são **demonstrações**.
+Status: **Fase 3 — LIVELANCE LEILÕES** concluída (sobre o MARKET + SELLER da Fase 2): leilões imediatos e programados, lances em tempo real, prorrogação automática, encerramento agendado e regra de inadimplência. Pagamento real só na Fase 4. Lives ainda são **demonstração**.
 
 ## Rodar localmente
 
