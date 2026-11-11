@@ -72,6 +72,7 @@ export type Database = {
           ended_at: string | null;
           payment_due_at: string | null;
           order_id: string | null;
+          live_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -525,6 +526,43 @@ export type Database = {
         Update: Record<string, never>;
         Relationships: [];
       };
+      lives: {
+        Row: {
+          id: string;
+          store_id: string;
+          title: string;
+          description: string | null;
+          status: Database["public"]["Enums"]["live_status"];
+          scheduled_at: string;
+          started_at: string | null;
+          ended_at: string | null;
+          playback_url: string | null;
+          pinned_product_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [
+          { foreignKeyName: "lives_store_id_fkey"; columns: ["store_id"]; isOneToOne: false; referencedRelation: "stores"; referencedColumns: ["id"] },
+          { foreignKeyName: "lives_pinned_product_id_fkey"; columns: ["pinned_product_id"]; isOneToOne: false; referencedRelation: "products"; referencedColumns: ["id"] },
+        ];
+      };
+      live_products: {
+        Row: { live_id: string; product_id: string; position: number };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [
+          { foreignKeyName: "live_products_live_id_fkey"; columns: ["live_id"]; isOneToOne: false; referencedRelation: "lives"; referencedColumns: ["id"] },
+          { foreignKeyName: "live_products_product_id_fkey"; columns: ["product_id"]; isOneToOne: false; referencedRelation: "products"; referencedColumns: ["id"] },
+        ];
+      };
+      live_messages: {
+        Row: { id: number; live_id: string; user_id: string; alias: string; body: string; hidden: boolean; created_at: string };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -577,6 +615,17 @@ export type Database = {
       remove_video: { Args: { _video_id: string }; Returns: string };
       toggle_video_like: { Args: { _video_id: string }; Returns: Json };
       register_video_view: { Args: { _video_id: string }; Returns: undefined };
+      create_live: { Args: { _title: string; _description: string | null; _scheduled_at: string; _product_ids: string[] }; Returns: string };
+      set_live_playback: { Args: { _live_id: string; _url: string | null }; Returns: undefined };
+      start_live: { Args: { _live_id: string }; Returns: undefined };
+      end_live: { Args: { _live_id: string }; Returns: undefined };
+      pin_live_product: { Args: { _live_id: string; _product_id: string | null }; Returns: undefined };
+      start_live_auction: {
+        Args: { _live_id: string; _product_id: string; _starting_cents: number; _increment_cents: number; _minutes: number };
+        Returns: string;
+      };
+      send_live_message: { Args: { _live_id: string; _body: string }; Returns: number };
+      hide_live_message: { Args: { _message_id: number }; Returns: undefined };
     };
     Enums: {
       app_role:
@@ -595,6 +644,7 @@ export type Database = {
       payment_status: "created" | "processing" | "succeeded" | "failed" | "expired" | "refunded";
       commission_status: "pending" | "confirmed" | "cancelled";
       video_status: "published" | "removed";
+      live_status: "scheduled" | "live" | "ended" | "cancelled";
       product_condition: "new" | "used" | "refurbished";
       product_status: "draft" | "active" | "paused";
     };

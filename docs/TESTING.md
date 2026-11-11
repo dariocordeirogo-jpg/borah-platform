@@ -1,13 +1,13 @@
 # Testes
 
-Resultado em 2026-11-11, Fase 6 (Vídeos):
+Resultado em 2026-11-11, Fase 7 (LIVELANCE LIVE):
 
 | Verificação | Comando | Resultado |
 | --- | --- | --- |
 | Build + tipos | `npm run build`, `npm run typecheck` | ok |
 | Lint | `npm run lint` | ok, 0 avisos |
-| Unitários | `npm test` | 87/87 (inclui assinatura igual à da biblioteca oficial da Stripe, links de indicação e regras de vídeo) |
-| Navegador (1440 px e 375 px) | `npm run build:e2e && npm run test:e2e` | 55 ok, 21 pulados no celular de propósito (fluxos de compra, leilão, pagamento, indicação e vídeo só no desktop) |
+| Unitários | `npm test` | 95/95 |
+| Navegador (1440 px e 375 px) | `npm run build:e2e && npm run test:e2e` | 60 ok, 26 pulados no celular de propósito (fluxos completos só no desktop) |
 | Concorrência | `npm run test:integration` | Checkout: 5 disputas pela última unidade, sempre 1 pedido. Lances: 20 simultâneos, sequência sempre crescente e consistente |
 | Segurança do banco (Fase 1) | `supabase/tests/rls_fase1.sql` | 17/17 |
 | Motor de pedidos (Fase 2) | `supabase/tests/market_fase2.sql` | 21/21 |
@@ -15,6 +15,7 @@ Resultado em 2026-11-11, Fase 6 (Vídeos):
 | Pagamentos (Fase 4) | `supabase/tests/pay_fase4.sql` | 47/47 |
 | Afiliados (Fase 5) | `supabase/tests/afiliados_fase5.sql` | 22/22 |
 | Vídeos (Fase 6) | `supabase/tests/videos_fase6.sql` | 19/19 |
+| LIVE (Fase 7) | `supabase/tests/live_fase7.sql` | 30/30 |
 | Encerramento automático | `cron.job_run_details` | 5.754 execuções em 4 dias, 0 falhas |
 
 Atrás de proxy (ambiente de nuvem): `NODE_USE_ENV_PROXY=1` nos comandos acima. `build:e2e` desliga o otimizador de imagens
@@ -55,6 +56,14 @@ entra e compra pela tela → comissão "Aguardando pagamento" de R$ 3,00 sobre R
 Vendedor tenta enviar uma imagem (recusada) → publica vídeo WebM com produto marcado e legenda → visitante vê o vídeo
 no feed e ele começa a tocar → precisa entrar para curtir → compradora curte (contador 1, continua curtido após recarregar)
 e usa "Comprar agora" do vídeo → carrinho → vendedor tira do ar → some do feed e o arquivo sai do Storage.
+
+## Live (`tests/e2e/live.spec.ts`)
+
+Loja programa a live com dois produtos → aparece em "Próximas lives" → sala mostra "ainda não começou" e chat fechado →
+loja começa, destaca um produto, link http é recusado e https .m3u8 é salvo → compradora vê o destaque com "Comprar agora"
+e o selo AO VIVO → manda mensagem que aparece no estúdio em tempo real → loja esconde e some na tela da compradora →
+loja abre leilão relâmpago e ele aparece sozinho para quem assiste (R$ 50,00, "Dar lance") → loja encerra e a sala fecha.
+O vídeo em si não é testado: depende do serviço de transmissão.
 
 ## Outros testes e2e
 
