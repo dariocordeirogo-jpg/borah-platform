@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { previewCoupon } from "@/lib/coupons/actions";
 import { placeOrder, saveAddress, type FormState } from "@/lib/market/actions";
 import { UFS } from "@/lib/market/schemas";
 
@@ -72,6 +73,53 @@ export function AddressForm({ open, next }: { open: boolean; next?: string }) {
   );
 }
 
+function CouponField() {
+  const [code, setCode] = useState("");
+  const [result, setResult] = useState<{ ok?: string; error?: string }>({});
+  const [checking, startCheck] = useTransition();
+  return (
+    <div className="space-y-2">
+      <label htmlFor="coupon" className="text-sm font-semibold text-navy">
+        Cupom de desconto <span className="font-normal text-muted">(opcional)</span>
+      </label>
+      <div className="flex gap-2">
+        <input
+          id="coupon"
+          name="coupon"
+          value={code}
+          onChange={(e) => {
+            setCode(e.target.value.toUpperCase());
+            setResult({});
+          }}
+          maxLength={20}
+          autoComplete="off"
+          placeholder="EX.: BEMVINDO10"
+          className={input}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          disabled={!code.trim() || checking}
+          onClick={() => startCheck(async () => setResult(await previewCoupon(code)))}
+        >
+          {checking && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+          Aplicar
+        </Button>
+      </div>
+      {result.ok && (
+        <p className="text-sm text-navy" data-testid="cupom-ok" role="status">
+          {result.ok}
+        </p>
+      )}
+      {result.error && (
+        <p className="text-sm text-danger" role="alert">
+          {result.error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function PlaceOrderForm({
   addresses,
 }: {
@@ -103,6 +151,7 @@ export function PlaceOrderForm({
           ))}
         </fieldset>
       )}
+      {addresses.length > 0 && <CouponField />}
       {state.error && (
         <p role="alert" className="rounded-xl bg-red-50 px-3 py-2 text-sm text-danger">
           {state.error}

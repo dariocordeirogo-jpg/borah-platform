@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
-import { Clapperboard, Gavel, LayoutDashboard, Package, Radio, Receipt, Settings, Wallet } from "lucide-react";
+import { Clapperboard, Gavel, LayoutDashboard, Package, Radio, Receipt, Settings, TicketPercent, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
@@ -13,6 +13,7 @@ const items = [
   { href: "/seller/videos", label: "Vídeos", icon: Clapperboard },
   { href: "/seller/lives", label: "Lives", icon: Radio },
   { href: "/seller/pedidos", label: "Pedidos", icon: Receipt },
+  { href: "/seller/cupons", label: "Cupons", icon: TicketPercent },
   { href: "/seller/pagamentos", label: "Pagamentos", icon: Wallet },
   { href: "/seller/loja", label: "Loja", icon: Settings },
 ];

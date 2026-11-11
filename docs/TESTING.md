@@ -80,6 +80,13 @@ Os filtros que a busca inteligente gera (preço máximo, condição, limpar filt
 é simulado e o teste confere o pedido (modelo, fallback, cache, esforço, esquema) e o tratamento de recusa e de resposta
 cortada. Chamadas reais ao Claude aguardam a chave.
 
+## Cupons (`tests/e2e/coupons.spec.ts`, `supabase/tests/cupons.sql`)
+
+Loja cria o cupom pelo painel, compradora aplica no checkout (prévia e erro de cupom inválido), pedido sai com
+desconto, o mesmo cupom não vale duas vezes e a loja vê o uso. No banco (27 verificações): regras de criação, RLS,
+cupom inválido desfaz o checkout inteiro, desconto só no pedido da loja do cupom, comissão sobre o total com desconto,
+cancelamento devolve o cupom e o desconto nunca zera o pedido.
+
 ## Lançamento (`tests/e2e/launch.spec.ts`)
 
 `/api/health` responde sem expor segredo, cabeçalhos de segurança (HSTS, COOP, nosniff), aviso de versão de testes

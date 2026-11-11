@@ -42,7 +42,10 @@ async function Orders({ searchParams }: { searchParams: Promise<{ erro?: string 
                   Para {a.recipient} · {a.city}/{a.state}
                 </p>
                 <div className="mt-3 flex items-center justify-between gap-3">
-                  <p className="font-bold text-navy">{formatBRL(o.total_cents)}</p>
+                  <p className="font-bold text-navy">
+                    {formatBRL(o.total_cents)}
+                    {o.coupon_code && <span className="ml-2 text-xs font-normal text-muted">cupom {o.coupon_code}</span>}
+                  </p>
                   {o.status === "pending_payment" && (
                     <form action={cancelStoreOrder}>
                       <input type="hidden" name="orderId" value={o.id} />
