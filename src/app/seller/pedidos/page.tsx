@@ -65,7 +65,7 @@ export default function Page({ searchParams }: PageProps<"/seller/pedidos">) {
   return (
     <div className="space-y-4">
       <h1 className="font-display text-2xl font-bold tracking-tight text-navy">Pedidos</h1>
-      <Notice>Os pagamentos (LIVELANCE PAY) chegam na Fase 4. Por enquanto, os pedidos ficam “Aguardando pagamento”.</Notice>
+      <Notice>Pedidos pagos pelo LIVELANCE PAY mudam sozinhos para “Pago”. Veja valores e comissão em Pagamentos.</Notice>
       <Suspense fallback={<div className="h-64 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
         <Orders searchParams={searchParams as Promise<{ erro?: string }>} />
       </Suspense>

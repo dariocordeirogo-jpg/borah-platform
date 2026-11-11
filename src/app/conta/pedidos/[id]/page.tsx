@@ -3,28 +3,38 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Notice } from "@/components/market";
+import { PayBox } from "@/components/pay/pay-box";
 import { OrderStatus } from "@/components/order-status";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth";
 import { formatBRL } from "@/lib/format";
 import { cancelMyOrder } from "@/lib/market/actions";
 import { getOrder } from "@/lib/market/queries";
+import { syncCheckoutReturn } from "@/lib/pay/sync";
 
 export const metadata: Metadata = { title: "Pedido", robots: { index: false } };
 
+type SP = { novo?: string; erro?: string; pagamento?: string; sessao?: string };
 type Addr = { recipient: string; street: string; number: string; complement: string | null; district: string; city: string; state: string; cep: string };
 
-async function Order({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ novo?: string; erro?: string }> }) {
+async function Order({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<SP> }) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const user = await getCurrentUser();
   if (!user) redirect(`/entrar?next=/conta/pedidos/${id}`);
+  // Volta do Checkout da Stripe: confere a sessão antes de mostrar o pedido
+  if (sp.pagamento === "retorno" && sp.sessao) await syncCheckoutReturn(sp.sessao);
   const o = await getOrder(id);
   if (!o || o.buyer_id !== user.id) notFound();
   const a = o.shipping_address as unknown as Addr;
 
   return (
     <div className="space-y-4">
-      {sp.novo && <Notice tone="success">Pedido registrado! A loja já recebeu. O pagamento chega na Fase 4.</Notice>}
+      {sp.novo && <Notice tone="success">Pedido registrado e estoque reservado. Agora é só pagar.</Notice>}
+      {sp.pagamento === "retorno" && o.status === "paid" && <Notice tone="success">Pagamento confirmado! A loja já foi avisada.</Notice>}
+      {sp.pagamento === "retorno" && o.status === "pending_payment" && (
+        <Notice>Pagamento recebido pela Stripe. A confirmação pode levar alguns instantes (Pix e boleto dependem do banco).</Notice>
+      )}
+      {sp.pagamento === "cancelado" && <Notice>Pagamento não concluído. Você pode tentar de novo quando quiser.</Notice>}
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold tracking-tight text-navy">Pedido #{o.number}</h1>
@@ -74,6 +84,8 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
         </p>
       </section>
 
+      <PayBox orderId={o.id} storeId={o.store_id} status={o.status} totalCents={o.total_cents} />
+
       {o.status === "pending_payment" && (
         <form action={cancelMyOrder}>
           <input type="hidden" name="orderId" value={o.id} />
@@ -93,7 +105,7 @@ export default function Page({ params, searchParams }: PageProps<"/conta/pedidos
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <Suspense fallback={<div className="h-64 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
-        <Order params={params} searchParams={searchParams as Promise<{ novo?: string; erro?: string }>} />
+        <Order params={params} searchParams={searchParams as Promise<SP>} />
       </Suspense>
     </div>
   );

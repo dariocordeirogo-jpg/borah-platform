@@ -8,11 +8,11 @@
 | LIVELANCE LIVE | Transmissões ao vivo com chat e produtos vinculados |
 | LIVELANCE LEILÕES | Lotes, lances em tempo real, cronômetro e arrematação |
 | LIVELANCE SELLER | Central do vendedor |
-| LIVELANCE PAY | Pagamentos (só quando houver provedor homologado) |
+| LIVELANCE PAY | Pagamentos pela Stripe Connect, com a comissão retida automaticamente |
 
 Domínio pretendido: `livelance.com.br` (ainda não configurado — ver [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
-Status: **Fase 3 — LIVELANCE LEILÕES** concluída (sobre o MARKET + SELLER da Fase 2): leilões imediatos e programados, lances em tempo real, prorrogação automática, encerramento agendado e regra de inadimplência. Pagamento real só na Fase 4. Lives ainda são **demonstração**.
+Status: **Fase 4 — LIVELANCE PAY** construída (sobre MARKET, SELLER e LEILÕES): Stripe Connect, pagamento do pedido pelo Checkout, avisos assinados conferidos no banco, comissão de 10% e página de recebimentos do vendedor. Falta ligar a chave de **teste** da Stripe (ver [docs/PAYMENTS.md](docs/PAYMENTS.md)); nenhum pagamento real. Lives ainda são **demonstração**.
 
 ## Rodar localmente
 
