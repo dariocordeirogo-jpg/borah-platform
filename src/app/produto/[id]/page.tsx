@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { PackageCheck, ShieldCheck, ShoppingCart, Store, Truck } from "lucide-react";
+import { Flag, PackageCheck, ShieldCheck, ShoppingCart, Store, Truck } from "lucide-react";
 import { Gallery } from "@/components/gallery";
 import { Notice, Price } from "@/components/market";
 import { Button } from "@/components/ui/button";
+import { isStaff } from "@/lib/admin/format";
 import { getCurrentUser } from "@/lib/auth";
 import { addToCart } from "@/lib/market/actions";
 import { conditionLabel } from "@/lib/market/format";
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: PageProps<"/produto/[id]">): 
 async function Product({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ adicionado?: string }> }) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const [p, user] = await Promise.all([getProduct(id), getCurrentUser()]);
-  if (!p || (p.status !== "active" && p.stores?.owner_id !== user?.id)) notFound();
+  if (!p || (p.status !== "active" && p.stores?.owner_id !== user?.id && !isStaff(user?.roles ?? []))) notFound();
   const own = !!user && p.stores?.owner_id === user.id;
   const available = p.status === "active" && p.stock > 0;
   const maxQty = Math.min(p.stock, 10);
@@ -97,6 +98,12 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
             </li>
             <li className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-navy-2" aria-hidden="true" /> Pagamento seguro pelo LIVELANCE PAY
+            </li>
+            <li className="flex items-center gap-2">
+              <Flag className="h-4 w-4 text-navy-2" aria-hidden="true" />
+              <Link href={`/denunciar?tipo=product&id=${p.id}&next=/produto/${p.id}`} className="text-muted hover:text-brand hover:underline">
+                Denunciar este anúncio
+              </Link>
             </li>
           </ul>
         </div>

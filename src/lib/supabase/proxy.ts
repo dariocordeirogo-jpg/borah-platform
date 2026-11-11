@@ -25,7 +25,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Checagem otimista: a página /conta também confere a sessão no servidor.
-  const protectedPaths = ["/conta", "/seller", "/checkout", "/carrinho"];
+  const protectedPaths = ["/conta", "/seller", "/checkout", "/carrinho", "/admin", "/denunciar"];
   if (!user && protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p))) {
     const url = request.nextUrl.clone();
     url.pathname = "/entrar";

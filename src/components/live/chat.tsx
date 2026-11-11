@@ -27,6 +27,7 @@ export function LiveChat({
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const [connected, setConnected] = useState(false);
   const listRef = useRef<HTMLOListElement>(null);
   const channelRef = useRef<ReturnType<ReturnType<typeof getBrowserClient>["channel"]> | null>(null);
 
@@ -44,7 +45,7 @@ export function LiveChat({
         const id = Number((payload as { id?: number }).id);
         setMessages((prev) => (moderator ? prev.map((x) => (x.id === id ? { ...x, hidden: true } : x)) : prev.filter((x) => x.id !== id)));
       })
-      .subscribe();
+      .subscribe((status) => setConnected(status === "SUBSCRIBED"));
     channelRef.current = channel;
     return () => {
       void supabase.removeChannel(channel);
@@ -58,7 +59,7 @@ export function LiveChat({
   const visible = moderator ? messages : messages.filter((m) => !m.hidden);
 
   return (
-    <section aria-label="Chat da live" className="flex h-[420px] flex-col rounded-[var(--radius-card)] border border-line bg-white">
+    <section aria-label="Chat da live" data-realtime={connected ? "on" : "off"} className="flex h-[420px] flex-col rounded-[var(--radius-card)] border border-line bg-white">
       <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-navy">Chat</h2>
       <ol ref={listRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-3 text-sm" data-testid="chat-mensagens">
         {!visible.length && <li className="text-muted">Nenhuma mensagem ainda.</li>}
@@ -104,6 +105,9 @@ export function LiveChat({
                 else {
                   setError(null);
                   setText("");
+                  // Mostra a própria mensagem na hora; o tempo real só confirma (sem duplicar pelo id)
+                  const id = res.id;
+                  if (id) setMessages((prev) => (prev.some((x) => x.id === id) ? prev : [...prev, { id, alias: "Você", body, hidden: false }]));
                 }
               });
             }}

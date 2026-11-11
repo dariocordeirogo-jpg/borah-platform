@@ -313,6 +313,7 @@ export type Database = {
       };
       products: {
         Row: {
+          blocked_reason: string | null;
           category_id: number | null;
           compare_at_cents: number | null;
           condition: Database["public"]["Enums"]["product_condition"];
@@ -563,6 +564,24 @@ export type Database = {
         Update: Record<string, never>;
         Relationships: [];
       };
+      reports: {
+        Row: {
+          id: string;
+          reporter_id: string;
+          kind: Database["public"]["Enums"]["report_kind"];
+          target_id: string;
+          reason: string;
+          details: string | null;
+          status: Database["public"]["Enums"]["report_status"];
+          resolved_by: string | null;
+          resolved_at: string | null;
+          note: string | null;
+          created_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -626,6 +645,21 @@ export type Database = {
       };
       send_live_message: { Args: { _live_id: string; _body: string }; Returns: number };
       hide_live_message: { Args: { _message_id: number }; Returns: undefined };
+      report_content: {
+        Args: { _kind: Database["public"]["Enums"]["report_kind"]; _target_id: string; _reason: string; _details?: string | null };
+        Returns: string;
+      };
+      admin_overview: { Args: Record<string, never>; Returns: Json };
+      admin_block_product: { Args: { _product_id: string; _reason: string }; Returns: undefined };
+      admin_unblock_product: { Args: { _product_id: string }; Returns: undefined };
+      admin_set_store_active: { Args: { _store_id: string; _active: boolean; _reason: string | null }; Returns: undefined };
+      admin_remove_video: { Args: { _video_id: string; _reason: string }; Returns: undefined };
+      admin_end_live: { Args: { _live_id: string; _reason: string }; Returns: undefined };
+      admin_hide_message: { Args: { _message_id: number }; Returns: undefined };
+      admin_resolve_report: {
+        Args: { _report_id: string; _status: Database["public"]["Enums"]["report_status"]; _note?: string | null };
+        Returns: undefined;
+      };
     };
     Enums: {
       app_role:
@@ -645,6 +679,8 @@ export type Database = {
       commission_status: "pending" | "confirmed" | "cancelled";
       video_status: "published" | "removed";
       live_status: "scheduled" | "live" | "ended" | "cancelled";
+      report_kind: "product" | "video" | "live" | "store" | "message";
+      report_status: "open" | "actioned" | "dismissed";
       product_condition: "new" | "used" | "refurbished";
       product_status: "draft" | "active" | "paused";
     };

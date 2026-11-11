@@ -89,11 +89,11 @@ export async function startLiveAuction(formData: FormData) {
   redirect(studio(liveId, error ? liveErrorMessage(error.message) : undefined));
 }
 
-export async function sendMessage(liveId: string, body: string): Promise<{ error?: string }> {
+export async function sendMessage(liveId: string, body: string): Promise<{ error?: string; id?: number }> {
   if (!uuid.safeParse(liveId).success) return { error: liveErrorMessage() };
   const supabase = await createClient();
-  const { error } = await supabase.rpc("send_live_message", { _live_id: liveId, _body: body.slice(0, 400) });
-  return error ? { error: liveErrorMessage(error.message) } : {};
+  const { data, error } = await supabase.rpc("send_live_message", { _live_id: liveId, _body: body.slice(0, 400) });
+  return error ? { error: liveErrorMessage(error.message) } : { id: data ?? undefined };
 }
 
 export async function hideMessage(messageId: number): Promise<{ error?: string }> {

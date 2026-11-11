@@ -106,6 +106,9 @@ test.describe("LIVELANCE LIVE: da programação ao leilão relâmpago", () => {
     await expect(highlight.getByRole("button", { name: "Comprar agora" })).toBeVisible();
     await expect(viewer.getByText("AO VIVO", { exact: true })).toBeVisible();
 
+    // Espera os dois chats conectarem ao tempo real antes de conversar
+    await expect(viewer.getByRole("region", { name: "Chat da live" })).toHaveAttribute("data-realtime", "on");
+    await expect(studio.getByRole("region", { name: "Chat da live" })).toHaveAttribute("data-realtime", "on");
     const text = `Tem em azul? ${run}`;
     await viewer.getByLabel("Mensagem para o chat").fill(text);
     await viewer.getByRole("button", { name: "Enviar mensagem" }).click();
