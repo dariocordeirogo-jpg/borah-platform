@@ -103,7 +103,7 @@ export function CreateStoreForm() {
   );
 }
 
-export function StoreSettingsForm({ store }: { store: { name: string; description: string | null } }) {
+export function StoreSettingsForm({ store }: { store: { name: string; description: string | null; origin_cep: string | null } }) {
   const [state, action, pending] = useActionState(updateStore, {});
   return (
     <form action={action} className="space-y-4" noValidate>
@@ -116,6 +116,23 @@ export function StoreSettingsForm({ store }: { store: { name: string; descriptio
       <div>
         <Label htmlFor="description">Sobre a loja</Label>
         <textarea id="description" name="description" rows={4} maxLength={600} defaultValue={store.description ?? ""} className={`${input} py-2`} />
+      </div>
+      <div>
+        <Label htmlFor="originCep" hint="de onde os pedidos saem">
+          CEP de origem
+        </Label>
+        <input
+          id="originCep"
+          name="originCep"
+          inputMode="numeric"
+          maxLength={9}
+          placeholder="00000-000"
+          defaultValue={store.origin_cep ? store.origin_cep.replace(/(\d{5})(\d{3})/, "$1-$2") : ""}
+          className={`${input} h-11 max-w-48`}
+          aria-describedby="originCep-erro"
+        />
+        <Err id="originCep-erro" state={state} name="originCep" />
+        <p className="mt-1 text-xs text-muted">Com o CEP, o frete (PAC e SEDEX) é calculado no checkout. Sem ele, o frete fica a combinar.</p>
       </div>
       <Button type="submit" disabled={pending}>
         {pending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />} Salvar
@@ -133,6 +150,7 @@ type ProductValues = {
   price_cents?: number;
   compare_at_cents?: number | null;
   stock?: number;
+  weight_grams?: number;
   status?: "draft" | "active" | "paused";
 };
 
@@ -185,7 +203,7 @@ export function ProductForm({
           </select>
         </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4">
         <div>
           <Label htmlFor="price">Preço (R$)</Label>
           <input {...f("price")} inputMode="decimal" placeholder="199,90" defaultValue={centsToInput(product?.price_cents)} className={`${input} h-11`} />
@@ -202,6 +220,13 @@ export function ProductForm({
           <Label htmlFor="stock">Estoque</Label>
           <input {...f("stock")} type="number" min={0} max={100000} defaultValue={product?.stock ?? 1} className={`${input} h-11`} />
           <Err id="stock-erro" state={state} name="stock" />
+        </div>
+        <div>
+          <Label htmlFor="weight" hint="com embalagem">
+            Peso (g)
+          </Label>
+          <input {...f("weight")} type="number" min={1} max={30000} defaultValue={product?.weight_grams ?? 500} className={`${input} h-11`} />
+          <Err id="weight-erro" state={state} name="weight" />
         </div>
       </div>
       <div>

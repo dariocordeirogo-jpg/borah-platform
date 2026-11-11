@@ -18,3 +18,15 @@ describe("live", () => {
     expect(liveErrorMessage()).toMatch(/Tente de novo/);
   });
 });
+
+import { muxPlaybackId } from "@/lib/live/format";
+
+describe("player do Mux", () => {
+  it.each([
+    ["https://stream.mux.com/AbC123xyz456.m3u8", "AbC123xyz456"],
+    ["https://stream.mux.com/AbC123xyz456.m3u8?token=x", null],
+    ["https://outro.com/AbC123xyz456.m3u8", null],
+    ["https://stream.mux.com/../x.m3u8", null],
+    [null, null],
+  ])("%s → %s", (url, id) => expect(muxPlaybackId(url)).toBe(id));
+});

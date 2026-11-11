@@ -101,6 +101,7 @@ export async function placeOrder(_prev: FormState, formData: FormData): Promise<
     _address_id: addressId.data,
     _ref_code: isReferralCode(ref) ? ref : null,
     _coupon_code: coupon || null,
+    _shipping_service: formData.get("shippingService") === "sedex" ? "sedex" : "pac",
   });
   if (error || !data?.length) return { error: marketErrorMessage(error?.message) };
   revalidatePath("/", "layout");

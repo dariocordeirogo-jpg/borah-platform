@@ -49,7 +49,9 @@ limpeza de dados só acontecem com autorização explícita do dono do projeto. 
 - Consolidar as políticas RLS permissivas duplicadas apontadas pelo advisor de performance (8 avisos), com teste de RLS.
 - Revisar índices não usados após algumas semanas de tráfego real.
 - [x] Cupons da loja (ver docs/ROADMAP.md).
-- Frete pelos Correios, SMS de verificação de telefone, e-mails de pedido.
+- [x] Frete por tabela no formato PAC/SEDEX (ver [SHIPPING.md](SHIPPING.md)); trocar pela API dos Correios quando houver contrato.
+- [ ] Revisar os valores da tabela de frete em /admin/frete.
+- SMS de verificação de telefone, e-mails de pedido.
 
 ## O que a Fase 10 já entregou no código
 

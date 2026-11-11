@@ -1,10 +1,13 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { previewCoupon } from "@/lib/coupons/actions";
+import { formatBRL } from "@/lib/format";
 import { placeOrder, saveAddress, type FormState } from "@/lib/market/actions";
+import { quoteShipping } from "@/lib/shipping/actions";
+import { formatDays, formatWeight, shippingServiceLabel, shippingTotal, type ShippingQuote, type ShippingService } from "@/lib/shipping/format";
 import { UFS } from "@/lib/market/schemas";
 
 const input =
@@ -120,23 +123,111 @@ function CouponField() {
   );
 }
 
+function ShippingOptions({ addressId, productsCents }: { addressId: string | null; productsCents: number }) {
+  const [service, setService] = useState<ShippingService>("pac");
+  const [result, setResult] = useState<{ quotes?: ShippingQuote[]; error?: string; for?: string }>({});
+  const [loading, startLoading] = useTransition();
+  useEffect(() => {
+    if (!addressId) return;
+    startLoading(async () => setResult({ ...(await quoteShipping(addressId)), for: addressId }));
+  }, [addressId]);
+
+  const quotes = result.for === addressId ? (result.quotes ?? []) : [];
+  const priced = quotes.filter((q) => q.pac || q.sedex);
+  const toArrange = quotes.filter((q) => !q.pac && !q.sedex);
+  const shipping = shippingTotal(quotes, service);
+  const option = (s: ShippingService) => {
+    const days = Math.max(0, ...priced.map((q) => q[s]?.days ?? 0));
+    return (
+      <label
+        key={s}
+        className="flex flex-1 cursor-pointer items-center justify-between gap-2 rounded-xl border border-line bg-white p-3 text-sm has-[:checked]:border-brand has-[:checked]:bg-brand-soft/40"
+      >
+        <span className="flex items-center gap-2">
+          <input type="radio" name="shippingService" value={s} checked={service === s} onChange={() => setService(s)} className="accent-[#D71920]" />
+          <span>
+            <span className="block font-semibold text-navy">{shippingServiceLabel[s]}</span>
+            <span className="block text-xs text-muted">até {formatDays(days)}</span>
+          </span>
+        </span>
+        <span className="font-semibold text-navy">{formatBRL(shippingTotal(priced, s))}</span>
+      </label>
+    );
+  };
+
+  return (
+    <fieldset className="space-y-2" data-testid="frete">
+      <legend className="mb-2 text-sm font-semibold text-navy">Frete (Correios)</legend>
+      {loading && <p className="text-sm text-muted">Calculando o frete…</p>}
+      {result.error && (
+        <p role="alert" className="text-sm text-danger">
+          {result.error}
+        </p>
+      )}
+      {!loading && priced.length > 0 && <div className="flex gap-2">{(["pac", "sedex"] as const).map(option)}</div>}
+      {!loading && priced.length > 0 && (
+        <ul className="space-y-0.5 text-xs text-muted">
+          {priced.map((q) => (
+            <li key={q.store_id}>
+              {q.store_name}: {formatWeight(q.grams)} · {shippingServiceLabel[service]} {formatBRL(q[service]?.price_cents ?? 0)} ·{" "}
+              {formatDays(q[service]?.days ?? 0)}
+            </li>
+          ))}
+        </ul>
+      )}
+      {!loading && toArrange.length > 0 && (
+        <p className="text-xs text-muted">
+          Frete a combinar com {toArrange.map((q) => q.store_name).join(", ")} (a loja ainda não informou o CEP de origem).
+        </p>
+      )}
+      {!loading && quotes.length > 0 && (
+        <dl className="space-y-1 border-t border-line pt-2 text-sm">
+          <div className="flex justify-between">
+            <dt className="text-muted">Produtos</dt>
+            <dd>{formatBRL(productsCents)}</dd>
+          </div>
+          <div className="flex justify-between">
+            <dt className="text-muted">Frete</dt>
+            <dd data-testid="frete-total">{priced.length ? formatBRL(shipping) : "A combinar"}</dd>
+          </div>
+          <div className="flex justify-between font-bold text-navy">
+            <dt>Total</dt>
+            <dd data-testid="total-com-frete">{formatBRL(productsCents + shipping)}</dd>
+          </div>
+        </dl>
+      )}
+    </fieldset>
+  );
+}
+
 export function PlaceOrderForm({
   addresses,
+  productsCents,
 }: {
+  productsCents: number;
   addresses: { id: string; recipient: string; street: string; number: string; complement: string | null; district: string; city: string; state: string; cep: string; is_default: boolean }[];
 }) {
   const [state, action, pending] = useActionState(placeOrder, {});
+  const initial = addresses.find((a) => a.is_default)?.id ?? addresses[0]?.id ?? null;
+  const [addressId, setAddressId] = useState<string | null>(initial);
   return (
     <form action={action} className="space-y-4">
       {addresses.length > 0 && (
         <fieldset className="space-y-2">
           <legend className="mb-2 text-sm font-semibold text-navy">Entregar em</legend>
-          {addresses.map((a, i) => (
+          {addresses.map((a) => (
             <label
               key={a.id}
               className="flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-white p-3 has-[:checked]:border-brand has-[:checked]:bg-brand-soft/40"
             >
-              <input type="radio" name="addressId" value={a.id} defaultChecked={a.is_default || i === 0} className="mt-1 accent-[#D71920]" />
+              <input
+                type="radio"
+                name="addressId"
+                value={a.id}
+                checked={addressId === a.id}
+                onChange={() => setAddressId(a.id)}
+                className="mt-1 accent-[#D71920]"
+              />
               <span className="text-sm">
                 <span className="block font-semibold text-navy">{a.recipient}</span>
                 <span className="block text-muted">
@@ -151,6 +242,7 @@ export function PlaceOrderForm({
           ))}
         </fieldset>
       )}
+      {addresses.length > 0 && <ShippingOptions addressId={addressId} productsCents={productsCents} />}
       {addresses.length > 0 && <CouponField />}
       {state.error && (
         <p role="alert" className="rounded-xl bg-red-50 px-3 py-2 text-sm text-danger">

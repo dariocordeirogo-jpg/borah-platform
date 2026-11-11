@@ -263,6 +263,8 @@ export type Database = {
           cancelled_reason: string | null;
           coupon_code: string | null;
           discount_cents: number;
+          shipping_service: "pac" | "sedex" | null;
+          shipping_days: number | null;
           created_at: string;
           id: string;
           number: number;
@@ -279,6 +281,8 @@ export type Database = {
           cancelled_reason?: string | null;
           coupon_code?: string | null;
           discount_cents?: number;
+          shipping_service?: "pac" | "sedex" | null;
+          shipping_days?: number | null;
           created_at?: string;
           id?: string;
           number?: never;
@@ -331,8 +335,10 @@ export type Database = {
           store_id: string;
           title: string;
           updated_at: string;
+          weight_grams: number;
         };
         Insert: {
+          weight_grams?: number;
           category_id?: number | null;
           compare_at_cents?: number | null;
           condition?: Database["public"]["Enums"]["product_condition"];
@@ -394,11 +400,13 @@ export type Database = {
           id: string;
           is_active: boolean;
           name: string;
+          origin_cep: string | null;
           owner_id: string;
           slug: string;
           updated_at: string;
         };
         Insert: {
+          origin_cep?: string | null;
           created_at?: string;
           description?: string | null;
           id?: string;
@@ -497,6 +505,19 @@ export type Database = {
           ends_at: string | null;
           is_active: boolean;
           created_at: string;
+          updated_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      shipping_rates: {
+        Row: {
+          service: "pac" | "sedex";
+          zone: "local" | "estadual" | "regional" | "nacional";
+          max_grams: number;
+          price_cents: number;
+          days: number;
           updated_at: string;
         };
         Insert: Record<string, never>;
@@ -678,8 +699,13 @@ export type Database = {
       become_affiliate: { Args: Record<string, never>; Returns: string };
       track_referral: { Args: { _code: string }; Returns: boolean };
       place_order: {
-        Args: { _address_id: string; _ref_code?: string | null; _coupon_code?: string | null };
+        Args: { _address_id: string; _ref_code?: string | null; _coupon_code?: string | null; _shipping_service?: "pac" | "sedex" };
         Returns: string[];
+      };
+      quote_cart_shipping: { Args: { _address_id: string }; Returns: Json };
+      admin_set_shipping_rate: {
+        Args: { _service: string; _zone: string; _max_grams: number; _price_cents: number; _days: number };
+        Returns: undefined;
       };
       check_coupon: { Args: { _code: string }; Returns: Json };
       create_coupon: {

@@ -1,4 +1,5 @@
 import { couponErrorMessage } from "@/lib/coupons/format";
+import { shippingErrorMessage } from "@/lib/shipping/format";
 /**
  * Converte o preço digitado ("1.299,90", "1299.9", "R$ 49") em centavos inteiros.
  * Devolve null quando não é um valor válido.
@@ -49,8 +50,8 @@ export const orderStatusLabel = {
 
 /** Traduz os erros levantados pelas funções do banco (checkout, cancel_order, create_store). */
 export function marketErrorMessage(message: string | undefined): string {
-  const coupon = couponErrorMessage(message);
-  if (coupon) return coupon;
+  const specific = couponErrorMessage(message) ?? shippingErrorMessage(message);
+  if (specific) return specific;
   const [code, detail] = (message ?? "").split(":");
   switch (code) {
     case "insufficient_stock":

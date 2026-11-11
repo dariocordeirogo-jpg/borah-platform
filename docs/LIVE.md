@@ -19,6 +19,11 @@ de celular (RTMP, ex.: Larix Broadcaster); quem assiste recebe o vídeo HLS no p
 
 Sem `MUX_TOKEN_ID` / `MUX_TOKEN_SECRET`, o estúdio diz "em configuração" e a loja pode colar um link HLS de outro serviço.
 
+## Player
+
+Lives com link do Mux (`stream.mux.com`) tocam no **Mux Player** (`@mux/mux-player`, modo `ll-live`, carregado só
+no navegador). Links HLS de outros serviços continuam no hls.js.
+
 ## Configuração
 
 1. Mux → Settings → Access Tokens → gerar token com permissão **Mux Video (Read + Write)** no ambiente certo

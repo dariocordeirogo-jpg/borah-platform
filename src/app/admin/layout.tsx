@@ -8,6 +8,7 @@ const items = [
   { href: "/admin/moderacao", label: "Moderação" },
   { href: "/admin/lojas", label: "Lojas" },
   { href: "/admin/pedidos", label: "Pedidos" },
+  { href: "/admin/frete", label: "Frete" },
 ];
 
 /** Só a equipe vê o menu e as páginas; para os demais a área não existe (404). */
