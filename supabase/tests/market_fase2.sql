@@ -104,7 +104,7 @@ end $$;
 reset role;
 select set_config('request.jwt.claims','{"role":"anon"}',true);
 set local role anon;
-insert into r select 'anônimo vê produto ativo', count(*)=1 from public.products;
+insert into r select 'anônimo vê produto ativo (não o rascunho)', count(*)=1 from public.products where store_id = (select v from ids where k='store');
 do $$ begin
   begin perform 1 from public.orders; insert into r values ('anônimo NÃO lê pedidos', (select count(*) from public.orders)=0);
   exception when others then insert into r values ('anônimo NÃO lê pedidos', true); end;

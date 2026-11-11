@@ -13,7 +13,7 @@ async function Dashboard({ searchParams }: { searchParams: Promise<{ bemvindo?: 
   const cards = [
     { icon: Package, label: "Produtos ativos", value: `${s.activeProducts} de ${s.totalProducts}`, href: "/seller/produtos" },
     { icon: Receipt, label: "Pedidos", value: String(s.orders), hint: `${s.pendingOrders} aguardando pagamento`, href: "/seller/pedidos" },
-    { icon: Wallet, label: "Vendas registradas", value: formatBRL(s.gmvCents), hint: "Sem pagamento real até a Fase 4", href: "/seller/pedidos" },
+    { icon: Wallet, label: "Vendas registradas", value: formatBRL(s.gmvCents), hint: "Pedidos registrados (pagos ou não)", href: "/seller/pedidos" },
     { icon: AlertTriangle, label: "Estoque baixo (≤ 2)", value: String(s.lowStock), href: "/seller/produtos" },
   ];
   return (

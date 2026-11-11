@@ -96,7 +96,7 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
               <Truck className="h-4 w-4 text-navy-2" aria-hidden="true" /> Frete calculado na integração com transportadoras (em breve)
             </li>
             <li className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-navy-2" aria-hidden="true" /> Pagamento seguro pelo LIVELANCE PAY (Fase 4)
+              <ShieldCheck className="h-4 w-4 text-navy-2" aria-hidden="true" /> Pagamento seguro pelo LIVELANCE PAY
             </li>
           </ul>
         </div>

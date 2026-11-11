@@ -62,6 +62,8 @@ export function marketErrorMessage(message: string | undefined): string {
       return "Escolha um endereço de entrega.";
     case "order_not_cancellable":
       return "Este pedido não pode mais ser cancelado.";
+    case "payment_processing":
+      return "Há um pagamento por Pix ou boleto em processamento. Aguarde a confirmação antes de cancelar.";
     case "order_not_found":
       return "Pedido não encontrado.";
     case "store_exists":

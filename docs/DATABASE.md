@@ -62,6 +62,20 @@ Flag `require_phone_sms` (desligada): quando houver provedor de SMS, exige telef
 
 Funções em `private` (fora da API): `has_role`, `is_admin`, `handle_new_user`, `set_updated_at`.
 
+## Tabelas (Fase 4 — LIVELANCE PAY)
+
+| Tabela | Conteúdo | Quem lê | Quem escreve |
+| --- | --- | --- | --- |
+| `store_payment_accounts` | Conta Stripe da loja; `verified` só após aviso assinado `account.updated` | Dono da loja | `register_payout_account` e avisos |
+| `payments` | Valor, comissão, líquido (`net_cents`), status, sessão e PaymentIntent | Comprador e loja | Só funções |
+| `payment_events` | Avisos recebidos (idempotência) | Ninguém pela API | Só `stripe_ingest_event` |
+| `private.payment_settings` | Comissão (bps), tolerância da assinatura, validade da sessão | Fora da API | Migração / SQL |
+
+Funções: `start_order_payment(pedido)`, `attach_checkout_session(pagamento, sessão)`, `register_payout_account(conta)`,
+`stripe_ingest_event(payload, assinatura)` (assinatura conferida com o segredo `stripe_webhook_secret` do Vault),
+`store_accepts_payments(loja)`, `platform_fee_bps()`. `cancel_order` agora recusa pedido com Pix/boleto em processamento.
+Detalhes e configuração: [PAYMENTS.md](PAYMENTS.md).
+
 ## Testes de RLS
 
 `supabase/tests/rls_fase1.sql` roda numa transação com rollback e confere 17 regras
@@ -74,7 +88,7 @@ Só no projeto de desenvolvimento: `e2e@livelance.test` (comprador), `e2e-compra
 concorrência) e `e2e-vendedor@livelance.test` (vendedor, "Loja E2E LIVELANCE"). Senha `Teste12345`.
 Antes de produção, remover os três, a loja e os produtos de teste.
 
-Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) e `supabase/tests/leiloes_fase3.sql` (36/36).
+Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) `supabase/tests/leiloes_fase3.sql` (36/36) e `supabase/tests/pay_fase4.sql` (47/47).
 
 ## Migrations aplicadas
 
@@ -88,5 +102,7 @@ Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2
 | 20261106135747 | fase2_indices_fk | Índices das chaves estrangeiras |
 | 20261106135914 | fase2_catalogo_publico | Visitantes conseguem ler o catálogo (correção achada no teste) |
 | 20261106144634 | fase3_leiloes | Verificação, leilões, lances, inadimplência, pg_cron, tempo real |
+| 20261111120010 | fase4_pay | Contas de recebimento, pagamentos, avisos assinados, reembolso |
+| 20261111120446 | fase4_loja_recebe | `store_accepts_payments` (público, sem expor a conta) |
 
 As duas primeiras ainda citam a marca antiga em comentários e textos: são histórico já aplicado e não são editadas.

@@ -421,6 +421,55 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["user_roles"]["Insert"]>;
         Relationships: [];
       };
+      store_payment_accounts: {
+        Row: {
+          account_id: string;
+          charges_enabled: boolean;
+          created_at: string;
+          details_submitted: boolean;
+          payouts_enabled: boolean;
+          provider: string;
+          requirements_due: string[];
+          store_id: string;
+          updated_at: string;
+          verified: boolean;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [
+          { foreignKeyName: "store_payment_accounts_store_id_fkey"; columns: ["store_id"]; isOneToOne: true; referencedRelation: "stores"; referencedColumns: ["id"] },
+        ];
+      };
+      payments: {
+        Row: {
+          amount_cents: number;
+          buyer_id: string;
+          checkout_session_id: string | null;
+          created_at: string;
+          currency: string;
+          destination_account: string;
+          expires_at: string | null;
+          failure_reason: string | null;
+          fee_cents: number;
+          id: string;
+          needs_refund: boolean;
+          net_cents: number;
+          order_id: string;
+          paid_at: string | null;
+          payment_intent_id: string | null;
+          provider: string;
+          refunded_at: string | null;
+          status: Database["public"]["Enums"]["payment_status"];
+          store_id: string;
+          updated_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [
+          { foreignKeyName: "payments_order_id_fkey"; columns: ["order_id"]; isOneToOne: false; referencedRelation: "orders"; referencedColumns: ["id"] },
+          { foreignKeyName: "payments_store_id_fkey"; columns: ["store_id"]; isOneToOne: false; referencedRelation: "stores"; referencedColumns: ["id"] },
+        ];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -459,6 +508,12 @@ export type Database = {
       cancel_order: { Args: { _order_id: string; _reason?: string }; Returns: undefined };
       checkout: { Args: { _address_id: string }; Returns: string[] };
       create_store: { Args: { _description?: string; _name: string; _slug: string }; Returns: string };
+      platform_fee_bps: { Args: Record<string, never>; Returns: number };
+      start_order_payment: { Args: { _order_id: string }; Returns: Json };
+      attach_checkout_session: { Args: { _payment_id: string; _session_id: string }; Returns: undefined };
+      register_payout_account: { Args: { _account_id: string }; Returns: string };
+      stripe_ingest_event: { Args: { _payload: string; _signature: string }; Returns: Json };
+      store_accepts_payments: { Args: { _store_id: string }; Returns: boolean };
     };
     Enums: {
       app_role:
@@ -474,6 +529,7 @@ export type Database = {
         | "analyst";
       auction_status: "active" | "ended" | "cancelled";
       order_status: "pending_payment" | "paid" | "shipped" | "delivered" | "cancelled";
+      payment_status: "created" | "processing" | "succeeded" | "failed" | "expired" | "refunded";
       product_condition: "new" | "used" | "refurbished";
       product_status: "draft" | "active" | "paused";
     };

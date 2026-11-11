@@ -20,6 +20,8 @@ Variáveis de ambiente (Production e Preview):
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://elygbieuroidqxkifgou.supabase.co` | igual |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | chave publishable do projeto | igual |
 | `NEXT_PUBLIC_SITE_URL` | `https://livelance.com.br` **só depois do passo 1 funcionar** | URL do preview ou deixar vazio |
+| `STRIPE_SECRET_KEY` | `sk_live_...` só com a flag `payments` ligada; antes disso `sk_test_...` | `sk_test_...` |
+| `STRIPE_WEBHOOK_SECRET` | `whsec_...` do endpoint de produção (o mesmo vai no Vault) | `whsec_...` de teste |
 
 `NEXT_PUBLIC_SITE_URL` controla canonical, Open Graph, sitemap e robots. Enquanto não for exatamente
 `https://livelance.com.br`, o `robots.txt` bloqueia indexação (evita o Google indexar previews).
@@ -38,4 +40,4 @@ Variáveis de ambiente (Production e Preview):
 
 ## 4. O que ainda não existe e entra quando o módulo for construído
 
-CORS e webhooks (pagamentos, vídeo), URLs de API externas e páginas dinâmicas no sitemap (produtos, lojas, lives, lotes).
+Webhook da Stripe já existe em `/api/webhooks/stripe` (ver [PAYMENTS.md](PAYMENTS.md)). CORS e webhooks de vídeo, URLs de API externas e páginas dinâmicas no sitemap (produtos, lojas, lives, lotes).

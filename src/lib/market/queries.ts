@@ -203,7 +203,7 @@ export async function getMyAddresses() {
 }
 
 const ORDER_SELECT =
-  "id, number, status, subtotal_cents, shipping_cents, total_cents, shipping_address, cancelled_reason, created_at, buyer_id, stores(name, slug, owner_id), order_items(id, title, unit_price_cents, quantity, product_id)" as const;
+  "id, number, status, subtotal_cents, shipping_cents, total_cents, shipping_address, cancelled_reason, created_at, buyer_id, store_id, stores(name, slug, owner_id), order_items(id, title, unit_price_cents, quantity, product_id)" as const;
 
 export async function getMyOrders() {
   const supabase = await db();
