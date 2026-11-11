@@ -35,7 +35,7 @@ export async function getOpenReports() {
   const supabase = await db();
   const { data } = await supabase
     .from("reports")
-    .select("id, kind, target_id, reason, details, created_at")
+    .select("id, kind, target_id, reason, details, created_at, ai_triage")
     .eq("status", "open")
     .order("created_at")
     .limit(100);

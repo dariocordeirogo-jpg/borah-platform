@@ -1,13 +1,13 @@
 # Testes
 
-Resultado em 2026-11-11, Fase 8 (Admin):
+Resultado em 2026-11-11, Fase 9 (IA):
 
 | Verificação | Comando | Resultado |
 | --- | --- | --- |
 | Build + tipos | `npm run build`, `npm run typecheck` | ok |
 | Lint | `npm run lint` | ok, 0 avisos |
-| Unitários | `npm test` | 98/98 |
-| Navegador (1440 px e 375 px) | `npm run build:e2e && npm run test:e2e` | 63 ok, 29 pulados no celular de propósito (fluxos completos só no desktop) |
+| Unitários | `npm test` | 107/107 (inclui o pedido ao Claude conferido com o SDK simulado) |
+| Navegador (1440 px e 375 px) | `npm run build:e2e && npm run test:e2e` | 65 ok, 31 pulados no celular de propósito (fluxos completos só no desktop) |
 | Concorrência | `npm run test:integration` | Checkout: 5 disputas pela última unidade, sempre 1 pedido. Lances: 20 simultâneos, sequência sempre crescente e consistente |
 | Segurança do banco (Fase 1) | `supabase/tests/rls_fase1.sql` | 17/17 |
 | Motor de pedidos (Fase 2) | `supabase/tests/market_fase2.sql` | 21/21 |
@@ -17,6 +17,7 @@ Resultado em 2026-11-11, Fase 8 (Admin):
 | Vídeos (Fase 6) | `supabase/tests/videos_fase6.sql` | 19/19 |
 | LIVE (Fase 7) | `supabase/tests/live_fase7.sql` | 30/30 |
 | Admin (Fase 8) | `supabase/tests/admin_fase8.sql` | 26/26 |
+| IA (Fase 9) | `supabase/tests/ia_fase9.sql` | 11/11 |
 | Encerramento automático | `cron.job_run_details` | 5.754 execuções em 4 dias, 0 falhas |
 
 Atrás de proxy (ambiente de nuvem): `NODE_USE_ENV_PROXY=1` nos comandos acima. `build:e2e` desliga o otimizador de imagens
@@ -71,6 +72,13 @@ O vídeo em si não é testado: depende do serviço de transmissão.
 Compradora denuncia um anúncio (segunda denúncia do mesmo item é recusada) e `/admin` não existe para ela (404, sem menu) →
 admin vê a denúncia, tentar bloquear sem motivo é recusado, com motivo o produto sai do site e a loja não consegue reativar →
 admin desbloqueia em Moderação → suspende a loja (página da loja some) e reativa. O `afterAll` garante loja ativa e produto pausado.
+
+## IA (`tests/e2e/ai.spec.ts` e `tests/unit/ai.test.ts`)
+
+Sem chave no ambiente de teste: a busca inteligente não aparece e o cadastro mostra "Descrição com IA: em configuração".
+Os filtros que a busca inteligente gera (preço máximo, condição, limpar filtros) são testados pela URL. Nos unitários, o SDK
+é simulado e o teste confere o pedido (modelo, fallback, cache, esforço, esquema) e o tratamento de recusa e de resposta
+cortada. Chamadas reais ao Claude aguardam a chave.
 
 ## Outros testes e2e
 

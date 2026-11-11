@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import type { FormState } from "@/lib/market/actions";
 import { centsToInput, slugify } from "@/lib/market/format";
 import { createStore, saveProduct, updateStore, uploadProductImages } from "@/app/seller/actions";
+import { DescribeWithAI } from "@/components/ai/describe-button";
 
 const input =
   "w-full rounded-xl border border-line bg-white px-3 text-base outline-none focus:border-navy-2 focus:ring-2 focus:ring-navy-2/20 aria-[invalid=true]:border-danger";
@@ -135,7 +136,15 @@ type ProductValues = {
   status?: "draft" | "active" | "paused";
 };
 
-export function ProductForm({ product, categories }: { product?: ProductValues; categories: { id: number; name: string }[] }) {
+export function ProductForm({
+  product,
+  categories,
+  aiEnabled = false,
+}: {
+  product?: ProductValues;
+  categories: { id: number; name: string }[];
+  aiEnabled?: boolean;
+}) {
   const [state, action, pending] = useActionState(saveProduct, {});
   const f = (name: string) => ({
     id: name,
@@ -200,6 +209,9 @@ export function ProductForm({ product, categories }: { product?: ProductValues; 
           Descrição
         </Label>
         <textarea {...f("description")} rows={6} maxLength={5000} defaultValue={product?.description ?? ""} className={`${input} py-2`} />
+        <div className="mt-2">
+          <DescribeWithAI productId={product?.id} enabled={aiEnabled} />
+        </div>
       </div>
       <div>
         <Label htmlFor="status">Situação</Label>

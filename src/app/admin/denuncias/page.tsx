@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button";
 import { actOnReport } from "@/lib/admin/actions";
 import { reportActionLabel, reportKindLabel, reportReasons, type ReportKind, type ReportReason } from "@/lib/admin/format";
 import { getOpenReports } from "@/lib/admin/queries";
+import { triageReport } from "@/lib/ai/actions";
+import { aiConfigured } from "@/lib/ai/claude";
+
+type AiTriage = { severity: "baixa" | "media" | "alta"; recommendation: "agir" | "descartar" | "revisar"; rationale: string };
+const severityLabel = { baixa: "Baixa", media: "Média", alta: "Alta" } as const;
+const recommendationLabel = { agir: "Agir", descartar: "Descartar", revisar: "Revisar com atenção" } as const;
 
 export const metadata: Metadata = { title: "Denúncias", robots: { index: false } };
 type SP = { erro?: string; ok?: string };
@@ -25,6 +31,7 @@ function targetHref(kind: ReportKind, id: string): string | null {
 
 async function Reports({ searchParams }: { searchParams: Promise<SP> }) {
   const [reports, sp] = await Promise.all([getOpenReports(), searchParams]);
+  const aiEnabled = aiConfigured();
   return (
     <div className="space-y-4">
       <h1 className="font-display text-2xl font-bold tracking-tight text-navy">Denúncias</h1>
@@ -49,6 +56,25 @@ async function Reports({ searchParams }: { searchParams: Promise<SP> }) {
                 <p className="text-xs text-muted">
                   Item: {href ? <Link href={href} className="text-brand hover:underline">{r.target_id}</Link> : r.target_id}
                 </p>
+                {r.ai_triage ? (
+                  <div className="rounded-lg bg-navy-soft p-3 text-sm text-navy" data-testid="triagem-ia">
+                    <p className="text-xs font-semibold">
+                      Sugestão da IA · gravidade {severityLabel[(r.ai_triage as AiTriage).severity]} ·{" "}
+                      {recommendationLabel[(r.ai_triage as AiTriage).recommendation]}
+                    </p>
+                    <p className="mt-1">{(r.ai_triage as AiTriage).rationale}</p>
+                    <p className="mt-1 text-xs text-muted">É só uma sugestão: a decisão é da equipe.</p>
+                  </div>
+                ) : (
+                  aiEnabled && (
+                    <form action={triageReport}>
+                      <input type="hidden" name="reportId" value={r.id} />
+                      <Button type="submit" size="sm" variant="ghost">
+                        Analisar com IA
+                      </Button>
+                    </form>
+                  )
+                )}
                 <form action={actOnReport} className="flex flex-wrap items-center gap-2">
                   <input type="hidden" name="reportId" value={r.id} />
                   <input type="hidden" name="kind" value={r.kind} />

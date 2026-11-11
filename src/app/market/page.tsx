@@ -6,6 +6,8 @@ import { EmptyState, Pagination, ProductGrid } from "@/components/market";
 import { ButtonLink } from "@/components/ui/button";
 import { getCategories, listProducts, type SortKey } from "@/lib/market/queries";
 import { cn } from "@/lib/utils";
+import { SmartSearch } from "@/components/ai/smart-search";
+import { aiConfigured } from "@/lib/ai/claude";
 
 export const metadata: Metadata = {
   title: "Marketplace",
@@ -13,7 +15,21 @@ export const metadata: Metadata = {
   alternates: { canonical: "/market" },
 };
 
-type SP = Promise<{ q?: string | string[]; categoria?: string | string[]; ordem?: string | string[]; pagina?: string | string[] }>;
+type SP = Promise<{
+  q?: string | string[];
+  categoria?: string | string[];
+  ordem?: string | string[];
+  pagina?: string | string[];
+  preco_min?: string | string[];
+  preco_max?: string | string[];
+  condicao?: string | string[];
+  ia?: string | string[];
+}>;
+const conditions = { new: "Novo", used: "Usado", refurbished: "Recondicionado" } as const;
+const reais = (v: string | undefined) => {
+  const n = Math.floor(Number(v));
+  return Number.isFinite(n) && n > 0 && n <= 10_000_000 ? n : undefined;
+};
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 const sorts: { key: SortKey; label: string }[] = [
   { key: "recentes", label: "Mais recentes" },
@@ -27,10 +43,23 @@ async function Catalog({ searchParams }: { searchParams: SP }) {
   const categoria = one(sp.categoria) || undefined;
   const ordem = (sorts.find((s) => s.key === one(sp.ordem))?.key ?? "recentes") as SortKey;
   const page = Math.max(1, Number(one(sp.pagina)) || 1);
+  const precoMin = reais(one(sp.preco_min));
+  const precoMax = reais(one(sp.preco_max));
+  const condicaoRaw = one(sp.condicao);
+  const condicao = condicaoRaw && condicaoRaw in conditions ? (condicaoRaw as keyof typeof conditions) : undefined;
+  const viaIA = one(sp.ia) === "1";
 
   const [categories, result] = await Promise.all([
     getCategories(),
-    listProducts({ q, categorySlug: categoria, sort: ordem, page }),
+    listProducts({
+      q,
+      categorySlug: categoria,
+      sort: ordem,
+      page,
+      minPriceCents: precoMin ? precoMin * 100 : undefined,
+      maxPriceCents: precoMax ? precoMax * 100 : undefined,
+      condition: condicao,
+    }),
   ]);
   const current = categories.find((c) => c.slug === categoria);
 
@@ -40,6 +69,9 @@ async function Catalog({ searchParams }: { searchParams: SP }) {
       q,
       categoria,
       ordem: ordem === "recentes" ? undefined : ordem,
+      preco_min: precoMin,
+      preco_max: precoMax,
+      condicao,
       pagina: undefined,
       ...over,
     };
@@ -73,6 +105,7 @@ async function Catalog({ searchParams }: { searchParams: SP }) {
             </button>
           </div>
         </form>
+        {aiConfigured() && <SmartSearch />}
         <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-brand">Categorias</h2>
         <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-col md:gap-0.5 md:px-0">
           <li>
@@ -112,6 +145,19 @@ async function Catalog({ searchParams }: { searchParams: SP }) {
             <p className="text-sm text-muted">
               {result.total} {result.total === 1 ? "produto" : "produtos"}
             </p>
+            {(precoMin || precoMax || condicao) && (
+              <ul className="mt-2 flex flex-wrap gap-1.5 text-xs" aria-label="Filtros aplicados" data-testid="filtros-aplicados">
+                {viaIA && <li className="rounded-full bg-navy px-2.5 py-1 font-semibold text-white">Entendido pela IA</li>}
+                {precoMin && <li className="rounded-full bg-navy-soft px-2.5 py-1 text-navy">a partir de R$ {precoMin}</li>}
+                {precoMax && <li className="rounded-full bg-navy-soft px-2.5 py-1 text-navy">até R$ {precoMax}</li>}
+                {condicao && <li className="rounded-full bg-navy-soft px-2.5 py-1 text-navy">{conditions[condicao]}</li>}
+                <li>
+                  <Link href={href({ preco_min: undefined, preco_max: undefined, condicao: undefined })} className="px-1 text-brand hover:underline">
+                    Limpar filtros
+                  </Link>
+                </li>
+              </ul>
+            )}
           </div>
           <nav aria-label="Ordenar" className="flex flex-wrap gap-1 text-sm">
             {sorts.map((s) => (

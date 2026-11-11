@@ -576,6 +576,7 @@ export type Database = {
           resolved_by: string | null;
           resolved_at: string | null;
           note: string | null;
+          ai_triage: Json | null;
           created_at: string;
         };
         Insert: Record<string, never>;
@@ -656,6 +657,8 @@ export type Database = {
       admin_remove_video: { Args: { _video_id: string; _reason: string }; Returns: undefined };
       admin_end_live: { Args: { _live_id: string; _reason: string }; Returns: undefined };
       admin_hide_message: { Args: { _message_id: number }; Returns: undefined };
+      ai_take_quota: { Args: { _feature: "description" | "search" | "triage" }; Returns: boolean };
+      admin_set_report_triage: { Args: { _report_id: string; _triage: Json }; Returns: undefined };
       admin_resolve_report: {
         Args: { _report_id: string; _status: Database["public"]["Enums"]["report_status"]; _note?: string | null };
         Returns: undefined;

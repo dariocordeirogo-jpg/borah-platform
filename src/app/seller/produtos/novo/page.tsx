@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { aiConfigured } from "@/lib/ai/claude";
 import { Suspense } from "react";
 import { ProductForm } from "@/components/seller-forms";
 import { getCategories } from "@/lib/market/queries";
@@ -9,7 +10,7 @@ export const metadata: Metadata = { title: "Novo produto" };
 async function NewProduct() {
   await requireStore("/seller/produtos/novo");
   const categories = await getCategories();
-  return <ProductForm categories={categories} />;
+  return <ProductForm categories={categories} aiEnabled={aiConfigured()} />;
 }
 
 export default function Page() {
