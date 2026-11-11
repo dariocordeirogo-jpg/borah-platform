@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { isCouponCode, normalizeCouponCode } from "@/lib/coupons/format";
 import { createClient } from "@/lib/supabase/server";
 import { isReferralCode, REF_COOKIE } from "@/lib/affiliates/format";
 import { marketErrorMessage } from "@/lib/market/format";
@@ -94,9 +95,12 @@ export async function placeOrder(_prev: FormState, formData: FormData): Promise<
   const { supabase } = await requireUser("/checkout");
   // Indicação (cookie do link /r/<código>): o banco decide se gera comissão
   const ref = (await cookies()).get(REF_COOKIE)?.value;
-  const { data, error } = await supabase.rpc("checkout_with_ref", {
+  const coupon = normalizeCouponCode(String(formData.get("coupon") ?? ""));
+  if (coupon && !isCouponCode(coupon)) return { error: marketErrorMessage("coupon_invalid") };
+  const { data, error } = await supabase.rpc("place_order", {
     _address_id: addressId.data,
     _ref_code: isReferralCode(ref) ? ref : null,
+    _coupon_code: coupon || null,
   });
   if (error || !data?.length) return { error: marketErrorMessage(error?.message) };
   revalidatePath("/", "layout");

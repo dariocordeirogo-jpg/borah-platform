@@ -68,6 +68,12 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
             <dt className="text-muted">Frete</dt>
             <dd className="text-muted">A combinar</dd>
           </div>
+          {o.discount_cents > 0 && (
+            <div className="flex justify-between" data-testid="desconto">
+              <dt className="text-muted">Desconto{o.coupon_code ? ` (cupom ${o.coupon_code})` : ""}</dt>
+              <dd className="text-navy">− {formatBRL(o.discount_cents)}</dd>
+            </div>
+          )}
           <div className="flex justify-between text-base font-bold text-navy">
             <dt>Total</dt>
             <dd>{formatBRL(o.total_cents)}</dd>

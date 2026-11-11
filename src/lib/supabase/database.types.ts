@@ -261,6 +261,8 @@ export type Database = {
         Row: {
           buyer_id: string;
           cancelled_reason: string | null;
+          coupon_code: string | null;
+          discount_cents: number;
           created_at: string;
           id: string;
           number: number;
@@ -275,6 +277,8 @@ export type Database = {
         Insert: {
           buyer_id: string;
           cancelled_reason?: string | null;
+          coupon_code?: string | null;
+          discount_cents?: number;
           created_at?: string;
           id?: string;
           number?: never;
@@ -478,6 +482,33 @@ export type Database = {
         Update: Record<string, never>;
         Relationships: [];
       };
+      coupons: {
+        Row: {
+          id: string;
+          store_id: string;
+          code: string;
+          kind: Database["public"]["Enums"]["coupon_kind"];
+          percent_off: number | null;
+          amount_off_cents: number | null;
+          min_subtotal_cents: number;
+          max_uses: number | null;
+          uses_count: number;
+          starts_at: string | null;
+          ends_at: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      coupon_redemptions: {
+        Row: { coupon_id: string; user_id: string; order_id: string; discount_cents: number; created_at: string };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
       affiliate_clicks: {
         Row: { user_id: string; day: string; clicks: number };
         Insert: Record<string, never>;
@@ -646,6 +677,24 @@ export type Database = {
       }
       become_affiliate: { Args: Record<string, never>; Returns: string };
       track_referral: { Args: { _code: string }; Returns: boolean };
+      place_order: {
+        Args: { _address_id: string; _ref_code?: string | null; _coupon_code?: string | null };
+        Returns: string[];
+      };
+      check_coupon: { Args: { _code: string }; Returns: Json };
+      create_coupon: {
+        Args: {
+          _code: string;
+          _kind: Database["public"]["Enums"]["coupon_kind"];
+          _value: number;
+          _min_subtotal_cents?: number;
+          _max_uses?: number | null;
+          _starts_at?: string | null;
+          _ends_at?: string | null;
+        };
+        Returns: string;
+      };
+      set_coupon_active: { Args: { _coupon_id: string; _active: boolean }; Returns: undefined };
       checkout_with_ref: { Args: { _address_id: string; _ref_code?: string | null }; Returns: string[] };
       create_video: { Args: { _product_id: string; _path: string; _caption?: string | null }; Returns: string };
       remove_video: { Args: { _video_id: string }; Returns: string };
@@ -696,6 +745,7 @@ export type Database = {
       order_status: "pending_payment" | "paid" | "shipped" | "delivered" | "cancelled";
       payment_status: "created" | "processing" | "succeeded" | "failed" | "expired" | "refunded";
       commission_status: "pending" | "confirmed" | "cancelled";
+      coupon_kind: "percent" | "fixed";
       video_status: "published" | "removed";
       live_status: "scheduled" | "live" | "ended" | "cancelled";
       report_kind: "product" | "video" | "live" | "store" | "message";

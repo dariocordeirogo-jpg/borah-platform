@@ -14,6 +14,7 @@ Plano completo: https://claude.ai/artifact/WBDmP5nMpUWFYPPh3GLm6R
 | 7 LIVELANCE LIVE | Programação, chat em tempo real com moderação, destaque, leilão relâmpago, player HLS | Construída; transmissão pelo Mux (ver docs/LIVE.md) |
 | 8 Admin | Denúncias, moderação, lojas, pedidos, números da plataforma, papéis da equipe | Construída |
 | 9 IA | Descrição com IA, busca inteligente, triagem de denúncias (Claude), cota diária | Construída (falta a chave da API) |
+| Pós-lançamento: cupons | Cupom da loja (% ou R$), compra mínima, limite de usos, validade, um uso por comprador, devolvido se o pedido for cancelado; desconto sai da loja e as comissões usam o total com desconto | Construída |
 | 10 Homologação e lançamento | Health check, cabeçalhos de segurança, CI, Termos/Privacidade (rascunho LGPD), script de limpeza, checklist | Construída (lançamento depende dos itens em docs/LAUNCH.md) |
 
 ## Regras de leilão já decididas
