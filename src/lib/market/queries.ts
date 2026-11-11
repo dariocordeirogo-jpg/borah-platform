@@ -65,6 +65,9 @@ export async function listProducts(opts: {
   sort?: SortKey;
   page?: number;
   limit?: number;
+  minPriceCents?: number;
+  maxPriceCents?: number;
+  condition?: Enums<"product_condition">;
 }) {
   const supabase = await db();
   const limit = opts.limit ?? PAGE_SIZE;
@@ -80,6 +83,9 @@ export async function listProducts(opts: {
   let query = supabase.from("products").select(CARD_SELECT, { count: "exact" }).eq("status", "active");
   if (categoryId) query = query.eq("category_id", categoryId);
   if (opts.storeId) query = query.eq("store_id", opts.storeId);
+  if (opts.minPriceCents) query = query.gte("price_cents", opts.minPriceCents);
+  if (opts.maxPriceCents) query = query.lte("price_cents", opts.maxPriceCents);
+  if (opts.condition) query = query.eq("condition", opts.condition);
   if (opts.q) query = query.textSearch("search", opts.q, { type: "websearch", config: "portuguese" });
 
   if (opts.sort === "menor-preco") query = query.order("price_cents", { ascending: true });

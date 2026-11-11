@@ -129,6 +129,12 @@ insert into public.user_roles (user_id, role)
 select id, 'admin_super' from auth.users where email = 'SEU-EMAIL' on conflict do nothing;
 ```
 
+## Fase 9 — IA
+
+`private.ai_usage` (cota por pessoa, recurso e dia; fora da API), `ai_take_quota(recurso)` (30 descrições, 60 buscas,
+300 triagens/dia; triagem só equipe; flag `ai`), `reports.ai_triage` e `admin_set_report_triage` (só valores da lista).
+Detalhes em [AI.md](AI.md).
+
 ## Testes de RLS
 
 `supabase/tests/rls_fase1.sql` roda numa transação com rollback e confere 17 regras
@@ -141,7 +147,7 @@ Só no projeto de desenvolvimento: `e2e@livelance.test` (comprador), `e2e-compra
 concorrência) `e2e-vendedor@livelance.test` (vendedor, "Loja E2E LIVELANCE") e `e2e-admin@livelance.test` (equipe, `admin_super`). Senha `Teste12345`.
 Antes de produção, remover os quatro, a loja e os produtos de teste.
 
-Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) `supabase/tests/leiloes_fase3.sql` (36/36) `supabase/tests/pay_fase4.sql` (47/47) `supabase/tests/afiliados_fase5.sql` (22/22) `supabase/tests/videos_fase6.sql` (19/19) `supabase/tests/live_fase7.sql` (30/30) e `supabase/tests/admin_fase8.sql` (26/26).
+Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) `supabase/tests/leiloes_fase3.sql` (36/36) `supabase/tests/pay_fase4.sql` (47/47) `supabase/tests/afiliados_fase5.sql` (22/22) `supabase/tests/videos_fase6.sql` (19/19) `supabase/tests/live_fase7.sql` (30/30) `supabase/tests/admin_fase8.sql` (26/26) e `supabase/tests/ia_fase9.sql` (11/11).
 
 ## Migrations aplicadas
 
@@ -162,5 +168,6 @@ Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2
 | 20261111141015 | storage_dono_le_pasta | Dono lê a própria pasta no Storage (sem isso, apagar foto/vídeo não removia o arquivo) |
 | 20261111142055 | fase7_live | Lives, produtos, chat, leilão relâmpago, tempo real |
 | 20261111144848 | fase8_admin | Denúncias, bloqueio de produto, ações da equipe com auditoria, leitura da equipe |
+| 20261111151244 | fase9_ia | Cota diária da IA, flag `ai`, triagem gravada na denúncia |
 
 As duas primeiras ainda citam a marca antiga em comentários e textos: são histórico já aplicado e não são editadas.

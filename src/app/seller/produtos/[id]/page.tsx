@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { aiConfigured } from "@/lib/ai/claude";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ExternalLink, Trash2 } from "lucide-react";
@@ -53,7 +54,7 @@ async function Edit({ params, searchParams }: { params: Promise<{ id: string }>;
 
       <section className="rounded-[var(--radius-card)] border border-line bg-white p-5 shadow-[var(--shadow-card)]">
         <h2 className="mb-3 font-semibold text-navy">Dados do produto</h2>
-        <ProductForm product={product} categories={categories} />
+        <ProductForm product={product} categories={categories} aiEnabled={aiConfigured()} />
       </section>
     </div>
   );
