@@ -499,6 +499,32 @@ export type Database = {
         Update: Record<string, never>;
         Relationships: [];
       };
+      videos: {
+        Row: {
+          id: string;
+          store_id: string;
+          product_id: string;
+          path: string;
+          caption: string | null;
+          status: Database["public"]["Enums"]["video_status"];
+          views_count: number;
+          likes_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [
+          { foreignKeyName: "videos_store_id_fkey"; columns: ["store_id"]; isOneToOne: false; referencedRelation: "stores"; referencedColumns: ["id"] },
+          { foreignKeyName: "videos_product_id_fkey"; columns: ["product_id"]; isOneToOne: false; referencedRelation: "products"; referencedColumns: ["id"] },
+        ];
+      };
+      video_likes: {
+        Row: { user_id: string; video_id: string; created_at: string };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -547,6 +573,10 @@ export type Database = {
       become_affiliate: { Args: Record<string, never>; Returns: string };
       track_referral: { Args: { _code: string }; Returns: boolean };
       checkout_with_ref: { Args: { _address_id: string; _ref_code?: string | null }; Returns: string[] };
+      create_video: { Args: { _product_id: string; _path: string; _caption?: string | null }; Returns: string };
+      remove_video: { Args: { _video_id: string }; Returns: string };
+      toggle_video_like: { Args: { _video_id: string }; Returns: Json };
+      register_video_view: { Args: { _video_id: string }; Returns: undefined };
     };
     Enums: {
       app_role:
@@ -564,6 +594,7 @@ export type Database = {
       order_status: "pending_payment" | "paid" | "shipped" | "delivered" | "cancelled";
       payment_status: "created" | "processing" | "succeeded" | "failed" | "expired" | "refunded";
       commission_status: "pending" | "confirmed" | "cancelled";
+      video_status: "published" | "removed";
       product_condition: "new" | "used" | "refurbished";
       product_status: "draft" | "active" | "paused";
     };
