@@ -53,8 +53,10 @@ export function Footer() {
       </div>
       <div className="border-t border-line">
         <p className="mx-auto max-w-7xl px-4 py-4 text-xs text-muted">
-          © {site.name} · {site.productionDomain} — versão de desenvolvimento. Os leilões, lives, produtos e lojas
-          exibidos são demonstrações.
+          © {site.name} · {site.productionDomain}
+          {site.production
+            ? " — intermediação de compra e venda entre lojas e compradores."
+            : " — versão de testes. Lojas, produtos, leilões e lives podem ser de teste ou demonstração."}
         </p>
       </div>
     </footer>

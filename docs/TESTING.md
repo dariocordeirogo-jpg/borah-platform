@@ -80,6 +80,12 @@ Os filtros que a busca inteligente gera (preço máximo, condição, limpar filt
 é simulado e o teste confere o pedido (modelo, fallback, cache, esforço, esquema) e o tratamento de recusa e de resposta
 cortada. Chamadas reais ao Claude aguardam a chave.
 
+## Lançamento (`tests/e2e/launch.spec.ts`)
+
+`/api/health` responde sem expor segredo, cabeçalhos de segurança (HSTS, COOP, nosniff), aviso de versão de testes
+no rodapé e Termos/Privacidade marcados como rascunho. O CI (`.github/workflows/ci.yml`) roda lint, tipos, unitários e
+build em cada PR; e2e e testes SQL continuam rodando contra o projeto de desenvolvimento.
+
 ## Outros testes e2e
 
 Marca (nenhuma menção antiga), paleta (sem verde, dourado só em comprar/dar lance), SEO, login, recuperação de senha,
