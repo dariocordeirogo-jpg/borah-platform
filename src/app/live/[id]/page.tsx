@@ -69,6 +69,9 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
           </p>
           <h1 className="font-display text-2xl font-bold tracking-tight text-navy">{live.title}</h1>
           {live.description && <p className="mt-1 text-sm text-muted">{live.description}</p>}
+          <Link href={`/denunciar?tipo=live&id=${live.id}&next=/live/${live.id}`} className="mt-1 inline-block text-xs text-muted hover:text-brand hover:underline">
+            Denunciar esta live
+          </Link>
           {live.status === "scheduled" && (
             <p className="mt-2 text-sm text-navy">
               Começa em {new Date(live.scheduled_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}

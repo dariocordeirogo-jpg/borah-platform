@@ -110,6 +110,25 @@ O arquivo vai direto do navegador ao Storage; `create_video` confere produto da 
 
 Tempo real: `lives` e `live_messages` na publicação `supabase_realtime` (além de `auctions`).
 
+## Tabelas (Fase 8 — Admin)
+
+| Item | Conteúdo | Quem lê | Quem escreve |
+| --- | --- | --- | --- |
+| `reports` | Denúncias (produto, vídeo, live, loja, mensagem), motivo, status, quem resolveu | Quem denunciou; equipe de moderação | `report_content` (20/dia, 1 aberta por item), `admin_resolve_report` |
+| `products.blocked_reason` | Bloqueio pela moderação; a loja não reativa enquanto houver motivo | Como o produto | `admin_block_product` / `admin_unblock_product` |
+
+Papéis: moderar (`admin_super`, `admin_ops`, `moderator`); suspender lojas (`admin_super`, `admin_ops`); ver números e pedidos
+(qualquer papel da equipe). Funções: `admin_overview`, `admin_block_product`, `admin_unblock_product`, `admin_set_store_active`
+(suspender cancela as lives da loja), `admin_remove_video`, `admin_end_live`, `admin_hide_message`, `admin_resolve_report`.
+Toda ação vai para `audit_logs` com o motivo. A equipe ganhou leitura de lojas, produtos, pedidos, pagamentos, vídeos, lives e chat.
+
+Para dar acesso de admin a uma conta (SQL do Supabase):
+
+```sql
+insert into public.user_roles (user_id, role)
+select id, 'admin_super' from auth.users where email = 'SEU-EMAIL' on conflict do nothing;
+```
+
 ## Testes de RLS
 
 `supabase/tests/rls_fase1.sql` roda numa transação com rollback e confere 17 regras
@@ -119,10 +138,10 @@ Resultado em 2026-11-06: **17/17 ok**.
 ## Usuários de teste
 
 Só no projeto de desenvolvimento: `e2e@livelance.test` (comprador), `e2e-comprador2@livelance.test` (comprador, teste de
-concorrência) e `e2e-vendedor@livelance.test` (vendedor, "Loja E2E LIVELANCE"). Senha `Teste12345`.
-Antes de produção, remover os três, a loja e os produtos de teste.
+concorrência) `e2e-vendedor@livelance.test` (vendedor, "Loja E2E LIVELANCE") e `e2e-admin@livelance.test` (equipe, `admin_super`). Senha `Teste12345`.
+Antes de produção, remover os quatro, a loja e os produtos de teste.
 
-Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) `supabase/tests/leiloes_fase3.sql` (36/36) `supabase/tests/pay_fase4.sql` (47/47) `supabase/tests/afiliados_fase5.sql` (22/22) `supabase/tests/videos_fase6.sql` (19/19) e `supabase/tests/live_fase7.sql` (30/30).
+Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) `supabase/tests/leiloes_fase3.sql` (36/36) `supabase/tests/pay_fase4.sql` (47/47) `supabase/tests/afiliados_fase5.sql` (22/22) `supabase/tests/videos_fase6.sql` (19/19) `supabase/tests/live_fase7.sql` (30/30) e `supabase/tests/admin_fase8.sql` (26/26).
 
 ## Migrations aplicadas
 
@@ -142,5 +161,6 @@ Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2
 | 20261111140455 | fase6_videos | Vídeos, curtidas, bucket `product-videos`, funções |
 | 20261111141015 | storage_dono_le_pasta | Dono lê a própria pasta no Storage (sem isso, apagar foto/vídeo não removia o arquivo) |
 | 20261111142055 | fase7_live | Lives, produtos, chat, leilão relâmpago, tempo real |
+| 20261111144848 | fase8_admin | Denúncias, bloqueio de produto, ações da equipe com auditoria, leitura da equipe |
 
 As duas primeiras ainda citam a marca antiga em comentários e textos: são histórico já aplicado e não são editadas.

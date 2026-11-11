@@ -12,7 +12,8 @@ Plano completo: https://claude.ai/artifact/WBDmP5nMpUWFYPPh3GLm6R
 | 5 Afiliados (Indique e ganhe) | Link `/r/<código>`, cookie de 30 dias, atribuição no checkout, comissão de 3% que acompanha o pedido, painel do afiliado | Construída (cupons e saque pendentes) |
 | 6 Vídeos | Feed vertical com produto marcado, curtidas, visualizações, envio direto ao Storage | Construída (moderação pelo admin na Fase 8) |
 | 7 LIVELANCE LIVE | Programação, chat em tempo real com moderação, destaque, leilão relâmpago, player HLS | Construída (falta o serviço de transmissão) |
-| 8–10 | Admin, IA, homologação e lançamento | — |
+| 8 Admin | Denúncias, moderação, lojas, pedidos, números da plataforma, papéis da equipe | Construída |
+| 9–10 | IA, homologação e lançamento | — |
 
 ## Regras de leilão já decididas
 

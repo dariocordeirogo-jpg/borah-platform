@@ -1,13 +1,13 @@
 # Testes
 
-Resultado em 2026-11-11, Fase 7 (LIVELANCE LIVE):
+Resultado em 2026-11-11, Fase 8 (Admin):
 
 | Verificação | Comando | Resultado |
 | --- | --- | --- |
 | Build + tipos | `npm run build`, `npm run typecheck` | ok |
 | Lint | `npm run lint` | ok, 0 avisos |
-| Unitários | `npm test` | 95/95 |
-| Navegador (1440 px e 375 px) | `npm run build:e2e && npm run test:e2e` | 60 ok, 26 pulados no celular de propósito (fluxos completos só no desktop) |
+| Unitários | `npm test` | 98/98 |
+| Navegador (1440 px e 375 px) | `npm run build:e2e && npm run test:e2e` | 63 ok, 29 pulados no celular de propósito (fluxos completos só no desktop) |
 | Concorrência | `npm run test:integration` | Checkout: 5 disputas pela última unidade, sempre 1 pedido. Lances: 20 simultâneos, sequência sempre crescente e consistente |
 | Segurança do banco (Fase 1) | `supabase/tests/rls_fase1.sql` | 17/17 |
 | Motor de pedidos (Fase 2) | `supabase/tests/market_fase2.sql` | 21/21 |
@@ -16,6 +16,7 @@ Resultado em 2026-11-11, Fase 7 (LIVELANCE LIVE):
 | Afiliados (Fase 5) | `supabase/tests/afiliados_fase5.sql` | 22/22 |
 | Vídeos (Fase 6) | `supabase/tests/videos_fase6.sql` | 19/19 |
 | LIVE (Fase 7) | `supabase/tests/live_fase7.sql` | 30/30 |
+| Admin (Fase 8) | `supabase/tests/admin_fase8.sql` | 26/26 |
 | Encerramento automático | `cron.job_run_details` | 5.754 execuções em 4 dias, 0 falhas |
 
 Atrás de proxy (ambiente de nuvem): `NODE_USE_ENV_PROXY=1` nos comandos acima. `build:e2e` desliga o otimizador de imagens
@@ -64,6 +65,12 @@ loja começa, destaca um produto, link http é recusado e https .m3u8 é salvo �
 e o selo AO VIVO → manda mensagem que aparece no estúdio em tempo real → loja esconde e some na tela da compradora →
 loja abre leilão relâmpago e ele aparece sozinho para quem assiste (R$ 50,00, "Dar lance") → loja encerra e a sala fecha.
 O vídeo em si não é testado: depende do serviço de transmissão.
+
+## Admin (`tests/e2e/admin.spec.ts`)
+
+Compradora denuncia um anúncio (segunda denúncia do mesmo item é recusada) e `/admin` não existe para ela (404, sem menu) →
+admin vê a denúncia, tentar bloquear sem motivo é recusado, com motivo o produto sai do site e a loja não consegue reativar →
+admin desbloqueia em Moderação → suspende a loja (página da loja some) e reativa. O `afterAll` garante loja ativa e produto pausado.
 
 ## Outros testes e2e
 
