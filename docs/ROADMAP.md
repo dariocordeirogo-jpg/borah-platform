@@ -11,7 +11,7 @@ Plano completo: https://claude.ai/artifact/WBDmP5nMpUWFYPPh3GLm6R
 | 4 LIVELANCE PAY | Stripe Connect (destination charge + comissão), Checkout com cartão/Pix/boleto, webhooks assinados, reembolso | Construída (falta chave de teste da Stripe; ver docs/PAYMENTS.md) |
 | 5 Afiliados (Indique e ganhe) | Link `/r/<código>`, cookie de 30 dias, atribuição no checkout, comissão de 3% que acompanha o pedido, painel do afiliado | Construída (cupons e saque pendentes) |
 | 6 Vídeos | Feed vertical com produto marcado, curtidas, visualizações, envio direto ao Storage | Construída (moderação pelo admin na Fase 8) |
-| 7 LIVELANCE LIVE | Transmissão, chat, leilão ao vivo | — |
+| 7 LIVELANCE LIVE | Programação, chat em tempo real com moderação, destaque, leilão relâmpago, player HLS | Construída (falta o serviço de transmissão) |
 | 8–10 | Admin, IA, homologação e lançamento | — |
 
 ## Regras de leilão já decididas

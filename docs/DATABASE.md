@@ -99,6 +99,17 @@ comissão quando o pedido é pago e cancela quando o pedido é cancelado ou reem
 Bucket `product-videos` (público para leitura, 50 MB, mp4/webm/mov; envio e exclusão só na pasta da própria loja).
 O arquivo vai direto do navegador ao Storage; `create_video` confere produto da loja, caminho e se o arquivo existe.
 
+## Tabelas (Fase 7 — LIVELANCE LIVE)
+
+| Tabela | Conteúdo | Quem lê | Quem escreve |
+| --- | --- | --- | --- |
+| `lives` | Loja, título, status, horários, link HLS, produto em destaque | Todos (exceto canceladas); a loja vê todas | Funções da live |
+| `live_products` | Produtos da live | Como a live | `create_live` |
+| `live_messages` | Chat (apelido "Ana S.", texto, escondida) | Todos (escondidas só a loja) | `send_live_message` (live no ar, 1 msg/2 s), `hide_live_message` |
+| `auctions.live_id` | Leilão relâmpago aberto na live | — | `start_live_auction` (usa `create_auction`) |
+
+Tempo real: `lives` e `live_messages` na publicação `supabase_realtime` (além de `auctions`).
+
 ## Testes de RLS
 
 `supabase/tests/rls_fase1.sql` roda numa transação com rollback e confere 17 regras
@@ -111,7 +122,7 @@ Só no projeto de desenvolvimento: `e2e@livelance.test` (comprador), `e2e-compra
 concorrência) e `e2e-vendedor@livelance.test` (vendedor, "Loja E2E LIVELANCE"). Senha `Teste12345`.
 Antes de produção, remover os três, a loja e os produtos de teste.
 
-Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) `supabase/tests/leiloes_fase3.sql` (36/36) `supabase/tests/pay_fase4.sql` (47/47) `supabase/tests/afiliados_fase5.sql` (22/22) e `supabase/tests/videos_fase6.sql` (19/19).
+Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) `supabase/tests/leiloes_fase3.sql` (36/36) `supabase/tests/pay_fase4.sql` (47/47) `supabase/tests/afiliados_fase5.sql` (22/22) `supabase/tests/videos_fase6.sql` (19/19) e `supabase/tests/live_fase7.sql` (30/30).
 
 ## Migrations aplicadas
 
@@ -130,5 +141,6 @@ Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2
 | 20261111133258 | fase5_afiliados | Afiliados, cliques, comissões, `checkout_with_ref`, gatilho de status |
 | 20261111140455 | fase6_videos | Vídeos, curtidas, bucket `product-videos`, funções |
 | 20261111141015 | storage_dono_le_pasta | Dono lê a própria pasta no Storage (sem isso, apagar foto/vídeo não removia o arquivo) |
+| 20261111142055 | fase7_live | Lives, produtos, chat, leilão relâmpago, tempo real |
 
 As duas primeiras ainda citam a marca antiga em comentários e textos: são histórico já aplicado e não são editadas.
