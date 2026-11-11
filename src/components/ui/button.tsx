@@ -8,11 +8,12 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-green text-white hover:bg-green-deep",
-        gold: "metal-gold text-ink hover:brightness-105 shadow-sm",
-        outline: "border border-green text-green-deep bg-white hover:bg-green-soft",
-        ghost: "text-green-deep hover:bg-green-soft",
-        light: "bg-white text-green-deep hover:bg-green-soft",
+        primary: "bg-brand text-white hover:bg-brand-dark active:bg-brand-dark",
+        /** Dourado: SÓ para comprar e dar lance. Nunca em navegação, admin ou cadastro. */
+        buy: "btn-buy font-bold",
+        secondary: "bg-navy text-white hover:bg-navy-2",
+        outline: "border border-line bg-white text-navy hover:border-navy-2 hover:bg-surface",
+        ghost: "text-navy hover:bg-surface",
       },
       size: {
         sm: "h-9 px-4 text-sm",

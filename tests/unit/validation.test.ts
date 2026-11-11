@@ -4,7 +4,7 @@ import { safeNextPath, signInSchema, signUpSchema } from "@/lib/validation";
 describe("safeNextPath (proteção contra open redirect)", () => {
   it("aceita caminhos internos", () => {
     expect(safeNextPath("/conta")).toBe("/conta");
-    expect(safeNextPath("/lances?x=1")).toBe("/lances?x=1");
+    expect(safeNextPath("/leiloes?x=1")).toBe("/leiloes?x=1");
   });
   it("recusa URLs externas e truques", () => {
     expect(safeNextPath("https://malicioso.com")).toBe("/conta");
@@ -38,5 +38,13 @@ describe("signUpSchema", () => {
 describe("signInSchema", () => {
   it("recusa e-mail inválido", () => {
     expect(signInSchema.safeParse({ email: "nao-e-email", password: "x" }).success).toBe(false);
+  });
+});
+
+describe("newPasswordSchema", () => {
+  it("exige confirmação igual", async () => {
+    const { newPasswordSchema } = await import("@/lib/validation");
+    expect(newPasswordSchema.safeParse({ password: "senha123", confirm: "senha123" }).success).toBe(true);
+    expect(newPasswordSchema.safeParse({ password: "senha123", confirm: "senha124" }).success).toBe(false);
   });
 });

@@ -4,13 +4,14 @@ Plano completo: https://claude.ai/artifact/WBDmP5nMpUWFYPPh3GLm6R
 
 | Fase | Entrega | Status |
 | --- | --- | --- |
-| 1 Fundação | Projeto, design system, home, login (e-mail e Google), perfis, papéis, RLS | Feita (aguardando config do Google e Vercel) |
-| 2 Marketplace | Lojas, produtos, busca, carrinho, pedido sem pagamento real | — |
-| 3 Leilões | Verificação de CPF/telefone, `place_bid`, anti-sniping, encerramento por pg_cron, regra de inadimplência | — |
-| 4 Pagamentos | Provedor com split, Pix, cartão, webhooks, ledger | — |
-| 5 Afiliados | Links, cupons, atribuição, comissões | — |
-| 6 Vídeos | Feed vertical com produto marcado | — |
-| 7 Lives | Transmissão, chat, leilão ao vivo | — |
+| 1 Fundação | Projeto, design system, home, login (e-mail e Google), perfis, papéis, RLS | Feita |
+| 1.1 Marca LIVELANCE | Nova marca, logo, SEO, PWA, recuperação de senha, módulos MARKET/LIVE/LEILÕES/SELLER | Feita (aguardando domínio, Vercel e config do Supabase) |
+| 2 LIVELANCE MARKET + SELLER | Lojas, produtos com fotos, busca, carrinho, checkout, pedidos sem pagamento real, painel do vendedor | Feita |
+| 3 LIVELANCE LEILÕES | Verificação de CPF/telefone, `place_bid`, anti-sniping, encerramento por pg_cron, regra de inadimplência, tempo real | Feita (SMS e parecer jurídico pendentes) |
+| 4 LIVELANCE PAY | Stripe Connect (destination charge + comissão), Checkout com cartão/Pix/boleto, webhooks assinados, reembolso | Construída (falta chave de teste da Stripe; ver docs/PAYMENTS.md) |
+| 5 Afiliados (Indique e ganhe) | Link `/r/<código>`, cookie de 30 dias, atribuição no checkout, comissão de 3% que acompanha o pedido, painel do afiliado | Construída (cupons e saque pendentes) |
+| 6 Vídeos | Feed vertical com produto marcado, curtidas, visualizações, envio direto ao Storage | Construída (moderação pelo admin na Fase 8) |
+| 7 LIVELANCE LIVE | Transmissão, chat, leilão ao vivo | — |
 | 8–10 | Admin, IA, homologação e lançamento | — |
 
 ## Regras de leilão já decididas

@@ -1,39 +1,67 @@
-# Design system BORAH
+# Design system LIVELANCE
 
-Fundo branco predominante, verde metálico como cor principal, amarelo metálico como secundária.
-Tokens em `src/app/globals.css` (`@theme`), usados como classes Tailwind (`bg-green`, `text-gold-ink`…).
+**Vermelho** é a marca. **Azul-marinho** dá confiança (títulos, valores, navegação). **Branco** é o fundo.
+**Dourado metálico** é exclusivo dos botões de compra e de lance.
+
+Tokens em `src/app/globals.css` (`@theme`), usados como classes Tailwind (`bg-brand`, `text-navy`…).
+
+## Cores
 
 | Token | Hex | Uso |
 | --- | --- | --- |
-| `green` | #168447 | Botões principais, ícones, links fortes |
-| `green-deep` | #105B35 | Texto verde, preços, hover |
-| `green-soft` | #E4F2EA | Fundos de ícones e cards |
-| `gold` | #D6A52D | **Só fundo** (botão de lance, destaques) com texto `ink` |
-| `gold-light` | #EBCB72 | Destaque sobre verde |
-| `gold-ink` | #8A6412 | Texto dourado sobre branco |
-| `ink` | #202820 | Texto principal |
-| `muted` | #5B6B5E | Texto secundário |
-| `surface` | #F5F7F4 | Fundos alternativos |
-| `danger` | #B42318 | Erros, AO VIVO, cronômetro urgente |
+| `brand` | #D71920 | Identidade, ícones, links e navegação ativos, botão principal, selo AO VIVO |
+| `brand-dark` | #A90F18 | Hover/active do vermelho |
+| `brand-soft` | #FDECEC | Fundo de ícones e hover leve |
+| `navy` | #10243A | Títulos, preços, maior lance, textos de destaque |
+| `navy-2` | #183B5B | Textos de apoio, rótulos, foco |
+| `navy-soft` | #E9EEF4 | Fundos informativos (ex.: aviso de verificação) |
+| `ink` | #1A2230 | Texto corrido |
+| `muted` | #5A6878 | Texto secundário |
+| `line` | #E3E6EB | Bordas e divisórias |
+| `surface` / `surface-2` | #F5F6F8 / #EDEFF3 | Fundos alternativos, rodapé, área de foto |
+| `danger` | #B42318 | Erros e cronômetro nos últimos minutos (funcional) |
+| `success` / `success-soft` | #1E7A46 / #E8F5EE | **Só** mensagens de status de sucesso (funcional) |
+| `buy` / `buy-dark` | #D6A638 / #B88720 | **Só** via `btn-buy` ou `<Button variant="buy">` |
 
-Utilitários metálicos: `metal-green`, `metal-gold`, `text-metal-green` — só em elementos de marca.
+## Regra do dourado
+
+Usar `btn-buy` (ou `variant="buy"`) apenas em: **Comprar agora**, **Finalizar compra**, **Adicionar ao carrinho**
+(quando for a ação principal), **Dar lance**, **Confirmar lance**, **Fazer oferta**. Texto em azul-marinho (7,0:1).
+Nunca em logo, cabeçalho, rodapé, menu, títulos, ícones, bordas, fundos, indicadores, gráficos ou ações administrativas.
+O teste `tests/e2e/palette.spec.ts` falha se aparecer dourado fora de um botão de compra/lance, ou verde fora de status.
 
 ## Contraste (WCAG AA, medido)
 
-| Combinação | Razão | Resultado |
+| Combinação | Razão |
+| --- | --- |
+| vermelho sobre branco / branco sobre vermelho | 5,19:1 |
+| azul-marinho sobre branco | 15,72:1 |
+| azul-marinho sobre dourado | 7,02:1 |
+| cinza `muted` sobre branco | 5,70:1 |
+| vermelho sobre `brand-soft` | 4,54:1 |
+
+## Logomarca
+
+Símbolo: **play 3D vermelho com martelo de leilão**, órbita e ondas de transmissão. Wordmark em itálico:
+LIVE em vermelho, LANCE em azul-marinho. Sem dourado.
+
+| Versão | Componente | Arquivo |
 | --- | --- | --- |
-| verde #168447 sobre branco | 4,75:1 | Passa |
-| verde profundo sobre branco | 8,17:1 | Passa |
-| grafite sobre dourado | 6,70:1 | Passa |
-| gold-ink sobre branco | 5,37:1 | Passa |
-| dourado #D6A52D sobre branco | 2,26:1 | **Proibido para texto** |
+| Símbolo colorido | `<LogoMark />` | `public/brand/livelance-simbolo.svg` |
+| Horizontal | `<Logo />` | `public/brand/livelance-horizontal.svg` |
+| Vertical com slogan | `<LogoStacked />` | `public/brand/livelance-vertical.svg` |
+| Monocromática | `<LogoMark mono />`, `<Logo mono />` | `public/brand/livelance-simbolo-mono.svg` |
+| Ícone do app 3D | — | `public/brand/livelance-icone-app.svg`, `livelance-icone-app-1024.png`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `src/app/icon.svg`, `src/app/apple-icon.png` |
+
+Os SVGs com texto usam a fonte Sora; para gráfica, converter em curvas. A logo foi redesenhada em vetor a partir
+da referência enviada; vale a revisão de um designer antes de materiais impressos.
 
 ## Tipografia
 
-Sora (títulos, `font-display`) e Inter (texto). Logo provisório: símbolo "B" com faísca dourada em `src/components/logo.tsx` — o logo definitivo é entrega separada.
+Sora (títulos e wordmark, `font-display`) e Inter (texto).
 
 ## Componentes
 
-`Button`/`ButtonLink` (variantes primary, gold, outline, ghost, light), `AuctionCard`, `UpcomingCard`, `ProductCard`,
-`Countdown`, `Header`, `BottomNav` (celular), `Footer`, `ComingSoon`, formulários de login em `auth-forms.tsx`.
-No celular as fileiras de leilão viram carrossel deslizante.
+`Button`/`ButtonLink` (primary vermelho, secondary azul-marinho, outline, ghost, **buy dourado**), `AuctionCard`
+(maior lance em destaque azul-marinho, botão Dar lance dourado), `UpcomingCard`, `ProductCard` (Comprar agora dourado),
+`Countdown`, `Header`, `BottomNav` (item ativo em vermelho), `Footer` (claro), `ComingSoon`, formulários em `auth-forms.tsx`.

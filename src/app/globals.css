@@ -1,33 +1,40 @@
 @import "tailwindcss";
 
 /*
- * BORAH — tokens de design.
- * Regras de contraste (WCAG AA, conferidas):
- *  - verde #168447 em branco: 4,75:1 → ok para texto e botões.
- *  - dourado #D6A52D só como FUNDO, com texto grafite (6,7:1). Nunca texto dourado em branco (2,26:1).
- *  - texto dourado sobre branco usa gold-ink #8A6412 (5,37:1).
- *  - texto verde sobre off-white (#F5F7F4) usa green-deep #105B35.
+ * LIVELANCE — tokens de design (paleta vermelho · azul-marinho · branco).
+ * Contraste WCAG AA medido:
+ *  - vermelho #D71920 em branco 5,19:1 · branco em vermelho 5,19:1
+ *  - azul-marinho #10243A em branco 15,72:1
+ *  - azul-marinho sobre dourado #D6A638 7,02:1 (botões de compra/lance)
+ *  - cinza de texto #5A6878 em branco 5,70:1
+ *
+ * REGRA DO DOURADO: os tokens `buy*` e o utilitário `btn-buy` existem SÓ para
+ * "Comprar agora", "Finalizar compra", "Dar lance", "Confirmar lance" e "Fazer oferta".
+ * Nunca em logo, menu, títulos, ícones, fundos, bordas ou ações administrativas.
  */
 @theme {
-  --color-green: #168447;
-  --color-green-deep: #105B35;
-  --color-green-soft: #E4F2EA;
-  --color-gold: #D6A52D;
-  --color-gold-light: #EBCB72;
-  --color-gold-ink: #8A6412;
-  --color-gold-soft: #FBF3DC;
-  --color-ink: #202820;
-  --color-muted: #5B6B5E;
-  --color-line: #E2E7E1;
-  --color-surface: #F5F7F4;
-  --color-surface-2: #EEF1ED;
+  --color-brand: #D71920;
+  --color-brand-dark: #A90F18;
+  --color-brand-soft: #FDECEC;
+  --color-navy: #10243A;
+  --color-navy-2: #183B5B;
+  --color-navy-soft: #E9EEF4;
+  --color-ink: #1A2230;
+  --color-muted: #5A6878;
+  --color-line: #E3E6EB;
+  --color-surface: #F5F6F8;
+  --color-surface-2: #EDEFF3;
   --color-danger: #B42318;
+  --color-success: #1E7A46;
+  --color-success-soft: #E8F5EE;
+  --color-buy: #D6A638;
+  --color-buy-dark: #B88720;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-sora), var(--font-inter), ui-sans-serif, sans-serif;
 
   --radius-card: 0.875rem;
-  --shadow-card: 0 1px 2px rgb(16 91 53 / 0.06), 0 4px 16px rgb(16 91 53 / 0.06);
+  --shadow-card: 0 1px 2px rgb(16 36 58 / 0.06), 0 4px 16px rgb(16 36 58 / 0.06);
 }
 
 @layer base {
@@ -40,20 +47,24 @@
     font-family: var(--font-sans);
   }
   :focus-visible {
-    outline: 2px solid var(--color-green);
+    outline: 2px solid var(--color-navy-2);
     outline-offset: 2px;
   }
 }
 
-/* Efeito metálico — só em elementos de marca, nunca em texto corrido */
-@utility metal-green {
-  background-image: linear-gradient(135deg, #1fa35a 0%, #168447 45%, #105b35 100%);
-}
-@utility metal-gold {
-  background-image: linear-gradient(135deg, #f3dc8f 0%, #d6a52d 50%, #b8891e 100%);
-}
-@utility text-metal-green {
-  background-image: linear-gradient(135deg, #1a9a52 0%, #168447 50%, #105b35 100%);
-  background-clip: text;
-  color: transparent;
+/* Dourado metálico: EXCLUSIVO dos botões de compra e de lance. */
+@utility btn-buy {
+  background-image: linear-gradient(180deg, #e8c25e 0%, #d6a638 48%, #b88720 100%);
+  color: var(--color-navy);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 1px 2px rgb(16 36 58 / 0.18);
+  &:hover {
+    background-image: linear-gradient(180deg, #f0cd6c 0%, #dcae42 48%, #c08f26 100%);
+  }
+  &:active {
+    background-image: linear-gradient(180deg, #c99a2e 0%, #b88720 100%);
+  }
+  &:disabled {
+    filter: grayscale(0.6);
+    opacity: 0.6;
+  }
 }

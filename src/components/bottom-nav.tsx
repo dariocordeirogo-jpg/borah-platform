@@ -2,19 +2,32 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Gavel, Home, PlaySquare, Radio, UserRound } from "lucide-react";
+import { Suspense } from "react";
+import { Gavel, Home, Radio, ShoppingBag, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/", label: "Início", icon: Home },
-  { href: "/lances", label: "Lances", icon: Gavel },
+  { href: "/market", label: "Market", icon: ShoppingBag },
   { href: "/ao-vivo", label: "Ao vivo", icon: Radio },
-  { href: "/videos", label: "Vídeos", icon: PlaySquare },
+  { href: "/leiloes", label: "Leilões", icon: Gavel },
   { href: "/conta", label: "Conta", icon: UserRound },
 ];
 
+/** Mostra a barra imediatamente; o item ativo é marcado quando o endereço atual chega. */
 export function BottomNav() {
-  const pathname = usePathname();
+  return (
+    <Suspense fallback={<BottomNavView pathname="" />}>
+      <BottomNavWithPath />
+    </Suspense>
+  );
+}
+
+function BottomNavWithPath() {
+  return <BottomNavView pathname={usePathname()} />;
+}
+
+function BottomNavView({ pathname }: { pathname: string }) {
   return (
     <nav
       aria-label="Navegação do aplicativo"
@@ -30,10 +43,10 @@ export function BottomNav() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium",
-                  active ? "text-green-deep" : "text-muted",
+                  active ? "text-brand" : "text-muted",
                 )}
               >
-                <Icon className={cn("h-5 w-5", active && "text-green")} aria-hidden="true" />
+                <Icon className={cn("h-5 w-5", active && "text-brand")} aria-hidden="true" />
                 {label}
               </Link>
             </li>

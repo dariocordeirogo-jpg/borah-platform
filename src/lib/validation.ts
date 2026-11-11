@@ -3,6 +3,13 @@ import { z } from "zod";
 /** Limpa espaços e maiúsculas ANTES de validar (quem digita "Ana@x.com " não deve ser recusado). */
 const emailField = z.string().trim().toLowerCase().pipe(z.email("Informe um e-mail válido."));
 
+const passwordField = z
+  .string()
+  .min(8, "A senha precisa ter pelo menos 8 caracteres.")
+  .max(72, "A senha pode ter no máximo 72 caracteres.")
+  .regex(/[A-Za-z]/, "Use pelo menos uma letra.")
+  .regex(/[0-9]/, "Use pelo menos um número.");
+
 export const signInSchema = z.object({
   email: emailField,
   password: z.string().min(1, "Informe sua senha."),
@@ -15,14 +22,18 @@ export const signUpSchema = z.object({
     .min(2, "Seu nome precisa ter pelo menos 2 letras.")
     .max(80, "Nome muito longo."),
   email: emailField,
-  password: z
-    .string()
-    .min(8, "A senha precisa ter pelo menos 8 caracteres.")
-    .max(72, "A senha pode ter no máximo 72 caracteres.")
-    .regex(/[A-Za-z]/, "Use pelo menos uma letra.")
-    .regex(/[0-9]/, "Use pelo menos um número."),
+  password: passwordField,
   acceptTerms: z.literal("on", { error: "Você precisa aceitar os termos para criar a conta." }),
 });
+
+export const resetRequestSchema = z.object({ email: emailField });
+
+export const newPasswordSchema = z
+  .object({
+    password: passwordField,
+    confirm: z.string(),
+  })
+  .refine((d) => d.password === d.confirm, { path: ["confirm"], message: "As senhas não conferem." });
 
 /** Só aceita caminhos internos, para evitar redirecionamento aberto (open redirect). */
 export function safeNextPath(value: unknown, fallback = "/conta"): string {

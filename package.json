@@ -1,5 +1,5 @@
 {
-  "name": "borah-platform",
+  "name": "livelance",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,9 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:e2e": "playwright test --trace off",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "build:e2e": "NEXT_IMAGE_UNOPTIMIZED=1 next build",
+    "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -21,6 +23,7 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "server-only": "^0.0.1",
+    "stripe": "23.1.0",
     "tailwind-merge": "^3.7.0",
     "zod": "^4.6.7"
   },

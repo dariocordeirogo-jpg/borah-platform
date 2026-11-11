@@ -1,0 +1,24 @@
+/**
+ * Identidade pública da plataforma. Fonte única para nome, slogan, SEO e módulos.
+ * O domínio de produção vem de NEXT_PUBLIC_SITE_URL: só troque para https://livelance.com.br
+ * depois que o domínio estiver registrado e apontado para a Vercel.
+ */
+export const site = {
+  name: "LIVELANCE",
+  slogan: "Tudo acontece ao vivo.",
+  tagline: "Compre. Venda. Assista. Dê seu lance.",
+  title: "LIVELANCE | Marketplace, Vendas ao Vivo e Leilões Online",
+  description:
+    "Na LIVELANCE você compra, vende, acompanha transmissões ao vivo e participa de leilões digitais em uma única plataforma.",
+  productionDomain: "livelance.com.br",
+  url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
+} as const;
+
+/** Módulos da plataforma (nomes oficiais). */
+export const modules = {
+  market: { name: "LIVELANCE MARKET", short: "Market", href: "/market" },
+  live: { name: "LIVELANCE LIVE", short: "Ao vivo", href: "/ao-vivo" },
+  auctions: { name: "LIVELANCE LEILÕES", short: "Leilões", href: "/leiloes" },
+  seller: { name: "LIVELANCE SELLER", short: "Vender", href: "/vender" },
+  pay: { name: "LIVELANCE PAY", short: "Pagamentos", href: null },
+} as const;
