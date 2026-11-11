@@ -75,7 +75,7 @@ async function Account() {
             ? { icon: Store, title: "Minha loja", text: "Painel LIVELANCE SELLER", href: "/seller" }
             : { icon: Store, title: "Abrir minha loja", text: "Venda na LIVELANCE", href: "/vender" },
           { icon: Gavel, title: "Meus lances", text: "Leilões em que você participa", href: "/conta/lances" },
-          { icon: Megaphone, title: "Minhas indicações", text: "Em breve · Indique e ganhe (Fase 5)", href: null },
+          { icon: Megaphone, title: "Minhas indicações", text: "Indique e ganhe comissão", href: user.roles.includes("affiliate") ? "/conta/indicacoes" : "/indique" },
         ].map((c) =>
           c.href ? (
             <Link key={c.title} href={c.href} className="rounded-[var(--radius-card)] border border-line bg-white p-4 hover:border-navy-2">

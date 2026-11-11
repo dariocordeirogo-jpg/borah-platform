@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { isReferralCode, REF_COOKIE } from "@/lib/affiliates/format";
 import { marketErrorMessage } from "@/lib/market/format";
 import { addressSchema } from "@/lib/market/schemas";
 
@@ -90,7 +92,12 @@ export async function placeOrder(_prev: FormState, formData: FormData): Promise<
   const addressId = uuid.safeParse(formData.get("addressId"));
   if (!addressId.success) return { error: "Escolha um endereço de entrega." };
   const { supabase } = await requireUser("/checkout");
-  const { data, error } = await supabase.rpc("checkout", { _address_id: addressId.data });
+  // Indicação (cookie do link /r/<código>): o banco decide se gera comissão
+  const ref = (await cookies()).get(REF_COOKIE)?.value;
+  const { data, error } = await supabase.rpc("checkout_with_ref", {
+    _address_id: addressId.data,
+    _ref_code: isReferralCode(ref) ? ref : null,
+  });
   if (error || !data?.length) return { error: marketErrorMessage(error?.message) };
   revalidatePath("/", "layout");
   redirect(data.length === 1 ? `/conta/pedidos/${data[0]}?novo=1` : "/conta/pedidos?novo=1");

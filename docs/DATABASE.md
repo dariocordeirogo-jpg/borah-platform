@@ -76,6 +76,19 @@ Funções: `start_order_payment(pedido)`, `attach_checkout_session(pagamento, se
 `store_accepts_payments(loja)`, `platform_fee_bps()`. `cancel_order` agora recusa pedido com Pix/boleto em processamento.
 Detalhes e configuração: [PAYMENTS.md](PAYMENTS.md).
 
+## Tabelas (Fase 5 — Indique e ganhe)
+
+| Tabela | Conteúdo | Quem lê | Quem escreve |
+| --- | --- | --- | --- |
+| `affiliates` | Código do afiliado | O próprio | `become_affiliate` |
+| `affiliate_clicks` | Cliques por dia (só contador) | O próprio | `track_referral` |
+| `affiliate_commissions` | Pedido, base, taxa, comissão, status (pendente → confirmada / cancelada) | O afiliado | `checkout_with_ref` e gatilho no pedido |
+| `private.affiliate_settings` | Taxa (300 = 3%) e janela do cookie (30 dias) | Fora da API | Migração / SQL |
+
+`checkout_with_ref(endereço, código)` chama o `checkout` e registra a comissão. Não gera comissão para autoindicação,
+indicação da própria loja ou código inválido (a compra segue normalmente). O gatilho `orders_sync_commission` confirma a
+comissão quando o pedido é pago e cancela quando o pedido é cancelado ou reembolsado.
+
 ## Testes de RLS
 
 `supabase/tests/rls_fase1.sql` roda numa transação com rollback e confere 17 regras
@@ -88,7 +101,7 @@ Só no projeto de desenvolvimento: `e2e@livelance.test` (comprador), `e2e-compra
 concorrência) e `e2e-vendedor@livelance.test` (vendedor, "Loja E2E LIVELANCE"). Senha `Teste12345`.
 Antes de produção, remover os três, a loja e os produtos de teste.
 
-Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) `supabase/tests/leiloes_fase3.sql` (36/36) e `supabase/tests/pay_fase4.sql` (47/47).
+Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) `supabase/tests/leiloes_fase3.sql` (36/36) `supabase/tests/pay_fase4.sql` (47/47) e `supabase/tests/afiliados_fase5.sql` (22/22).
 
 ## Migrations aplicadas
 
@@ -104,5 +117,6 @@ Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2
 | 20261106144634 | fase3_leiloes | Verificação, leilões, lances, inadimplência, pg_cron, tempo real |
 | 20261111120010 | fase4_pay | Contas de recebimento, pagamentos, avisos assinados, reembolso |
 | 20261111120446 | fase4_loja_recebe | `store_accepts_payments` (público, sem expor a conta) |
+| 20261111133258 | fase5_afiliados | Afiliados, cliques, comissões, `checkout_with_ref`, gatilho de status |
 
 As duas primeiras ainda citam a marca antiga em comentários e textos: são histórico já aplicado e não são editadas.

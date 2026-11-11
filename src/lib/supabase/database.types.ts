@@ -470,6 +470,35 @@ export type Database = {
           { foreignKeyName: "payments_store_id_fkey"; columns: ["store_id"]; isOneToOne: false; referencedRelation: "stores"; referencedColumns: ["id"] },
         ];
       };
+      affiliates: {
+        Row: { user_id: string; code: string; is_active: boolean; created_at: string };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      affiliate_clicks: {
+        Row: { user_id: string; day: string; clicks: number };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      affiliate_commissions: {
+        Row: {
+          id: string;
+          order_id: string;
+          order_number: number;
+          affiliate_id: string;
+          base_cents: number;
+          rate_bps: number;
+          amount_cents: number;
+          status: Database["public"]["Enums"]["commission_status"];
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -514,6 +543,10 @@ export type Database = {
       register_payout_account: { Args: { _account_id: string }; Returns: string };
       stripe_ingest_event: { Args: { _payload: string; _signature: string }; Returns: Json };
       store_accepts_payments: { Args: { _store_id: string }; Returns: boolean };
+      affiliate_program: { Args: Record<string, never>; Returns: Json };
+      become_affiliate: { Args: Record<string, never>; Returns: string };
+      track_referral: { Args: { _code: string }; Returns: boolean };
+      checkout_with_ref: { Args: { _address_id: string; _ref_code?: string | null }; Returns: string[] };
     };
     Enums: {
       app_role:
@@ -530,6 +563,7 @@ export type Database = {
       auction_status: "active" | "ended" | "cancelled";
       order_status: "pending_payment" | "paid" | "shipped" | "delivered" | "cancelled";
       payment_status: "created" | "processing" | "succeeded" | "failed" | "expired" | "refunded";
+      commission_status: "pending" | "confirmed" | "cancelled";
       product_condition: "new" | "used" | "refurbished";
       product_status: "draft" | "active" | "paused";
     };

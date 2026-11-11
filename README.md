@@ -12,7 +12,7 @@
 
 Domínio pretendido: `livelance.com.br` (ainda não configurado — ver [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
-Status: **Fase 4 — LIVELANCE PAY** construída (sobre MARKET, SELLER e LEILÕES): Stripe Connect, pagamento do pedido pelo Checkout, avisos assinados conferidos no banco, comissão de 10% e página de recebimentos do vendedor. Falta ligar a chave de **teste** da Stripe (ver [docs/PAYMENTS.md](docs/PAYMENTS.md)); nenhum pagamento real. Lives ainda são **demonstração**.
+Status: **Fase 5 — Indique e ganhe** construída: link de indicação `/r/<código>`, venda atribuída no banco e comissão de 3% (paga pela plataforma). Antes, **Fase 4 — LIVELANCE PAY** (sobre MARKET, SELLER e LEILÕES): Stripe Connect, pagamento do pedido pelo Checkout, avisos assinados conferidos no banco, comissão de 10% e página de recebimentos do vendedor. Falta ligar a chave de **teste** da Stripe (ver [docs/PAYMENTS.md](docs/PAYMENTS.md)); nenhum pagamento real. Lives ainda são **demonstração**.
 
 ## Rodar localmente
 
