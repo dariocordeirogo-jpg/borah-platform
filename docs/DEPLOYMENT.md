@@ -21,6 +21,7 @@ Variáveis de ambiente (Production e Preview):
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | chave publishable do projeto | igual |
 | `NEXT_PUBLIC_SITE_URL` | `https://livelance.com.br` **só depois do passo 1 funcionar** | URL do preview ou deixar vazio |
 | `STRIPE_SECRET_KEY` | `sk_live_...` só com a flag `payments` ligada; antes disso `sk_test_...` | `sk_test_...` |
+| `MUX_TOKEN_ID` / `MUX_TOKEN_SECRET` | token do ambiente de produção do Mux | token do ambiente de desenvolvimento |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` do endpoint de produção (o mesmo vai no Vault) | `whsec_...` de teste |
 
 `NEXT_PUBLIC_SITE_URL` controla canonical, Open Graph, sitemap e robots. Enquanto não for exatamente

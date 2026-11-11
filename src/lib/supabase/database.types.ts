@@ -601,6 +601,18 @@ export type Database = {
       cancel_auction: { Args: { _auction_id: string }; Returns: undefined };
       place_bid: { Args: { _auction_id: string; _amount_cents: number; _idempotency_key: string }; Returns: Json };
       confirm_auction_win: { Args: { _auction_id: string; _address_id: string }; Returns: string };
+      live_stream_ref: {
+        Args: { _live_id: string }
+        Returns: {
+          disabled_at: string
+          playback_id: string
+          stream_id: string
+        }[]
+      }
+      mark_live_stream_disabled: {
+        Args: { _live_id: string }
+        Returns: undefined
+      }
       my_auction_status: { Args: { _auction_id: string }; Returns: Json };
       my_bids: {
         Args: Record<string, never>;
@@ -628,6 +640,10 @@ export type Database = {
       stripe_ingest_event: { Args: { _payload: string; _signature: string }; Returns: Json };
       store_accepts_payments: { Args: { _store_id: string }; Returns: boolean };
       affiliate_program: { Args: Record<string, never>; Returns: Json };
+      attach_live_stream: {
+        Args: { _live_id: string; _playback_id: string; _stream_id: string }
+        Returns: undefined
+      }
       become_affiliate: { Args: Record<string, never>; Returns: string };
       track_referral: { Args: { _code: string }; Returns: boolean };
       checkout_with_ref: { Args: { _address_id: string; _ref_code?: string | null }; Returns: string[] };

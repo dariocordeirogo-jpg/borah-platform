@@ -8,6 +8,7 @@ test("health: banco responde e nenhum segredo é exposto", async ({ request }) =
   expect(body).toMatchObject({ ok: true, db: "ok" });
   expect(typeof body.integrations.stripe).toBe("boolean");
   expect(typeof body.integrations.ai).toBe("boolean");
+  expect(typeof body.integrations.live).toBe("boolean");
   expect(JSON.stringify(body)).not.toMatch(/sk_|whsec_|sb_secret|service_role/);
 });
 

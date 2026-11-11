@@ -91,6 +91,9 @@ test.describe("LIVELANCE LIVE: da programação ao leilão relâmpago", () => {
     await studio.getByRole("button", { name: `Destacar ${bag}` }).click();
     await expect(studio.getByText("Em destaque")).toBeVisible();
 
+    // Sem o token do Mux no ambiente de teste: transmissão integrada "em configuração", link HLS manual
+    await expect(studio.getByTestId("transmissao")).toContainText("em configuração");
+    await expect(studio.getByTestId("transmissao")).not.toContainText("rtmps://");
     await studio.getByLabel("Link de reprodução HLS").fill("http://inseguro.com/live.m3u8");
     await studio.getByRole("button", { name: "Salvar" }).click();
     await expect(studio.getByRole("alert").filter({ hasText: "link HLS" })).toBeVisible();

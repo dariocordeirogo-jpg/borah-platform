@@ -45,6 +45,12 @@ export function liveErrorMessage(message?: string): string {
       return "Produto sem estoque para leiloar.";
     case "invalid_duration":
       return "Duração inválida para o leilão.";
+    case "stream_unavailable":
+      return "O serviço de transmissão não respondeu agora. Tente de novo em instantes.";
+    case "stream_exists":
+      return "Esta live já tem uma transmissão.";
+    case "invalid_stream":
+      return "O serviço de transmissão devolveu dados inválidos. Tente de novo.";
     case "too_fast":
       return "Calma! Espere um instante para mandar outra mensagem.";
     case "invalid_message":

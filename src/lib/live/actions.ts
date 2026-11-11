@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { brasiliaLocalToISO } from "@/lib/auctions/schemas";
 import { isPlaybackUrl, liveErrorMessage } from "@/lib/live/format";
+import { createMuxStream, disableMuxStream, muxConfigured, publicPlaybackId } from "@/lib/live/mux";
+import { retireLiveStream } from "@/lib/live/stream";
 import { parseBRLToCents } from "@/lib/market/format";
 import { createClient } from "@/lib/supabase/server";
 
@@ -44,6 +46,38 @@ export async function setPlayback(formData: FormData) {
   redirect(studio(liveId, error ? liveErrorMessage(error.message) : undefined));
 }
 
+/** Loja: cria a transmissão no Mux e liga à live (servidor RTMPS + chave aparecem no estúdio). */
+export async function openStream(formData: FormData) {
+  const liveId = uuid.parse(formData.get("liveId"));
+  if (!muxConfigured()) redirect(studio(liveId, liveErrorMessage("stream_unavailable")));
+  const supabase = await createClient();
+  // Só o dono da loja chega aqui (o RPC recusa os outros) e só uma transmissão por live
+  const { data: ref, error: refError } = await supabase.rpc("live_stream_ref", { _live_id: liveId });
+  if (refError) redirect(studio(liveId, liveErrorMessage(refError.message)));
+  if (ref?.length) redirect(studio(liveId));
+  const { data: live } = await supabase.from("lives").select("status").eq("id", liveId).maybeSingle();
+  if (!live || !["scheduled", "live"].includes(live.status)) redirect(studio(liveId, liveErrorMessage("live_finished")));
+
+  let stream;
+  try {
+    stream = await createMuxStream(liveId);
+  } catch (e) {
+    console.error("mux: não foi possível criar a transmissão", liveId, e);
+    redirect(studio(liveId, liveErrorMessage("stream_unavailable")));
+  }
+  const playbackId = publicPlaybackId(stream);
+  const { error } = playbackId
+    ? await supabase.rpc("attach_live_stream", { _live_id: liveId, _stream_id: stream.id, _playback_id: playbackId })
+    : { error: { message: "invalid_stream" } };
+  if (error) {
+    // Não deixa transmissão solta no Mux
+    await disableMuxStream(stream.id).catch(() => undefined);
+    redirect(studio(liveId, liveErrorMessage(error.message)));
+  }
+  revalidatePath(`/live/${liveId}`);
+  redirect(studio(liveId));
+}
+
 export async function startLive(formData: FormData) {
   const liveId = uuid.parse(formData.get("liveId"));
   const supabase = await createClient();
@@ -56,6 +90,7 @@ export async function endLive(formData: FormData) {
   const liveId = uuid.parse(formData.get("liveId"));
   const supabase = await createClient();
   const { error } = await supabase.rpc("end_live", { _live_id: liveId });
+  if (!error) await retireLiveStream(supabase, liveId);
   revalidatePath("/ao-vivo");
   redirect(studio(liveId, error ? liveErrorMessage(error.message) : undefined));
 }

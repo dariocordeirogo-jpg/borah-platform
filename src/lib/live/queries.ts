@@ -1,5 +1,6 @@
 import "server-only";
 import { connection } from "next/server";
+import { getMuxStream, MUX_RTMP_URL, muxConfigured, type MuxStreamStatus } from "@/lib/live/mux";
 import { productImageUrl } from "@/lib/market/images";
 import { createClient } from "@/lib/supabase/server";
 
@@ -90,4 +91,25 @@ export async function getLiveProductsForSeller(storeId: string) {
     .order("updated_at", { ascending: false })
     .limit(100);
   return data ?? [];
+}
+
+export type StudioStream =
+  | { kind: "unconfigured" }
+  | { kind: "none" }
+  | { kind: "ready"; serverUrl: string; streamKey: string; status: MuxStreamStatus }
+  | { kind: "unreachable" };
+
+/** Estúdio (só o dono da loja): transmissão do Mux desta live, com a chave buscada na hora (nunca gravada no banco). */
+export async function getStudioStream(liveId: string): Promise<StudioStream> {
+  if (!muxConfigured()) return { kind: "unconfigured" };
+  const supabase = await db();
+  const { data, error } = await supabase.rpc("live_stream_ref", { _live_id: liveId });
+  const ref = data?.[0];
+  if (error || !ref) return { kind: "none" };
+  try {
+    const stream = await getMuxStream(ref.stream_id);
+    return { kind: "ready", serverUrl: MUX_RTMP_URL, streamKey: stream.stream_key, status: stream.status };
+  } catch {
+    return { kind: "unreachable" };
+  }
 }

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { adminErrorMessage, isReportKind, reportReasons } from "@/lib/admin/format";
+import { retireLiveStream } from "@/lib/live/stream";
 import { createClient } from "@/lib/supabase/server";
 import { safeNextPath } from "@/lib/validation";
 
@@ -52,6 +53,7 @@ export async function actOnReport(formData: FormData) {
               : await supabase.rpc("admin_hide_message", { _message_id: Number(targetId) });
     // "not_found" aqui = o item já tinha sido tratado; a denúncia pode ser fechada mesmo assim
     if (error && !error.message.startsWith("not_found")) back("/admin/denuncias", adminErrorMessage(error.message));
+    if (kind === "live") await retireLiveStream(supabase, targetId);
   }
   const { error } = await supabase.rpc("admin_resolve_report", {
     _report_id: reportId,
@@ -86,6 +88,7 @@ export async function endLiveAdmin(formData: FormData) {
   const id = uuid.parse(formData.get("id"));
   const supabase = await createClient();
   const { error } = await supabase.rpc("admin_end_live", { _live_id: id, _reason: reason(formData) });
+  if (!error) await retireLiveStream(supabase, id);
   back("/admin/moderacao", error ? adminErrorMessage(error.message) : undefined);
 }
 
