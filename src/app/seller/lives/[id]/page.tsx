@@ -8,9 +8,9 @@ import { LiveRefresh } from "@/components/live/live-refresh";
 import { Notice } from "@/components/market";
 import { Button } from "@/components/ui/button";
 import { formatBRL } from "@/lib/format";
-import { endLive, pinProduct, setPlayback, startLive, startLiveAuction } from "@/lib/live/actions";
+import { endLive, openStream, pinProduct, setPlayback, startLive, startLiveAuction } from "@/lib/live/actions";
 import { liveAuctionMinutes, liveStatusLabel } from "@/lib/live/format";
-import { getLive } from "@/lib/live/queries";
+import { getLive, getStudioStream, type StudioStream } from "@/lib/live/queries";
 import { requireStore } from "@/lib/market/seller-guard";
 
 export const metadata: Metadata = { title: "Estúdio da live" };
@@ -24,6 +24,8 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
   const data = await getLive(id);
   if (!data || data.live.store_id !== store.id) notFound();
   const { live, products, auction, messages } = data;
+  const stream: StudioStream =
+    live.status === "scheduled" || live.status === "live" ? await getStudioStream(live.id) : { kind: "none" };
   const isLive = live.status === "live";
   const auctionRunning = auction?.status === "active";
 
@@ -61,20 +63,7 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
         </div>
       </section>
 
-      <section className="space-y-2 rounded-[var(--radius-card)] border border-line bg-white p-5 text-sm">
-        <h2 className="font-semibold text-navy">Vídeo da transmissão</h2>
-        <p className="text-muted">
-          Transmita pelo serviço de vídeo (ex.: OBS ou celular) e cole aqui o link de reprodução HLS (https, termina em
-          .m3u8). Quem estiver assistindo recebe o vídeo na hora.
-        </p>
-        <form action={setPlayback} className="flex gap-2">
-          <input type="hidden" name="liveId" value={live.id} />
-          <input name="playbackUrl" defaultValue={live.playback_url ?? ""} aria-label="Link de reprodução HLS" placeholder="https://.../live.m3u8" className={input} />
-          <Button type="submit" variant="secondary">
-            Salvar
-          </Button>
-        </form>
-      </section>
+      {(live.status === "scheduled" || isLive) && <StreamPanel liveId={live.id} playbackUrl={live.playback_url} stream={stream} />}
 
       <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
         <section className="rounded-[var(--radius-card)] border border-line bg-white" aria-label="Produtos da live">
@@ -137,6 +126,85 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
         <LiveChat liveId={live.id} initial={messages} canSend={isLive} loggedIn moderator />
       </div>
     </div>
+  );
+}
+
+const streamStatusLabel = {
+  active: "Recebendo vídeo",
+  idle: "Aguardando o sinal do OBS ou do celular",
+  disabled: "Transmissão desligada",
+} as const;
+
+function ManualPlayback({ liveId, playbackUrl }: { liveId: string; playbackUrl: string | null }) {
+  return (
+    <form action={setPlayback} className="flex gap-2">
+      <input type="hidden" name="liveId" value={liveId} />
+      <input name="playbackUrl" defaultValue={playbackUrl ?? ""} aria-label="Link de reprodução HLS" placeholder="https://.../live.m3u8" className={input} />
+      <Button type="submit" variant="secondary">
+        Salvar
+      </Button>
+    </form>
+  );
+}
+
+function StreamPanel({ liveId, playbackUrl, stream }: { liveId: string; playbackUrl: string | null; stream: StudioStream }) {
+  return (
+    <section className="space-y-3 rounded-[var(--radius-card)] border border-line bg-white p-5 text-sm" data-testid="transmissao">
+      <h2 className="font-semibold text-navy">Vídeo da transmissão</h2>
+      {stream.kind === "ready" && (
+        <>
+          <p className="text-muted">
+            Status: <strong className="text-navy" data-testid="status-transmissao">{streamStatusLabel[stream.status]}</strong>. Quando o
+            vídeo estiver chegando, toque em “Começar live”.
+          </p>
+          <dl className="grid gap-2 sm:grid-cols-[140px_1fr]">
+            <dt className="font-semibold text-navy">Servidor</dt>
+            <dd>
+              <code className="select-all break-all rounded bg-surface px-2 py-1">{stream.serverUrl}</code>
+            </dd>
+            <dt className="font-semibold text-navy">Chave</dt>
+            <dd>
+              <details>
+                <summary className="cursor-pointer text-brand">Mostrar chave de transmissão</summary>
+                <code className="mt-1 block select-all break-all rounded bg-surface px-2 py-1">{stream.streamKey}</code>
+                <p className="mt-1 text-xs text-muted">Não compartilhe: quem tiver a chave consegue transmitir na sua live.</p>
+              </details>
+            </dd>
+          </dl>
+          <p className="text-xs text-muted">
+            OBS: Configurações → Transmissão → Serviço “Personalizado”, cole o servidor e a chave. No celular, use um app de
+            transmissão RTMP (ex.: Larix Broadcaster) com os mesmos dados.
+          </p>
+        </>
+      )}
+      {stream.kind === "unreachable" && (
+        <Notice tone="error">O serviço de transmissão não respondeu agora. Atualize a página em instantes.</Notice>
+      )}
+      {stream.kind === "none" && (
+        <>
+          <p className="text-muted">Gere a chave e transmita pelo OBS (computador) ou por um app de celular. Quem assiste recebe o vídeo aqui na LIVELANCE.</p>
+          <form action={openStream}>
+            <input type="hidden" name="liveId" value={liveId} />
+            <Button type="submit">Gerar chave de transmissão</Button>
+          </form>
+          <details>
+            <summary className="cursor-pointer text-xs text-muted">Usar outro serviço (link HLS)</summary>
+            <div className="mt-2">
+              <ManualPlayback liveId={liveId} playbackUrl={playbackUrl} />
+            </div>
+          </details>
+        </>
+      )}
+      {stream.kind === "unconfigured" && (
+        <>
+          <p className="text-muted">
+            A transmissão integrada da LIVELANCE está em configuração. Por enquanto, transmita por um serviço de vídeo e cole
+            aqui o link de reprodução HLS (https, termina em .m3u8).
+          </p>
+          <ManualPlayback liveId={liveId} playbackUrl={playbackUrl} />
+        </>
+      )}
+    </section>
   );
 }
 

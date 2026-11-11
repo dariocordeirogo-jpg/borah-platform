@@ -9,7 +9,8 @@ limpeza de dados só acontecem com autorização explícita do dono do projeto. 
 - [ ] Termos de uso e Política de privacidade revisados por advogado (hoje são rascunhos em `/termos` e `/privacidade`).
 - [ ] Encarregado de dados (DPO) nomeado e canal de contato publicado na Política de privacidade.
 - [ ] Quem paga as comissões de indicação e como (saque, crédito) — hoje só ficam registradas.
-- [ ] Serviço de transmissão das lives (recomendado: Mux). Até lá, a live usa uma URL HLS informada pela loja.
+- [x] Serviço de transmissão das lives: Mux integrado (ver [LIVE.md](LIVE.md)).
+- [ ] Token do Mux válido (`MUX_TOKEN_ID` / `MUX_TOKEN_SECRET`) na Vercel e teste de uma live real pelo OBS.
 
 ## 2. Contas e chaves (nunca no GitHub; só na Vercel e no Vault)
 

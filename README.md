@@ -47,4 +47,5 @@ Os testes e2e usam o projeto Supabase de desenvolvimento e o usuário `e2e@livel
 - [docs/TESTING.md](docs/TESTING.md) — testes e critérios de aceite
 - [docs/ROADMAP.md](docs/ROADMAP.md) — fases
 - [docs/LAUNCH.md](docs/LAUNCH.md) — checklist de lançamento
+- [docs/LIVE.md](docs/LIVE.md) — transmissão das lives (Mux)
 - [docs/BRAND_MIGRATION.md](docs/BRAND_MIGRATION.md) — relatório da migração BORAH → LIVELANCE

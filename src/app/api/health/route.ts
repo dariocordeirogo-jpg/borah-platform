@@ -16,6 +16,7 @@ export async function GET() {
     integrations: {
       stripe: Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET),
       ai: Boolean(process.env.ANTHROPIC_API_KEY),
+      live: Boolean(process.env.MUX_TOKEN_ID && process.env.MUX_TOKEN_SECRET),
     },
     commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null,
   };
