@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
-import { Gavel, LayoutDashboard, Package, Receipt, Settings, Wallet } from "lucide-react";
+import { Clapperboard, Gavel, LayoutDashboard, Package, Receipt, Settings, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/seller", label: "Visão geral", icon: LayoutDashboard },
   { href: "/seller/produtos", label: "Produtos", icon: Package },
   { href: "/seller/leiloes", label: "Leilões", icon: Gavel },
+  { href: "/seller/videos", label: "Vídeos", icon: Clapperboard },
   { href: "/seller/pedidos", label: "Pedidos", icon: Receipt },
   { href: "/seller/pagamentos", label: "Pagamentos", icon: Wallet },
   { href: "/seller/loja", label: "Loja", icon: Settings },

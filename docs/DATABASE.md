@@ -89,6 +89,16 @@ Detalhes e configuração: [PAYMENTS.md](PAYMENTS.md).
 indicação da própria loja ou código inválido (a compra segue normalmente). O gatilho `orders_sync_commission` confirma a
 comissão quando o pedido é pago e cancela quando o pedido é cancelado ou reembolsado.
 
+## Tabelas (Fase 6 — Vídeos)
+
+| Tabela | Conteúdo | Quem lê | Quem escreve |
+| --- | --- | --- | --- |
+| `videos` | Loja, produto marcado, arquivo, legenda, status, visualizações, curtidas | Todos (publicado, loja ativa, produto ativo); a loja vê os seus | `create_video`, `remove_video`, contadores |
+| `video_likes` | Quem curtiu | O próprio | `toggle_video_like` |
+
+Bucket `product-videos` (público para leitura, 50 MB, mp4/webm/mov; envio e exclusão só na pasta da própria loja).
+O arquivo vai direto do navegador ao Storage; `create_video` confere produto da loja, caminho e se o arquivo existe.
+
 ## Testes de RLS
 
 `supabase/tests/rls_fase1.sql` roda numa transação com rollback e confere 17 regras
@@ -101,7 +111,7 @@ Só no projeto de desenvolvimento: `e2e@livelance.test` (comprador), `e2e-compra
 concorrência) e `e2e-vendedor@livelance.test` (vendedor, "Loja E2E LIVELANCE"). Senha `Teste12345`.
 Antes de produção, remover os três, a loja e os produtos de teste.
 
-Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) `supabase/tests/leiloes_fase3.sql` (36/36) `supabase/tests/pay_fase4.sql` (47/47) e `supabase/tests/afiliados_fase5.sql` (22/22).
+Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2.sql` (21/21) `supabase/tests/leiloes_fase3.sql` (36/36) `supabase/tests/pay_fase4.sql` (47/47) `supabase/tests/afiliados_fase5.sql` (22/22) e `supabase/tests/videos_fase6.sql` (19/19).
 
 ## Migrations aplicadas
 
@@ -118,5 +128,7 @@ Testes SQL: `supabase/tests/rls_fase1.sql` (17/17), `supabase/tests/market_fase2
 | 20261111120010 | fase4_pay | Contas de recebimento, pagamentos, avisos assinados, reembolso |
 | 20261111120446 | fase4_loja_recebe | `store_accepts_payments` (público, sem expor a conta) |
 | 20261111133258 | fase5_afiliados | Afiliados, cliques, comissões, `checkout_with_ref`, gatilho de status |
+| 20261111140455 | fase6_videos | Vídeos, curtidas, bucket `product-videos`, funções |
+| 20261111141015 | storage_dono_le_pasta | Dono lê a própria pasta no Storage (sem isso, apagar foto/vídeo não removia o arquivo) |
 
 As duas primeiras ainda citam a marca antiga em comentários e textos: são histórico já aplicado e não são editadas.

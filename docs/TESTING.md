@@ -1,19 +1,20 @@
 # Testes
 
-Resultado em 2026-11-11, Fase 5 (Indique e ganhe):
+Resultado em 2026-11-11, Fase 6 (Vídeos):
 
 | Verificação | Comando | Resultado |
 | --- | --- | --- |
 | Build + tipos | `npm run build`, `npm run typecheck` | ok |
 | Lint | `npm run lint` | ok, 0 avisos |
-| Unitários | `npm test` | 83/83 (inclui assinatura igual à da biblioteca oficial da Stripe e links de indicação) |
-| Navegador (1440 px e 375 px) | `npm run build:e2e && npm run test:e2e` | 51 ok, 17 pulados no celular de propósito (fluxos de compra, leilão, pagamento e indicação só no desktop) |
+| Unitários | `npm test` | 87/87 (inclui assinatura igual à da biblioteca oficial da Stripe, links de indicação e regras de vídeo) |
+| Navegador (1440 px e 375 px) | `npm run build:e2e && npm run test:e2e` | 55 ok, 21 pulados no celular de propósito (fluxos de compra, leilão, pagamento, indicação e vídeo só no desktop) |
 | Concorrência | `npm run test:integration` | Checkout: 5 disputas pela última unidade, sempre 1 pedido. Lances: 20 simultâneos, sequência sempre crescente e consistente |
 | Segurança do banco (Fase 1) | `supabase/tests/rls_fase1.sql` | 17/17 |
 | Motor de pedidos (Fase 2) | `supabase/tests/market_fase2.sql` | 21/21 |
 | Motor de leilões (Fase 3) | `supabase/tests/leiloes_fase3.sql` | 36/36 (Fase 3) |
 | Pagamentos (Fase 4) | `supabase/tests/pay_fase4.sql` | 47/47 |
 | Afiliados (Fase 5) | `supabase/tests/afiliados_fase5.sql` | 22/22 |
+| Vídeos (Fase 6) | `supabase/tests/videos_fase6.sql` | 19/19 |
 | Encerramento automático | `cron.job_run_details` | 5.754 execuções em 4 dias, 0 falhas |
 
 Atrás de proxy (ambiente de nuvem): `NODE_USE_ENV_PROXY=1` nos comandos acima. `build:e2e` desliga o otimizador de imagens
@@ -48,6 +49,12 @@ Afiliado entra no programa em `/indique` → painel com link geral e gerador de 
 link inválido só redireciona, sem cookie, e `?to=` externo cai na home → compradora chega por `/r/<código>?to=/produto/x`,
 entra e compra pela tela → comissão "Aguardando pagamento" de R$ 3,00 sobre R$ 100,00 → aviso de pagamento → "Confirmada"
 → reembolso → "Cancelada". Usa a conta de recebimento da loja de teste ativada pelo `pay.spec.ts`.
+
+## Vídeos (`tests/e2e/videos.spec.ts`)
+
+Vendedor tenta enviar uma imagem (recusada) → publica vídeo WebM com produto marcado e legenda → visitante vê o vídeo
+no feed e ele começa a tocar → precisa entrar para curtir → compradora curte (contador 1, continua curtido após recarregar)
+e usa "Comprar agora" do vídeo → carrinho → vendedor tira do ar → some do feed e o arquivo sai do Storage.
 
 ## Outros testes e2e
 
