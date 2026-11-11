@@ -12,6 +12,8 @@ export const site = {
     "Na LIVELANCE você compra, vende, acompanha transmissões ao vivo e participa de leilões digitais em uma única plataforma.",
   productionDomain: "livelance.com.br",
   url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
+  /** Só é produção quando o site responde no domínio oficial. */
+  production: (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "") === "https://livelance.com.br",
 } as const;
 
 /** Módulos da plataforma (nomes oficiais). */
