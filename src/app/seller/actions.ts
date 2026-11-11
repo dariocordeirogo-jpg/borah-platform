@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { normalizeCep } from "@/lib/shipping/format";
 import { createClient } from "@/lib/supabase/server";
 import { marketErrorMessage } from "@/lib/market/format";
 import { extensionFor, sniffImageType } from "@/lib/market/image-check";
@@ -48,10 +49,13 @@ export async function createStore(_prev: FormState, formData: FormData): Promise
 export async function updateStore(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = storeSchema.omit({ slug: true }).safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { fieldErrors: parsed.error.flatten().fieldErrors };
+  const rawCep = String(formData.get("originCep") ?? "").trim();
+  const originCep = rawCep ? normalizeCep(rawCep) : null;
+  if (rawCep && !originCep) return { fieldErrors: { originCep: ["CEP inválido. Use 8 números, ex.: 01001-000."] } };
   const { supabase, store } = await requireSeller();
   const { error } = await supabase
     .from("stores")
-    .update({ name: parsed.data.name, description: parsed.data.description })
+    .update({ name: parsed.data.name, description: parsed.data.description, origin_cep: originCep })
     .eq("id", store.id);
   if (error) return { error: "Não foi possível salvar." };
   revalidatePath("/", "layout");
@@ -73,6 +77,7 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
     price_cents: d.price,
     compare_at_cents: d.compareAt,
     stock: d.stock,
+    weight_grams: d.weight,
     status: d.status,
   };
 

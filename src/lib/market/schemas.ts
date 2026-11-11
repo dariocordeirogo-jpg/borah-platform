@@ -65,6 +65,12 @@ export const productSchema = z
         return cents;
       }),
     stock: z.coerce.number().int("Estoque deve ser um número inteiro.").min(0).max(100000),
+    weight: z
+      .preprocess((v) => (v === undefined || v === null || String(v).trim() === "" ? 500 : v), z.coerce.number({ message: "Informe o peso em gramas." }))
+      .pipe(z.number()
+      .int("Peso em gramas, sem vírgula.")
+      .min(1, "Peso mínimo: 1 g.")
+      .max(30000, "Peso máximo: 30 kg (limite dos Correios).")),
     status: z.enum(["draft", "active", "paused"]),
   })
   .refine((d) => d.compareAt === null || d.compareAt > d.price, {

@@ -8,6 +8,7 @@ import { OrderStatus } from "@/components/order-status";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth";
 import { formatBRL } from "@/lib/format";
+import { formatDays, shippingServiceLabel } from "@/lib/shipping/format";
 import { cancelMyOrder } from "@/lib/market/actions";
 import { getOrder } from "@/lib/market/queries";
 import { syncCheckoutReturn } from "@/lib/pay/sync";
@@ -65,8 +66,12 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
             <dd>{formatBRL(o.subtotal_cents)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-muted">Frete</dt>
-            <dd className="text-muted">A combinar</dd>
+            <dt className="text-muted">
+              Frete{o.shipping_service ? ` (${shippingServiceLabel[o.shipping_service]}, até ${formatDays(o.shipping_days ?? 0)})` : ""}
+            </dt>
+            <dd className={o.shipping_service ? "" : "text-muted"} data-testid="frete-pedido">
+              {o.shipping_service ? formatBRL(o.shipping_cents) : "A combinar com a loja"}
+            </dd>
           </div>
           {o.discount_cents > 0 && (
             <div className="flex justify-between" data-testid="desconto">

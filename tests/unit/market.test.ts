@@ -91,3 +91,15 @@ describe("schemas", () => {
     expect(storeSchema.safeParse({ name: "Loja", slug: "Com Espaço" }).success).toBe(false);
   });
 });
+
+describe("peso do produto", () => {
+  const base = { title: "Tênis", categoryId: "1", condition: "new", price: "199,90", stock: "3", status: "active" };
+  it("sem peso usa 500 g; acima de 30 kg é recusado", async () => {
+    const { productSchema } = await import("@/lib/market/schemas");
+    const ok = productSchema.safeParse(base);
+    expect(ok.success && ok.data.weight).toBe(500);
+    expect(productSchema.safeParse({ ...base, weight: "800" }).success).toBe(true);
+    expect(productSchema.safeParse({ ...base, weight: "40000" }).success).toBe(false);
+    expect(productSchema.safeParse({ ...base, weight: "1,5" }).success).toBe(false);
+  });
+});

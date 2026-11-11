@@ -209,7 +209,7 @@ export async function getMyAddresses() {
 }
 
 const ORDER_SELECT =
-  "id, number, status, subtotal_cents, shipping_cents, discount_cents, coupon_code, total_cents, shipping_address, cancelled_reason, created_at, buyer_id, store_id, stores(name, slug, owner_id), order_items(id, title, unit_price_cents, quantity, product_id)" as const;
+  "id, number, status, subtotal_cents, shipping_cents, shipping_service, shipping_days, discount_cents, coupon_code, total_cents, shipping_address, cancelled_reason, created_at, buyer_id, store_id, stores(name, slug, owner_id), order_items(id, title, unit_price_cents, quantity, product_id)" as const;
 
 export async function getMyOrders() {
   const supabase = await db();
@@ -238,7 +238,7 @@ export async function getMyStore() {
   if (!user) return null;
   const { data } = await supabase
     .from("stores")
-    .select("id, name, slug, description, is_active, created_at")
+    .select("id, name, slug, description, origin_cep, is_active, created_at")
     .eq("owner_id", user.id)
     .maybeSingle();
   return data;
@@ -263,7 +263,7 @@ export async function getSellerProduct(storeId: string, id: string) {
   const { data } = await supabase
     .from("products")
     .select(
-      "id, title, description, price_cents, compare_at_cents, stock, condition, status, category_id, product_images(id, path, position)",
+      "id, title, description, price_cents, compare_at_cents, stock, weight_grams, condition, status, category_id, product_images(id, path, position)",
     )
     .eq("store_id", storeId)
     .eq("id", id)

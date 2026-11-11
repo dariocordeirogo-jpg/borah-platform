@@ -38,11 +38,11 @@ async function Checkout() {
           ))}
         </ul>
         <div className="mt-3 flex justify-between border-t border-line pt-3 font-bold text-navy">
-          <span>Total</span>
+          <span>Produtos</span>
           <span>{formatBRL(cart.totalCents)}</span>
         </div>
-        <p className="mb-4 text-xs text-muted">Frete a combinar com a loja nesta fase.</p>
-        <PlaceOrderForm addresses={addresses} />
+        <p className="mb-4 text-xs text-muted">Frete calculado pelo endereço escolhido. Cupom de desconto aplicado ao finalizar.</p>
+        <PlaceOrderForm addresses={addresses} productsCents={cart.totalCents} />
       </aside>
     </div>
   );

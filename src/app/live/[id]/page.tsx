@@ -59,7 +59,7 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
     <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
       <LiveRefresh liveId={live.id} />
       <div className="space-y-4">
-        <LivePlayer src={live.playback_url} status={live.status} />
+        <LivePlayer src={live.playback_url} status={live.status} title={live.title} />
         <div>
           <p className="text-xs font-semibold text-muted">
             {liveStatusLabel[live.status]} ·{" "}

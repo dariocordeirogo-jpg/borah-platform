@@ -18,6 +18,12 @@ export function isPlaybackUrl(value: string): boolean {
   }
 }
 
+/** Link de reprodução do Mux (https://stream.mux.com/<playback>.m3u8) → id de reprodução; outros serviços → null. */
+export function muxPlaybackId(url: string | null): string | null {
+  const m = url?.match(/^https:\/\/stream\.mux\.com\/([A-Za-z0-9]{10,100})\.m3u8$/);
+  return m ? m[1] : null;
+}
+
 export const liveAuctionMinutes = [5, 10, 15] as const;
 
 export function liveErrorMessage(message?: string): string {
