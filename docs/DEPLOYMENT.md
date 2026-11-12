@@ -23,9 +23,20 @@ Variáveis de ambiente (Production e Preview):
 | `STRIPE_SECRET_KEY` | `sk_live_...` só com a flag `payments` ligada; antes disso `sk_test_...` | `sk_test_...` |
 | `MUX_TOKEN_ID` / `MUX_TOKEN_SECRET` | token do ambiente de produção do Mux | token do ambiente de desenvolvimento |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` do endpoint de produção (o mesmo vai no Vault) | `whsec_...` de teste |
+| `SITE_ACCESS_PASSWORD` | senha da página "Em construção" (tipo *Sensitive*); apagar no lançamento | vazio |
+| `SITE_ACCESS_SECRET` | texto aleatório longo (opcional; trocar derruba todos os acessos) | vazio |
 
 `NEXT_PUBLIC_SITE_URL` controla canonical, Open Graph, sitemap e robots. Enquanto não for exatamente
 `https://zexi.com.br`, o `robots.txt` bloqueia indexação (evita o Google indexar previews).
+
+### Página "Em construção" (acesso interno com senha)
+
+Com `SITE_ACCESS_PASSWORD` definida, o `src/proxy.ts` manda todo visitante para `/em-construcao`, que pede a senha.
+Quem acerta recebe o cookie httpOnly `zexi_acesso` (hash da senha, 30 dias) e volta para a página que tentou abrir.
+Ficam abertos só `/api/health`, `/api/webhooks/*`, ícones, manifesto, `robots.txt` e arquivos estáticos
+(`src/lib/site-lock.ts`). Enquanto o bloqueio está ligado o `robots.txt` responde `Disallow: /`.
+**Lançar = apagar a variável na Vercel e fazer redeploy.** Trocar a senha desloga todo mundo.
+A proteção SSO da Vercel não vale para domínios próprios; no domínio, quem protege é esta senha.
 
 ## 3. Supabase Auth (painel → Authentication)
 

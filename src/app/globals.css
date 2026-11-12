@@ -73,3 +73,8 @@
     opacity: 0.6;
   }
 }
+
+/* Página "Em construção": some com cabeçalho, rodapé e menu (nem visíveis, nem focáveis pelo teclado) */
+body:has([data-site-gate]) > :not(#conteudo) {
+  display: none;
+}
