@@ -1,7 +1,7 @@
-# LIVELANCE LIVE — transmissão (Mux)
+# ZEXI LIVE — transmissão (Mux)
 
 O vídeo das lives é transmitido pelo [Mux](https://www.mux.com). A loja transmite do OBS (computador) ou de um app
-de celular (RTMP, ex.: Larix Broadcaster); quem assiste recebe o vídeo HLS no player da LIVELANCE (hls.js).
+de celular (RTMP, ex.: Larix Broadcaster); quem assiste recebe o vídeo HLS no player da Zexi (hls.js).
 
 ## Como funciona
 

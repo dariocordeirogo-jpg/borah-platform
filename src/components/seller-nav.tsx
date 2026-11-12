@@ -34,7 +34,7 @@ function SellerNavWithPath() {
 function SellerNavView({ pathname }: { pathname: string }) {
   return (
     <nav aria-label="Painel do vendedor" className="rounded-[var(--radius-card)] bg-navy p-2 text-white md:p-3">
-      <p className="hidden px-3 pb-2 pt-1 text-[11px] font-bold tracking-wider text-white/70 md:block">LIVELANCE SELLER</p>
+      <p className="hidden px-3 pb-2 pt-1 text-[11px] font-bold tracking-wider text-white/70 md:block">ZEXI SELLER</p>
       <ul className="flex gap-1 overflow-x-auto md:flex-col">
         {items.map(({ href, label, icon: Icon }) => {
           const active = href === "/seller" ? pathname === "/seller" : pathname.startsWith(href);

@@ -1,4 +1,4 @@
--- Teste do LIVELANCE MARKET (Fase 2). Roda numa transação e desfaz tudo (rollback).
+-- Teste do ZEXI MARKET (Fase 2). Roda numa transação e desfaz tudo (rollback).
 -- Todas as linhas devem vir com ok = true.
 begin;
 insert into auth.users (id, email, raw_user_meta_data, aud, role) values

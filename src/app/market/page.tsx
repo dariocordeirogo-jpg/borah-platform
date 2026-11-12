@@ -11,7 +11,7 @@ import { aiConfigured } from "@/lib/ai/claude";
 
 export const metadata: Metadata = {
   title: "Marketplace",
-  description: "LIVELANCE MARKET: compre de lojas brasileiras com preço fixo, carrinho e entrega.",
+  description: "ZEXI MARKET: compre de lojas brasileiras com preço fixo, carrinho e entrega.",
   alternates: { canonical: "/market" },
 };
 
@@ -196,7 +196,7 @@ async function Catalog({ searchParams }: { searchParams: SP }) {
           >
             {q || categoria
               ? "Tente outra palavra ou outra categoria."
-              : "Ainda não há produtos à venda. Abra sua loja e publique o primeiro anúncio da LIVELANCE."}
+              : "Ainda não há produtos à venda. Abra sua loja e publique o primeiro anúncio da Zexi."}
           </EmptyState>
         )}
       </section>
@@ -208,7 +208,7 @@ export default function Page({ searchParams }: PageProps<"/market">) {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 md:py-8">
       <p className="mb-4 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-        <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" /> LIVELANCE MARKET
+        <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI MARKET
       </p>
       <Suspense fallback={<div className="h-96 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
         <Catalog searchParams={searchParams as SP} />

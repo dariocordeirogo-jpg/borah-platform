@@ -1,4 +1,4 @@
--- Teste do LIVELANCE PAY (Fase 4). Roda numa transação e desfaz tudo (rollback).
+-- Teste do ZEXI PAY (Fase 4). Roda numa transação e desfaz tudo (rollback).
 -- Os avisos da Stripe são simulados e assinados aqui com o mesmo segredo do Vault.
 begin;
 insert into auth.users (id, email, raw_user_meta_data, aud, role) values

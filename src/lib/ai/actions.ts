@@ -27,7 +27,7 @@ export async function generateDescription(input: {
   categoryId?: number | null;
   condition: "new" | "used" | "refurbished";
 }): Promise<{ text?: string; error?: string }> {
-  if (!aiConfigured()) return { error: "A IA da LIVELANCE está em configuração." };
+  if (!aiConfigured()) return { error: "A IA da Zexi está em configuração." };
   const title = input.title.trim();
   if (title.length < 3) return { error: "Escreva o título do produto primeiro." };
   const supabase = await createClient();
@@ -112,7 +112,7 @@ export async function smartSearch(formData: FormData) {
 export async function triageReport(formData: FormData) {
   const reportId = uuid.parse(formData.get("reportId"));
   const back = (msg?: string) => redirect(`/admin/denuncias${msg ? `?erro=${encodeURIComponent(msg)}` : ""}`);
-  if (!aiConfigured()) back("A IA da LIVELANCE está em configuração.");
+  if (!aiConfigured()) back("A IA da Zexi está em configuração.");
   const supabase = await createClient();
   const { data: allowed, error: quotaError } = await supabase.rpc("ai_take_quota", { _feature: "triage" });
   if (quotaError) back("Seu papel na equipe não permite essa ação.");

@@ -208,7 +208,7 @@ export function SignUpForm() {
             <input
               type="checkbox"
               name="acceptTerms"
-              className="mt-0.5 h-5 w-5 rounded accent-[#D71920]"
+              className="mt-0.5 h-5 w-5 rounded accent-brand"
               aria-describedby={state.fieldErrors?.acceptTerms ? "terms-erro" : undefined}
             />
             <span>

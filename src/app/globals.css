@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 /*
- * LIVELANCE — tokens de design (paleta vermelho · azul-marinho · branco).
- * Contraste WCAG AA medido:
- *  - vermelho #D71920 em branco 5,19:1 · branco em vermelho 5,19:1
- *  - azul-marinho #10243A em branco 15,72:1
- *  - azul-marinho sobre dourado #D6A638 7,02:1 (botões de compra/lance)
+ * Zexi — tokens de design (paleta grafite · laranja · branco), fiéis à arte da marca.
+ * Os nomes dos tokens (`brand`, `navy`) foram mantidos da marca anterior: `brand` = laranja Zexi, `navy` = grafite.
+ * Contraste medido:
+ *  - laranja #FF4D2D com texto branco 3,3:1 (botões usam texto em negrito; decisão da marca)
+ *  - laranja #FF4D2D sobre grafite 5,7:1
+ *  - grafite #0F1115 em branco 18,9:1
  *  - cinza de texto #5A6878 em branco 5,70:1
  *
  * REGRA DO DOURADO: os tokens `buy*` e o utilitário `btn-buy` existem SÓ para
@@ -13,14 +14,16 @@
  * Nunca em logo, menu, títulos, ícones, fundos, bordas ou ações administrativas.
  */
 @theme {
-  --color-brand: #D71920;
-  --color-brand-dark: #A90F18;
-  --color-brand-soft: #FDECEC;
-  /* Vermelho mais claro para texto sobre fundo azul-marinho (contraste AA) */
-  --color-brand-bright: #FF5A61;
-  --color-navy: #10243A;
-  --color-navy-2: #183B5B;
-  --color-navy-soft: #E9EEF4;
+  --color-brand: #FF4D2D;
+  --color-brand-dark: #E23A1C;
+  --color-brand-soft: #FFEDE8;
+  /* Laranja da marca (ponto AO VIVO, pingo do i, selos) — o mesmo do botão */
+  --color-brand-vivid: #FF4D2D;
+  /* Laranja claro para texto sobre fundo grafite */
+  --color-brand-bright: #FF6A4F;
+  --color-navy: #0F1115;
+  --color-navy-2: #1F232B;
+  --color-navy-soft: #EEF0F3;
   --color-ink: #1A2230;
   --color-muted: #5A6878;
   --color-line: #E3E6EB;
@@ -69,4 +72,9 @@
     filter: grayscale(0.6);
     opacity: 0.6;
   }
+}
+
+/* Página "Em construção": some com cabeçalho, rodapé e menu (nem visíveis, nem focáveis pelo teclado) */
+body:has([data-site-gate]) > :not(#conteudo) {
+  display: none;
 }

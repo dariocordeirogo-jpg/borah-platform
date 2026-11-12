@@ -30,7 +30,7 @@ async function ensureVerified(page: Page, cpf: string, auctionUrl: string) {
   }
 }
 
-test.describe("LIVELANCE LEILÕES: disputa em tempo real", () => {
+test.describe("ZEXI LEILÕES: disputa em tempo real", () => {
   test.describe.configure({ mode: "serial" });
   test.beforeEach(({}, info) => test.skip(info.project.name !== "desktop", "roda uma vez (desktop)"));
 

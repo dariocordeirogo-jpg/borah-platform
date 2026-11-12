@@ -13,7 +13,7 @@ async function Form({ searchParams }: { searchParams: Promise<{ next?: string | 
 export default function Page({ searchParams }: PageProps<"/entrar">) {
   return (
     <>
-      <h1 className="mt-4 text-center font-display text-2xl font-bold">Entrar na LIVELANCE</h1>
+      <h1 className="mt-4 text-center font-display text-2xl font-bold">Entrar na Zexi</h1>
       <p className="mb-6 mt-1 text-center text-sm text-muted">Acesse sua conta para comprar, assistir e dar lances.</p>
       <Suspense fallback={<div className="h-80" />}>
         <Form searchParams={searchParams} />

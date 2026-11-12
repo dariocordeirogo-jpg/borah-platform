@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ArrowRight, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Timer, Video } from "lucide-react";
+import { ArrowRight, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Tag, Timer, UserRound, Video } from "lucide-react";
+import { HeroCarousel } from "@/components/home/hero-carousel";
 import { AuctionCard, DemoTag, ProductCard, UpcomingCard } from "@/components/cards";
 import { AuctionCardLive } from "@/components/auctions/auction-card";
 import { MarketProductCard } from "@/components/market";
@@ -9,7 +9,6 @@ import { listAuctions } from "@/lib/auctions/queries";
 import { ButtonLink } from "@/components/ui/button";
 import { listProducts } from "@/lib/market/queries";
 import { categories, endingSoon, liveAuctions, offers, stores, upcoming } from "@/lib/demo-data";
-import { site } from "@/lib/site";
 
 function SectionHeader({
   title,
@@ -111,118 +110,35 @@ function Rail({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Os três jeitos de negociar, lado a lado, para não deixar dúvida. */
-const modes = [
-  {
-    href: "/market",
-    icon: ShoppingBag,
-    name: "LIVELANCE MARKET",
-    verb: "Compre agora",
-    text: "Preço fixo, carrinho e entrega. Sem disputa.",
-    iconClass: "bg-navy-soft text-navy",
-    image: "/images/home/compre.webp",
-    alt: "Tênis, fones, relógios e bolsas sobre fundo azul-marinho com sacolas vermelhas",
-  },
-  {
-    href: "/ao-vivo",
-    icon: Radio,
-    name: "LIVELANCE LIVE",
-    verb: "Assista e compre",
-    text: "Vendedores apresentam ao vivo. Pergunte no chat e compre sem sair da transmissão.",
-    iconClass: "bg-brand-soft text-brand",
-    image: "/images/home/live.webp",
-    alt: "Vendedor mostra uma bolsa para o celular durante uma transmissão ao vivo em uma loja",
-  },
-  {
-    href: "/leiloes",
-    icon: Gavel,
-    name: "LIVELANCE LEILÕES",
-    verb: "Dê seu lance",
-    text: "Lotes com lance inicial, incremento mínimo e cronômetro oficial. Quem der o maior lance arremata.",
-    iconClass: "bg-brand text-white",
-    image: "/images/home/leilao.webp",
-    alt: "Martelo de leilão ao lado de uma câmera antiga e relógios de colecionador",
-  },
+/** Atalhos logo abaixo do carrossel: os três jeitos de negociar e os caminhos mais procurados. */
+const shortcuts = [
+  { href: "/market", icon: ShoppingBag, title: "Compre agora", text: "Preço fixo e entrega pelos Correios.", cta: "Ver produtos", iconClass: "bg-navy-soft text-navy" },
+  { href: "/ao-vivo", icon: Radio, title: "Assista e compre", text: "Lojas mostrando produtos ao vivo.", cta: "Ver lives", iconClass: "bg-brand-soft text-brand" },
+  { href: "/leiloes", icon: Gavel, title: "Dê seu lance", text: "Leilões com cronômetro oficial.", cta: "Ver leilões", iconClass: "bg-brand text-white" },
+  { href: "/market?preco_max=100", icon: Tag, title: "Até R$ 100", text: "Achados que cabem no bolso.", cta: "Ver achados", iconClass: "bg-navy-soft text-navy" },
+  { href: "/conta", icon: UserRound, title: "Entre na sua conta", text: "Acompanhe pedidos e lances.", cta: "Entrar", iconClass: "bg-brand-soft text-brand" },
+  { href: "/vender", icon: StoreIcon, title: "Venda na Zexi", text: "Abra sua loja e venda ao vivo.", cta: "Começar a vender", iconClass: "bg-navy text-white" },
 ];
 
 export default function HomePage() {
   return (
     <>
-      <section className="relative isolate overflow-hidden bg-navy" aria-labelledby="hero-titulo">
-        <div className="relative h-60 sm:h-80 md:absolute md:inset-0 md:-z-10 md:h-auto">
-          <Image
-            src="/images/home/hero.webp"
-            alt="Vendedora sorridente mostra um tênis para o celular durante uma live de vendas"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-[65%_20%] md:object-[70%_center]"
-          />
-          <div
-            className="absolute inset-0 bg-gradient-to-t from-navy via-transparent to-transparent md:bg-gradient-to-r md:from-navy md:via-navy/85 md:to-transparent"
-            aria-hidden="true"
-          />
-        </div>
-        <div className="mx-auto flex max-w-7xl flex-col px-4 pb-10 pt-2 md:min-h-[540px] md:justify-center md:pb-16 md:pt-16">
-          <div className="max-w-xl text-white">
-            <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold tracking-wide text-white ring-1 ring-white/25 backdrop-blur-sm">
-              <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75 motion-reduce:animate-none" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-brand" />
-              </span>
-              MARKET · LIVE · LEILÕES
-            </p>
-            <h1 id="hero-titulo" className="mt-4 font-display text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">
-              Tudo acontece
-              <br />
-              <span className="text-brand-bright">ao vivo.</span>
-            </h1>
-            <p className="mt-4 max-w-lg text-base text-white/85 md:text-lg">
-              Compre com preço fixo, assista vendedores apresentando ao vivo e dispute leilões com cronômetro oficial — tudo
-              em uma plataforma brasileira.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <ButtonLink href="/market" size="lg">
-                Explorar ofertas <ArrowRight className="h-5 w-5" aria-hidden="true" />
-              </ButtonLink>
-              <ButtonLink href="/ao-vivo" size="lg" variant="outline" className="border-white/60 bg-white/10 text-white backdrop-blur-sm hover:bg-white hover:text-navy">
-                <Radio className="h-5 w-5" aria-hidden="true" /> Ver lives
-              </ButtonLink>
-            </div>
-            <p className="mt-5 text-sm font-semibold tracking-wide text-white/70">{site.tagline}</p>
-          </div>
-        </div>
-        <p className="absolute right-3 top-2 text-[10px] text-white/70 md:bottom-2 md:top-auto">Imagem ilustrativa</p>
-      </section>
+      <HeroCarousel />
 
-      <section className="border-b border-line bg-surface" aria-label="Modalidades">
-        <ul className="mx-auto grid max-w-7xl gap-4 px-4 py-8 md:grid-cols-3 md:py-10">
-          {modes.map((m) => (
-            <li key={m.href}>
+      <section aria-label="Atalhos" className="relative z-30 -mt-16 md:-mt-20">
+        <ul className="mx-auto flex max-w-7xl snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 md:grid md:grid-cols-3 md:overflow-visible lg:grid-cols-6">
+          {shortcuts.map((s) => (
+            <li key={s.title} className="w-[44%] shrink-0 snap-start sm:w-[30%] md:w-auto">
               <Link
-                href={m.href}
-                className="group flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white text-ink shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lg"
+                href={s.href}
+                className="group flex h-full flex-col items-center rounded-[var(--radius-card)] bg-white p-4 text-center shadow-[0_6px_24px_rgba(16,36,58,0.12)] ring-1 ring-line transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(16,36,58,0.18)]"
               >
-                <span className="relative block aspect-[2/1] overflow-hidden bg-navy-soft md:aspect-[16/9]">
-                  <Image
-                    src={m.image}
-                    alt={m.alt}
-                    fill
-                    sizes="(min-width: 768px) 33vw, 100vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none"
-                  />
-                  <span className={`absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-xl shadow ${m.iconClass}`}>
-                    <m.icon className="h-5 w-5" aria-hidden="true" />
-                  </span>
+                <span className="text-sm font-bold text-navy md:text-base">{s.title}</span>
+                <span className={`my-3 flex h-16 w-16 items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-110 ${s.iconClass}`}>
+                  <s.icon className="h-8 w-8" aria-hidden="true" />
                 </span>
-                <span className="flex flex-1 flex-col p-4">
-                  <span className="block text-[11px] font-bold tracking-wider text-brand">{m.name}</span>
-                  <span className="flex items-center gap-1 font-display text-lg font-bold text-navy">
-                    {m.verb}
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-                  </span>
-                  <span className="mt-0.5 block text-sm text-muted">{m.text}</span>
-                </span>
+                <span className="text-xs text-muted md:text-sm">{s.text}</span>
+                <span className="mt-auto pt-3 text-sm font-semibold text-brand group-hover:underline">{s.cta}</span>
               </Link>
             </li>
           ))}
@@ -260,7 +176,7 @@ export default function HomePage() {
           <SectionHeader
             badge={
               <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-                <Radio className="h-3.5 w-3.5" aria-hidden="true" /> LIVELANCE LIVE
+                <Radio className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI LIVE
               </span>
             }
             title="Transmissões ao vivo"
@@ -279,7 +195,7 @@ export default function HomePage() {
           <SectionHeader
             badge={
               <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-                <Gavel className="h-3.5 w-3.5" aria-hidden="true" /> LIVELANCE LEILÕES
+                <Gavel className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI LEILÕES
               </span>
             }
             title="Leilões em andamento"
@@ -313,7 +229,7 @@ export default function HomePage() {
           <SectionHeader
             badge={
               <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-                <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" /> LIVELANCE MARKET
+                <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI MARKET
               </span>
             }
             title="Produtos em destaque e ofertas"
@@ -351,7 +267,7 @@ export default function HomePage() {
           className="overflow-hidden rounded-[var(--radius-card)] border border-line bg-white shadow-[var(--shadow-card)] md:grid md:grid-cols-[1.3fr_1fr]"
         >
           <div className="p-6 md:p-10">
-            <p className="text-xs font-bold tracking-wider text-brand">LIVELANCE SELLER</p>
+            <p className="text-xs font-bold tracking-wider text-brand">ZEXI SELLER</p>
             <h2 id="vendedores" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-navy md:text-3xl">
               Venda do seu jeito: vitrine, live ou leilão.
             </h2>
@@ -360,7 +276,7 @@ export default function HomePage() {
               leilão.
             </p>
             <ButtonLink href="/vender" size="lg" className="mt-6">
-              Quero vender na LIVELANCE <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              Quero vender na Zexi <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </ButtonLink>
           </div>
           <ul className="grid gap-px border-t border-line bg-line md:border-l md:border-t-0">

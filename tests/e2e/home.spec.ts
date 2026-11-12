@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-test("home LIVELANCE: slogan, três modalidades e aviso de demonstração", async ({ page }) => {
+test("home Zexi: slogan, três modalidades e aviso de demonstração", async ({ page }) => {
   await page.goto("/");
-  await expect(page).toHaveTitle("LIVELANCE | Marketplace, Vendas ao Vivo e Leilões Online");
+  await expect(page).toHaveTitle("Zexi | Marketplace, Vendas ao Vivo e Leilões Online");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Tudo acontece");
   for (const name of [/Compre agora/, /Assista e compre/, /Dê seu lance/]) {
     await expect(page.getByRole("link", { name }).first()).toBeVisible();
@@ -13,11 +13,43 @@ test("home LIVELANCE: slogan, três modalidades e aviso de demonstração", asyn
   }
 });
 
-test("nenhuma menção à marca antiga na página", async ({ page }) => {
-  for (const path of ["/", "/entrar", "/cadastro", "/recuperar-senha", "/leiloes", "/ao-vivo", "/market", "/vender", "/termos"]) {
+test("carrossel de banners troca pelas setas e pelas bolinhas; atalhos levam às modalidades", async ({ page }, info) => {
+  await page.goto("/");
+  const first = page.getByTestId("slide-ao-vivo");
+  await expect(first).toHaveAttribute("aria-hidden", "false");
+  await expect(first.getByRole("heading", { name: /Tudo acontece ao vivo/ })).toBeVisible();
+  await page.getByRole("button", { name: "Ir para o banner 3" }).click();
+  await expect(page.getByTestId("slide-leiloes")).toHaveAttribute("aria-hidden", "false");
+  await expect(first).toHaveAttribute("aria-hidden", "true");
+  if (info.project.name === "desktop") {
+    await page.getByRole("button", { name: "Próximo banner" }).click();
+    await expect(page.getByTestId("slide-cupons")).toHaveAttribute("aria-hidden", "false");
+    await page.getByRole("button", { name: "Banner anterior" }).click();
+    await expect(page.getByTestId("slide-leiloes")).toHaveAttribute("aria-hidden", "false");
+  }
+  const atalhos = page.getByRole("region", { name: "Atalhos" });
+  await expect(atalhos.getByRole("link", { name: /Até R\$ 100/ })).toHaveAttribute("href", "/market?preco_max=100");
+  await expect(atalhos.getByRole("link", { name: /Venda na Zexi/ })).toHaveAttribute("href", "/vender");
+});
+
+test("nenhuma menção às marcas antigas (BORAH, LIVELANCE) na página", async ({ page }) => {
+  for (const path of ["/", "/entrar", "/cadastro", "/recuperar-senha", "/leiloes", "/ao-vivo", "/market", "/vender", "/termos", "/privacidade", "/indique"]) {
     await page.goto(path);
-    const html = await page.content();
+    // A loja das contas de teste ("Loja E2E LIVELANCE") é dado do banco de desenvolvimento, não texto do site
+    const html = (await page.content()).replaceAll("Loja E2E LIVELANCE", "");
     expect(html, path).not.toMatch(/b[o0]r[aλΛ]h/i);
+    expect(html, path).not.toMatch(/livelance/i);
+  }
+});
+
+test("marca Zexi: logo no cabeçalho, ícones e manifesto", async ({ page, request }) => {
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: "Zexi — página inicial" }).first()).toBeVisible();
+  const manifest = await (await request.get("/manifest.webmanifest")).json();
+  expect(manifest.name).toBe("Zexi");
+  expect(manifest.theme_color).toBe("#0F1115");
+  for (const icon of ["/brand/zexi-simbolo.svg", "/brand/icon-192.png", "/icon.svg", "/apple-icon.png"]) {
+    expect((await request.get(icon)).status(), icon).toBe(200);
   }
 });
 
@@ -31,7 +63,7 @@ test("SEO: robots, sitemap, manifest e imagem de compartilhamento", async ({ req
   const sitemap = await (await request.get("/sitemap.xml")).text();
   expect(sitemap).toContain("/leiloes");
   const manifest = await (await request.get("/manifest.webmanifest")).json();
-  expect(manifest.name).toBe("LIVELANCE");
+  expect(manifest.name).toBe("Zexi");
   const og = await request.get("/opengraph-image");
   expect(og.status()).toBe(200);
   expect(og.headers()["content-type"]).toContain("image/png");

@@ -11,7 +11,7 @@ import { bpsToPercent } from "@/lib/pay/format";
 
 export const metadata: Metadata = {
   title: "Indique e ganhe",
-  description: "Divulgue produtos e leilões da LIVELANCE com o seu link e ganhe comissão pelas vendas.",
+  description: "Divulgue produtos e leilões da Zexi com o seu link e ganhe comissão pelas vendas.",
   alternates: { canonical: "/indique" },
 };
 
@@ -23,7 +23,7 @@ async function Program({ searchParams }: { searchParams: Promise<{ erro?: string
   const steps = [
     { icon: Link2, title: "Pegue seu link", text: "Um link geral e links para qualquer produto, leilão ou loja." },
     { icon: ShoppingBag, title: "Compartilhe", text: `Quem clicar e comprar em até ${days} dias conta para você (vale o último link clicado).` },
-    { icon: BadgePercent, title: "Ganhe comissão", text: `${rate} do valor de cada pedido pago. Sai da comissão da LIVELANCE: o vendedor recebe o mesmo.` },
+    { icon: BadgePercent, title: "Ganhe comissão", text: `${rate} do valor de cada pedido pago. Sai da comissão da Zexi: o vendedor recebe o mesmo.` },
   ];
 
   return (
@@ -33,7 +33,7 @@ async function Program({ searchParams }: { searchParams: Promise<{ erro?: string
         <p className="text-sm font-bold tracking-wider text-white/70">INDIQUE E GANHE</p>
         <h1 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">Ganhe {rate} em cada venda que você indicar</h1>
         <p className="mt-3 max-w-2xl text-white/80">
-          Divulgue produtos e leilões da LIVELANCE no WhatsApp, Instagram ou onde quiser. Sem custo e sem precisar ter loja.
+          Divulgue produtos e leilões da Zexi no WhatsApp, Instagram ou onde quiser. Sem custo e sem precisar ter loja.
         </p>
         <div className="mt-6">
           {affiliate ? (

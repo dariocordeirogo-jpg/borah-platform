@@ -36,7 +36,7 @@ async function Payments({ searchParams }: { searchParams: Promise<SP> }) {
     <div className="space-y-4">
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
       {sp.refazer && <Notice>O link do cadastro expirou. Clique em “Continuar cadastro” para abrir um novo.</Notice>}
-      {!available && <Notice>O LIVELANCE PAY está em configuração. Assim que for liberado, você conecta sua conta aqui.</Notice>}
+      {!available && <Notice>O ZEXI PAY está em configuração. Assim que for liberado, você conecta sua conta aqui.</Notice>}
 
       <section className="rounded-[var(--radius-card)] border border-line bg-white p-5 shadow-[var(--shadow-card)]" aria-label="Conta de recebimento">
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -44,7 +44,7 @@ async function Payments({ searchParams }: { searchParams: Promise<SP> }) {
             <h2 className="font-semibold text-navy">Conta de recebimento</h2>
             <p className="mt-1 text-sm text-muted">
               Os recebimentos passam pela Stripe. Cada venda cai direto na conta da sua loja, já descontada a comissão da
-              LIVELANCE{feeBps != null ? ` (${bpsToPercent(feeBps)})` : ""}.
+              Zexi{feeBps != null ? ` (${bpsToPercent(feeBps)})` : ""}.
             </p>
           </div>
           <span

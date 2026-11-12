@@ -1,7 +1,7 @@
-# LIVELANCE PAY (Stripe)
+# ZEXI PAY (Stripe)
 
 Pagamentos com **Stripe Connect**. Cada loja tem uma conta conectada (Express, Brasil). Cada pedido vira uma cobrança
-com destino à conta da loja (*destination charge*): a Stripe repassa o valor para a loja e a comissão da LIVELANCE
+com destino à conta da loja (*destination charge*): a Stripe repassa o valor para a loja e a comissão da Zexi
 (`application_fee_amount`) fica com a plataforma.
 
 ## Quem decide o quê

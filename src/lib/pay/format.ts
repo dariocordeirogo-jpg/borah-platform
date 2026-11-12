@@ -1,4 +1,4 @@
-/** Textos e regras de exibição do LIVELANCE PAY (sem segredo; pode ir ao navegador). */
+/** Textos e regras de exibição do ZEXI PAY (sem segredo; pode ir ao navegador). */
 
 /** Modo da chave Stripe pelo prefixo: teste ou produção. Outros formatos não são aceitos. */
 export function stripeKeyMode(key: string | undefined): "test" | "live" | null {
@@ -72,7 +72,7 @@ export function payErrorMessage(message: string | undefined): string {
     case "not_authenticated":
       return "Entre na sua conta para continuar.";
     case "pay_unavailable":
-      return "O LIVELANCE PAY está em configuração. O pagamento online será liberado em breve.";
+      return "O ZEXI PAY está em configuração. O pagamento online será liberado em breve.";
     case "stripe_error":
       return "A Stripe não respondeu agora. Tente de novo em instantes.";
     default:

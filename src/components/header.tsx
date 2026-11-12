@@ -65,7 +65,7 @@ export function Header() {
         <Logo />
         <form action="/busca" role="search" className="hidden flex-1 md:block">
           <label htmlFor="busca-desktop" className="sr-only">
-            Buscar na LIVELANCE
+            Buscar na Zexi
           </label>
           <div className="flex h-11 items-center rounded-full border border-line bg-surface pl-4 focus-within:border-navy-2">
             <input
@@ -92,7 +92,7 @@ export function Header() {
 
       <form action="/busca" role="search" className="px-4 pb-3 md:hidden">
         <label htmlFor="busca-mobile" className="sr-only">
-          Buscar na LIVELANCE
+          Buscar na Zexi
         </label>
         <div className="flex h-11 items-center rounded-full border border-line bg-surface pl-4 focus-within:border-navy-2">
           <Search className="h-4 w-4 text-muted" aria-hidden="true" />
@@ -119,7 +119,7 @@ export function Header() {
             </Link>
           ))}
           <Link href="/vender" className="my-1.5 rounded-full px-3 py-1.5 text-sm font-medium hover:bg-surface">
-            Venda na LIVELANCE
+            Venda na Zexi
           </Link>
           <span className="mx-2 h-5 w-px bg-line" aria-hidden="true" />
           <div className="flex gap-1 overflow-x-auto">

@@ -13,7 +13,7 @@ export default function Page() {
       </p>
       <h1 className="mt-6 font-display text-3xl font-extrabold">Política de privacidade</h1>
       <div className="mt-6 space-y-3 text-sm leading-relaxed text-ink/90">
-        <H2>1. Quais dados a LIVELANCE trata</H2>
+        <H2>1. Quais dados a Zexi trata</H2>
         <ul className="list-disc space-y-1 pl-5">
           <li>Conta: nome, e-mail, foto de perfil (quando você entra com o Google) e data de criação.</li>
           <li>Endereços de entrega que você cadastrar.</li>
@@ -23,7 +23,7 @@ export default function Page() {
           </li>
           <li>Pedidos, lances, arremates, cupons usados e histórico de status.</li>
           <li>
-            Pagamentos: processados pelo provedor de pagamento (Stripe). A LIVELANCE não recebe nem guarda número de cartão;
+            Pagamentos: processados pelo provedor de pagamento (Stripe). A Zexi não recebe nem guarda número de cartão;
             guarda apenas identificadores e o status do pagamento.
           </li>
           <li>Lojas: dados da loja e da conta de recebimento cadastrada no provedor de pagamento.</li>

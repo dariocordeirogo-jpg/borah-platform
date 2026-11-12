@@ -7,7 +7,7 @@ import { getFeed } from "@/lib/videos/queries";
 
 export const metadata: Metadata = {
   title: "Vídeos",
-  description: "Vídeos curtos das lojas da LIVELANCE: veja o produto em ação e compre sem sair do vídeo.",
+  description: "Vídeos curtos das lojas da Zexi: veja o produto em ação e compre sem sair do vídeo.",
   alternates: { canonical: "/videos" },
 };
 
@@ -15,7 +15,7 @@ async function Feed() {
   const { videos, loggedIn } = await getFeed();
   if (!videos.length) {
     return (
-      <EmptyState title="Nenhum vídeo ainda" action={<ButtonLink href="/vender">Venda na LIVELANCE</ButtonLink>}>
+      <EmptyState title="Nenhum vídeo ainda" action={<ButtonLink href="/vender">Venda na Zexi</ButtonLink>}>
         Os vídeos das lojas aparecem aqui. Tem loja? Publique o primeiro no painel do vendedor.
       </EmptyState>
     );

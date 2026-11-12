@@ -17,7 +17,7 @@ export function ConfirmWinForm({ auctionId, addresses }: { auctionId: string; ad
           <legend className="mb-2 text-sm font-semibold text-navy">Entregar em</legend>
           {addresses.map((a, i) => (
             <label key={a.id} className="flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-white p-3 has-[:checked]:border-brand has-[:checked]:bg-brand-soft/40">
-              <input type="radio" name="addressId" value={a.id} defaultChecked={a.is_default || i === 0} className="mt-1 accent-[#D71920]" />
+              <input type="radio" name="addressId" value={a.id} defaultChecked={a.is_default || i === 0} className="mt-1 accent-brand" />
               <span className="text-sm">
                 <span className="block font-semibold text-navy">{a.recipient}</span>
                 <span className="block text-muted">

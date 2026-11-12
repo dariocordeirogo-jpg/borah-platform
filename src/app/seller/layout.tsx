@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SellerNav } from "@/components/seller-nav";
 
-export const metadata: Metadata = { title: { default: "Painel do vendedor", template: "%s · LIVELANCE SELLER" }, robots: { index: false } };
+export const metadata: Metadata = { title: { default: "Painel do vendedor", template: "%s · ZEXI SELLER" }, robots: { index: false } };
 
 export default function SellerLayout({ children }: LayoutProps<"/seller">) {
   return (

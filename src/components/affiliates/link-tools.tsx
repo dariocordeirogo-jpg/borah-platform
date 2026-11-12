@@ -41,7 +41,7 @@ export function CopyField({ label, value, testId }: { label: string; value: stri
   );
 }
 
-/** Cole o endereço de um produto, leilão ou loja da LIVELANCE e receba o link com o seu código. */
+/** Cole o endereço de um produto, leilão ou loja da Zexi e receba o link com o seu código. */
 export function LinkBuilder({ code, siteUrl }: { code: string; siteUrl: string }) {
   const [input, setInput] = useState("");
   const path = input ? toInternalPath(input, siteUrl) : null;
@@ -52,11 +52,11 @@ export function LinkBuilder({ code, siteUrl }: { code: string; siteUrl: string }
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="livelance.com.br/produto/..."
+          placeholder="zexi.com.br/produto/..."
           className="h-11 w-full rounded-xl border border-line bg-white px-3 text-sm text-ink placeholder:text-muted"
         />
       </label>
-      {input && !path && <p className="text-sm text-danger">Use um endereço da LIVELANCE.</p>}
+      {input && !path && <p className="text-sm text-danger">Use um endereço da Zexi.</p>}
       {path && <CopyField label="Seu link para essa página" value={referralLink(siteUrl, code, path)} testId="link-gerado" />}
     </div>
   );

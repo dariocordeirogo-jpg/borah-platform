@@ -49,7 +49,7 @@ export function Price({ cents, compareAt, size = "md" }: { cents: number; compar
   );
 }
 
-/** Card de produto real do LIVELANCE MARKET. */
+/** Card de produto real do ZEXI MARKET. */
 export function MarketProductCard({ product }: { product: ProductCardData }) {
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-lg">

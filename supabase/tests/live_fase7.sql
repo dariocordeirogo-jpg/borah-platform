@@ -1,4 +1,4 @@
--- Teste do LIVELANCE LIVE (Fase 7). Roda numa transação e desfaz tudo (rollback).
+-- Teste do ZEXI LIVE (Fase 7). Roda numa transação e desfaz tudo (rollback).
 begin;
 insert into auth.users (id, email, raw_user_meta_data, aud, role) values
  ('00000000-0000-0000-0000-0000000000a7','vend7@teste.livelance','{"full_name":"Vendedor Sete"}','authenticated','authenticated'),

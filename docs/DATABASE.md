@@ -12,7 +12,7 @@ Projeto Supabase: ref `elygbieuroidqxkifgou`, região sa-east-1 (nome interno no
 | `audit_logs` | Eventos sensíveis | Admins | Só funções do banco |
 | `feature_flags` | Liga/desliga módulos | Todos | Só o servidor |
 
-## Tabelas (Fase 2 — LIVELANCE MARKET + SELLER)
+## Tabelas (Fase 2 — ZEXI MARKET + SELLER)
 
 | Tabela | Conteúdo | Quem lê | Quem escreve |
 | --- | --- | --- | --- |
@@ -35,7 +35,7 @@ Funções expostas (validam `auth.uid()` internamente; o aviso do verificador do
 Storage: bucket público `product-images` (JPG/PNG/WebP, até 5 MB); só o dono envia/apaga na pasta da própria loja.
 O servidor confere a assinatura real do arquivo antes de enviar.
 
-## Tabelas (Fase 3 — LIVELANCE LEILÕES)
+## Tabelas (Fase 3 — ZEXI LEILÕES)
 
 | Tabela | Conteúdo | Quem lê | Quem escreve |
 | --- | --- | --- | --- |
@@ -62,7 +62,7 @@ Flag `require_phone_sms` (desligada): quando houver provedor de SMS, exige telef
 
 Funções em `private` (fora da API): `has_role`, `is_admin`, `handle_new_user`, `set_updated_at`.
 
-## Tabelas (Fase 4 — LIVELANCE PAY)
+## Tabelas (Fase 4 — ZEXI PAY)
 
 | Tabela | Conteúdo | Quem lê | Quem escreve |
 | --- | --- | --- | --- |
@@ -99,7 +99,7 @@ comissão quando o pedido é pago e cancela quando o pedido é cancelado ou reem
 Bucket `product-videos` (público para leitura, 50 MB, mp4/webm/mov; envio e exclusão só na pasta da própria loja).
 O arquivo vai direto do navegador ao Storage; `create_video` confere produto da loja, caminho e se o arquivo existe.
 
-## Tabelas (Fase 7 — LIVELANCE LIVE)
+## Tabelas (Fase 7 — ZEXI LIVE)
 
 | Tabela | Conteúdo | Quem lê | Quem escreve |
 | --- | --- | --- | --- |

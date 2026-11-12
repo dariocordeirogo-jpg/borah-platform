@@ -14,7 +14,7 @@ export function isReferralCode(value: unknown): value is string {
 }
 
 /**
- * Aceita "https://livelance.com.br/produto/x", "livelance.com.br/leiloes" ou "/market" e devolve só o caminho
+ * Aceita "https://zexi.com.br/produto/x", "zexi.com.br/leiloes" ou "/market" e devolve só o caminho
  * interno ("/produto/x"). Links de outros sites, ou sem caminho válido, viram null.
  */
 export function toInternalPath(input: string, siteUrl: string): string | null {
@@ -32,7 +32,7 @@ export function toInternalPath(input: string, siteUrl: string): string | null {
   } catch {
     return null;
   }
-  const allowed = new Set([site.hostname, `www.${site.hostname}`, "livelance.com.br", "www.livelance.com.br"]);
+  const allowed = new Set([site.hostname, `www.${site.hostname}`, "zexi.com.br", "www.zexi.com.br"]);
   if (!allowed.has(url.hostname)) return null;
   if (url.pathname.startsWith("/r/")) return null;
   return `${url.pathname}${url.search}` || "/";

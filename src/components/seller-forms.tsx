@@ -74,7 +74,7 @@ export function CreateStoreForm() {
           Endereço
         </Label>
         <div className="flex items-center rounded-xl border border-line bg-surface pl-3 text-sm text-muted focus-within:border-navy-2">
-          livelance.com.br/loja/
+          zexi.com.br/loja/
           <input
             id="slug"
             name="slug"

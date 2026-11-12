@@ -31,7 +31,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   return {
     id: user.id,
     email: user.email ?? null,
-    displayName: profile?.display_name ?? user.email ?? "Usuário LIVELANCE",
+    displayName: profile?.display_name ?? user.email ?? "Usuário Zexi",
     avatarUrl: profile?.avatar_url ?? null,
     roles: (roles ?? []).map((r) => r.role as string),
   };

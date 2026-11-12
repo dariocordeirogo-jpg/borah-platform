@@ -10,7 +10,7 @@ async function Settings() {
   return (
     <>
       <p className="mb-4 text-sm text-muted">
-        Endereço da loja: <span className="font-medium text-navy">livelance.com.br/loja/{store.slug}</span> (não pode ser alterado)
+        Endereço da loja: <span className="font-medium text-navy">zexi.com.br/loja/{store.slug}</span> (não pode ser alterado)
       </p>
       <StoreSettingsForm store={store} />
     </>

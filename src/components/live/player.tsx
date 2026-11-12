@@ -35,7 +35,7 @@ export function LivePlayer({
       el.setAttribute("autoplay", "muted");
       el.setAttribute("muted", "");
       el.setAttribute("playsinline", "");
-      el.setAttribute("accent-color", "#D71920");
+      el.setAttribute("accent-color", "#FF4D2D");
       el.setAttribute("default-hidden-captions", "");
       if (title) el.setAttribute("metadata-video-title", title);
       el.setAttribute("data-testid", "live-video");

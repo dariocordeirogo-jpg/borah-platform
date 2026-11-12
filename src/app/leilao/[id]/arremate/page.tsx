@@ -25,7 +25,7 @@ async function Confirm({ params }: { params: Promise<{ id: string }> }) {
         <AddressForm open={!addresses.length} next={`/leilao/${id}/arremate`} />
         <p className="flex items-start gap-2 rounded-xl bg-navy-soft px-4 py-3 text-sm text-navy">
           <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-          Ao confirmar, o pedido do arremate é registrado como “Aguardando pagamento”. Em seguida você paga pelo LIVELANCE PAY na página do pedido.
+          Ao confirmar, o pedido do arremate é registrado como “Aguardando pagamento”. Em seguida você paga pelo ZEXI PAY na página do pedido.
         </p>
       </div>
       <aside className="h-fit rounded-[var(--radius-card)] border border-line bg-white p-5 shadow-[var(--shadow-card)]">
