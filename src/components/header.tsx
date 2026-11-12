@@ -122,7 +122,7 @@ export function Header() {
             Venda na Zexi
           </Link>
           <span className="mx-2 h-5 w-px bg-line" aria-hidden="true" />
-          <div className="flex gap-1 overflow-x-auto">
+          <div className="scrollbar-none flex min-w-0 flex-1 gap-1 overflow-x-auto">
             {categories.slice(0, 6).map((c) => (
               <Link
                 key={c.slug}

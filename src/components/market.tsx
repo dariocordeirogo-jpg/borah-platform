@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ImageOff, PackageOpen } from "lucide-react";
 import type { ReactNode } from "react";
+import { ListingCard, ListingGrid } from "@/components/listing";
 import { formatBRL } from "@/lib/format";
 import { conditionLabel } from "@/lib/market/format";
 import type { ProductCardData } from "@/lib/market/queries";
@@ -50,37 +51,30 @@ export function Price({ cents, compareAt, size = "md" }: { cents: number; compar
 }
 
 /** Card de produto real do ZEXI MARKET. */
-export function MarketProductCard({ product }: { product: ProductCardData }) {
+export function MarketProductCard({ product, priority }: { product: ProductCardData; priority?: boolean }) {
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-lg">
-      <ProductImage src={product.imageUrl} alt={product.title} />
-      <div className="flex flex-1 flex-col gap-1 p-3">
-        <h3 className="line-clamp-2 text-sm leading-snug text-ink">
-          <Link href={`/produto/${product.id}`} className="after:absolute after:inset-0">
-            {product.title}
-          </Link>
-        </h3>
-        <Price cents={product.priceCents} compareAt={product.compareAtCents} />
-        <p className="mt-auto flex items-center justify-between gap-2 pt-1 text-xs text-muted">
-          <span className="truncate">{product.store?.name}</span>
-          <span className="shrink-0">{product.stock > 0 ? conditionLabel[product.condition] : "Esgotado"}</span>
-        </p>
-      </div>
-    </article>
+    <ListingCard
+      href={`/produto/${product.id}`}
+      title={product.title}
+      imageUrl={product.imageUrl}
+      priceCents={product.priceCents}
+      compareAtCents={product.compareAtCents}
+      store={product.store?.name}
+      priority={priority}
+      meta={product.stock > 0 ? conditionLabel[product.condition] : <span className="font-semibold text-danger">Esgotado</span>}
+    />
   );
 }
 
 export function ProductGrid({ products }: { products: ProductCardData[] }) {
   return (
-    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-      {products.map((p) => (
-        <li key={p.id} className="flex">
-          <div className="w-full">
-            <MarketProductCard product={p} />
-          </div>
+    <ListingGrid label="Produtos">
+      {products.map((p, i) => (
+        <li key={p.id}>
+          <MarketProductCard product={p} priority={i < 4} />
         </li>
       ))}
-    </ul>
+    </ListingGrid>
   );
 }
 

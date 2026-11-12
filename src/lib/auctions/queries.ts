@@ -1,4 +1,5 @@
 import "server-only";
+import { hiddenStoreIds, notInList } from "@/lib/test-stores";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import type { Row } from "@/lib/supabase/database.types";
@@ -57,6 +58,8 @@ export async function listAuctions(tab: AuctionTab, limit = 48) {
   const supabase = await db();
   const now = new Date().toISOString();
   let q = supabase.from("auctions").select(CARD).limit(limit);
+  const hidden = await hiddenStoreIds(supabase);
+  if (hidden.length) q = q.not("store_id", "in", notInList(hidden));
   if (tab === "andamento") q = q.eq("status", "active").lte("starts_at", now).order("ends_at", { ascending: true });
   else if (tab === "programados") q = q.eq("status", "active").gt("starts_at", now).order("starts_at", { ascending: true });
   else q = q.eq("status", "ended").order("ended_at", { ascending: false });

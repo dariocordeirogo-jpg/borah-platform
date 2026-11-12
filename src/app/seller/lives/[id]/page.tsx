@@ -65,7 +65,7 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
 
       {(live.status === "scheduled" || isLive) && <StreamPanel liveId={live.id} playbackUrl={live.playback_url} stream={stream} />}
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
+      <div className="grid grid-cols-1 gap-4 [&>*]:min-w-0 lg:grid-cols-[1fr_360px]">
         <section className="rounded-[var(--radius-card)] border border-line bg-white" aria-label="Produtos da live">
           <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-navy">Produtos</h2>
           <ul className="divide-y divide-line">

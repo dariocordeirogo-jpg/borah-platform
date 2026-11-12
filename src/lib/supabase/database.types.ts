@@ -399,6 +399,7 @@ export type Database = {
           description: string | null;
           id: string;
           is_active: boolean;
+          is_test: boolean;
           name: string;
           origin_cep: string | null;
           owner_id: string;

@@ -1,123 +1,127 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { ArrowRight, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Tag, Timer, UserRound, Video } from "lucide-react";
+import { ArrowRight, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Tag, UserRound, Video } from "lucide-react";
 import { HeroCarousel } from "@/components/home/hero-carousel";
-import { AuctionCard, DemoTag, ProductCard, UpcomingCard } from "@/components/cards";
+import { AuctionCard, DemoLiveCard, DemoTag, ProductCard, UpcomingCard } from "@/components/cards";
 import { AuctionCardLive } from "@/components/auctions/auction-card";
+import { LiveCard, Shelf } from "@/components/listing";
 import { MarketProductCard } from "@/components/market";
-import { listAuctions } from "@/lib/auctions/queries";
 import { ButtonLink } from "@/components/ui/button";
+import { listAuctions } from "@/lib/auctions/queries";
+import { listLives } from "@/lib/live/queries";
 import { listProducts } from "@/lib/market/queries";
-import { categories, endingSoon, liveAuctions, offers, stores, upcoming } from "@/lib/demo-data";
+import { categories, demoLives, endingSoon, liveAuctions, offers, stores, upcoming } from "@/lib/demo-data";
 
-function SectionHeader({
-  title,
-  subtitle,
-  href,
-  cta,
-  badge,
-}: {
-  title: string;
-  subtitle?: string;
-  href: string;
-  cta: string;
-  badge?: React.ReactNode;
-}) {
+const eyebrow = (Icon: typeof Radio, text: string) => (
+  <span className="mb-0.5 inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-brand">
+    <Icon className="h-3.5 w-3.5" aria-hidden="true" /> {text}
+  </span>
+);
+
+/** Vitrine com poucos itens reais é completada com demonstração (sempre marcada) até este mínimo. */
+const MIN_SHELF = 5;
+const fill = <T,>(realCount: number, demo: T[]) => (realCount >= MIN_SHELF ? [] : demo.slice(0, MIN_SHELF - realCount));
+
+const whenBR = (iso: string) =>
+  new Date(iso).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+
+function ShelfSkeleton({ live = false }: { live?: boolean }) {
   return (
-    <div className="mb-4 flex items-end justify-between gap-4">
-      <div>
-        {badge}
-        <h2 className="font-display text-xl font-bold tracking-tight text-navy md:text-2xl">{title}</h2>
-        {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
+    <div className="rounded-xl bg-white p-4 md:p-5">
+      <div className="mb-3 h-6 w-48 animate-pulse rounded bg-surface-2" />
+      <div className="flex gap-3 overflow-hidden">
+        {Array.from({ length: live ? 3 : 5 }).map((_, i) => (
+          <div key={i} className={`${live ? "aspect-video w-[82%] sm:w-[48%] lg:w-[32%]" : "aspect-[3/5] w-[44%] sm:w-[31%] md:w-[23.5%] lg:w-[18.8%]"} shrink-0 animate-pulse rounded-lg bg-surface`} />
+        ))}
       </div>
-      <Link href={href} className="flex shrink-0 items-center gap-1 text-sm font-semibold text-brand hover:text-brand-dark hover:underline">
-        {cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-      </Link>
     </div>
   );
 }
 
-/** Leilões reais em andamento; enquanto não houver nenhum, mostra a vitrine de demonstração. */
-async function LiveAuctions() {
-  const { items, serverNow } = await listAuctions("andamento", 8);
-  if (!items.length) {
-    return (
-      <Rail>
-        {endingSoon.map((a) => (
-          <AuctionCard key={a.id} auction={a} />
-        ))}
-      </Rail>
-    );
-  }
+/** Lives reais no ar (ou programadas); sem nenhuma, mostra a vitrine de demonstração. */
+async function LivesShelf() {
+  const { live, upcoming: next } = await listLives();
+  const real = [...live.map((l) => ({ l, on: true })), ...next.map((l) => ({ l, on: false }))].slice(0, 8);
   return (
-    <Rail>
-      {items.map((a) => (
-        <AuctionCardLive key={a.id} a={a} serverNow={serverNow} />
+    <Shelf title="Transmissões ao vivo" eyebrow={eyebrow(Radio, "ZEXI LIVE")} href="/ao-vivo" cta="Ver lives" size="live">
+      {real.map(({ l, on }) => (
+        <li key={l.id}>
+          <LiveCard href={`/live/${l.id}`} title={l.title} store={l.stores?.name} live={on} when={on ? undefined : whenBR(l.scheduled_at)} />
+        </li>
       ))}
-    </Rail>
+      {(real.length ? [] : demoLives).map((l) => (
+        <li key={l.id}>
+          <DemoLiveCard live={l} />
+        </li>
+      ))}
+    </Shelf>
   );
 }
 
-async function ScheduledAuctions() {
-  const { items, serverNow } = await listAuctions("programados", 6);
-  if (!items.length) {
-    return (
-      <div className="grid gap-3 md:grid-cols-3">
-        {upcoming.map((u) => (
-          <UpcomingCard key={u.id} item={u} />
-        ))}
-      </div>
-    );
-  }
+/** Leilões reais em andamento; sem nenhum, a vitrine de demonstração. */
+async function AuctionsShelf() {
+  const { items, serverNow } = await listAuctions("andamento", 10);
   return (
-    <Rail>
+    <Shelf title="Leilões terminando" eyebrow={eyebrow(Gavel, "ZEXI LEILÕES")} href="/leiloes" cta="Ver leilões">
       {items.map((a) => (
-        <AuctionCardLive key={a.id} a={a} serverNow={serverNow} />
+        <li key={a.id}>
+          <AuctionCardLive a={a} serverNow={serverNow} />
+        </li>
       ))}
-    </Rail>
+      {fill(items.length, [...liveAuctions, ...endingSoon]).map((a) => (
+        <li key={a.id}>
+          <AuctionCard auction={a} />
+        </li>
+      ))}
+    </Shelf>
   );
 }
 
-/** Produtos reais do Market; enquanto não houver nenhum, mostra a vitrine de demonstração. */
-async function FeaturedProducts() {
-  const { items } = await listProducts({ limit: 10 });
-  if (!items.length) {
-    return (
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-        {offers.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
-      </div>
-    );
-  }
+async function ScheduledShelf() {
+  const { items, serverNow } = await listAuctions("programados", 10);
   return (
-    <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+    <Shelf title="Próximos leilões" href="/leiloes?aba=programados" cta="Ver agenda">
+      {items.map((a) => (
+        <li key={a.id}>
+          <AuctionCardLive a={a} serverNow={serverNow} />
+        </li>
+      ))}
+      {fill(items.length, upcoming).map((u) => (
+        <li key={u.id}>
+          <UpcomingCard item={u} />
+        </li>
+      ))}
+    </Shelf>
+  );
+}
+
+/** Produtos reais do Market; sem nenhum, a vitrine de demonstração. */
+async function ProductsShelf() {
+  const { items } = await listProducts({ limit: 12 });
+  return (
+    <Shelf title="Ofertas do Market" eyebrow={eyebrow(ShoppingBag, "ZEXI MARKET")} href="/market" cta="Ver todas">
       {items.map((p) => (
         <li key={p.id}>
           <MarketProductCard product={p} />
         </li>
       ))}
-    </ul>
-  );
-}
-
-/** No celular vira carrossel deslizante; do tablet em diante, grade. */
-function Rail({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 [&>*]:w-[78%] [&>*]:shrink-0 [&>*]:snap-start sm:[&>*]:w-auto">
-      {children}
-    </div>
+      {fill(items.length, offers).map((p) => (
+        <li key={p.id}>
+          <ProductCard product={p} />
+        </li>
+      ))}
+    </Shelf>
   );
 }
 
 /** Atalhos logo abaixo do carrossel: os três jeitos de negociar e os caminhos mais procurados. */
 const shortcuts = [
-  { href: "/market", icon: ShoppingBag, title: "Compre agora", text: "Preço fixo e entrega pelos Correios.", cta: "Ver produtos", iconClass: "bg-navy-soft text-navy" },
-  { href: "/ao-vivo", icon: Radio, title: "Assista e compre", text: "Lojas mostrando produtos ao vivo.", cta: "Ver lives", iconClass: "bg-brand-soft text-brand" },
-  { href: "/leiloes", icon: Gavel, title: "Dê seu lance", text: "Leilões com cronômetro oficial.", cta: "Ver leilões", iconClass: "bg-brand text-white" },
-  { href: "/market?preco_max=100", icon: Tag, title: "Até R$ 100", text: "Achados que cabem no bolso.", cta: "Ver achados", iconClass: "bg-navy-soft text-navy" },
-  { href: "/conta", icon: UserRound, title: "Entre na sua conta", text: "Acompanhe pedidos e lances.", cta: "Entrar", iconClass: "bg-brand-soft text-brand" },
-  { href: "/vender", icon: StoreIcon, title: "Venda na Zexi", text: "Abra sua loja e venda ao vivo.", cta: "Começar a vender", iconClass: "bg-navy text-white" },
+  { href: "/market", icon: ShoppingBag, title: "Compre agora", hint: "Preço fixo" },
+  { href: "/ao-vivo", icon: Radio, title: "Ao vivo", hint: "Assista e compre" },
+  { href: "/leiloes", icon: Gavel, title: "Leilões", hint: "Dê seu lance" },
+  { href: "/market?preco_max=100", icon: Tag, title: "Até R$ 100", hint: "Achados" },
+  { href: "/conta", icon: UserRound, title: "Minha conta", hint: "Pedidos e lances" },
+  { href: "/vender", icon: StoreIcon, title: "Venda na Zexi", hint: "Abra sua loja" },
 ];
 
 export default function HomePage() {
@@ -125,148 +129,90 @@ export default function HomePage() {
     <>
       <HeroCarousel />
 
-      <section aria-label="Atalhos" className="relative z-30 -mt-16 md:-mt-20">
-        <ul className="mx-auto flex max-w-7xl snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 md:grid md:grid-cols-3 md:overflow-visible lg:grid-cols-6">
+      <section aria-label="Atalhos" className="relative z-30 mx-auto -mt-10 max-w-7xl px-4 md:-mt-14">
+        <ul className="grid grid-cols-3 gap-2 sm:gap-3 md:grid-cols-6">
           {shortcuts.map((s) => (
-            <li key={s.title} className="w-[44%] shrink-0 snap-start sm:w-[30%] md:w-auto">
+            <li key={s.title}>
               <Link
                 href={s.href}
-                className="group flex h-full flex-col items-center rounded-[var(--radius-card)] bg-white p-4 text-center shadow-[0_6px_24px_rgba(16,36,58,0.12)] ring-1 ring-line transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(16,36,58,0.18)]"
+                className="group flex h-full flex-col items-center gap-1.5 rounded-xl bg-white px-2 py-3 text-center shadow-[0_2px_10px_rgba(15,17,21,0.10)] transition-shadow hover:shadow-[0_6px_20px_rgba(15,17,21,0.16)] md:py-4"
               >
-                <span className="text-sm font-bold text-navy md:text-base">{s.title}</span>
-                <span className={`my-3 flex h-16 w-16 items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-110 ${s.iconClass}`}>
-                  <s.icon className="h-8 w-8" aria-hidden="true" />
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-soft text-brand transition-colors group-hover:bg-brand group-hover:text-white md:h-12 md:w-12">
+                  <s.icon className="h-5 w-5 md:h-6 md:w-6" aria-hidden="true" />
                 </span>
-                <span className="text-xs text-muted md:text-sm">{s.text}</span>
-                <span className="mt-auto pt-3 text-sm font-semibold text-brand group-hover:underline">{s.cta}</span>
+                <span className="text-xs font-semibold leading-tight text-navy sm:text-sm">{s.title}</span>
+                <span className="sr-only text-xs text-muted sm:not-sr-only sm:block">{s.hint}</span>
               </Link>
             </li>
           ))}
         </ul>
       </section>
 
-      <div className="border-b border-line bg-white">
-        <p className="mx-auto flex max-w-7xl items-start gap-2 px-4 py-2.5 text-xs text-muted md:items-center md:text-sm">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-navy-2 md:mt-0" aria-hidden="true" />
-          Versão de desenvolvimento: lives, leilões, produtos, lojas e preços desta página são demonstrações. Nenhum
-          lance, transmissão ou pagamento é real.
+      <div className="mx-auto max-w-7xl space-y-4 px-4 py-4 md:space-y-5 md:py-6">
+        <p className="flex items-start gap-2 rounded-lg bg-navy-soft px-3 py-2 text-xs text-navy-2 md:items-center">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 md:mt-0" aria-hidden="true" />
+          Versão de testes: itens marcados como “Demonstração” não são reais. Nenhum lance, transmissão ou pagamento
+          desta vitrine é real.
         </p>
-      </div>
 
-      <div className="mx-auto max-w-7xl space-y-12 px-4 py-8 md:py-12">
-        <section aria-labelledby="categorias">
-          <h2 id="categorias" className="sr-only">
+        <section aria-labelledby="categorias" className="rounded-xl bg-white p-4 shadow-[0_1px_2px_rgba(15,17,21,0.08)] md:p-5">
+          <h2 id="categorias" className="mb-3 font-display text-lg font-bold tracking-tight text-navy md:text-xl">
             Categorias
           </h2>
-          <ul className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-12 md:px-0">
+          <ul className="scrollbar-none -mx-4 flex gap-1 overflow-x-auto px-4 md:mx-0 md:grid md:grid-cols-6 md:gap-2 md:px-0 lg:grid-cols-12">
             {categories.map((c) => (
               <li key={c.slug} className="shrink-0">
-                <Link href={`/market?categoria=${c.slug}`} className="flex w-20 flex-col items-center gap-2 text-center md:w-auto">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft text-brand transition-colors hover:bg-brand hover:text-white">
-                    <c.icon className="h-6 w-6" aria-hidden="true" />
+                <Link
+                  href={`/market?categoria=${c.slug}`}
+                  className="flex w-[4.75rem] flex-col items-center gap-1.5 rounded-lg p-1.5 text-center hover:bg-surface md:w-auto"
+                >
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface text-navy">
+                    <c.icon className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  <span className="text-xs font-medium">{c.name}</span>
+                  <span className="text-xs leading-tight text-ink">{c.name}</span>
                 </Link>
               </li>
             ))}
           </ul>
         </section>
 
-        <section>
-          <SectionHeader
-            badge={
-              <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-                <Radio className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI LIVE
-              </span>
-            }
-            title="Transmissões ao vivo"
-            subtitle="Vendedores apresentando produtos agora"
-            href="/ao-vivo"
-            cta="Ver lives"
-          />
-          <Rail>
-            {liveAuctions.map((a) => (
-              <AuctionCard key={a.id} auction={a} />
-            ))}
-          </Rail>
-        </section>
+        <Suspense fallback={<ShelfSkeleton live />}>
+          <LivesShelf />
+        </Suspense>
+        <Suspense fallback={<ShelfSkeleton />}>
+          <AuctionsShelf />
+        </Suspense>
+        <Suspense fallback={<ShelfSkeleton />}>
+          <ProductsShelf />
+        </Suspense>
+        <Suspense fallback={<ShelfSkeleton />}>
+          <ScheduledShelf />
+        </Suspense>
 
-        <section>
-          <SectionHeader
-            badge={
-              <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-                <Gavel className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI LEILÕES
-              </span>
-            }
-            title="Leilões em andamento"
-            subtitle="Terminando em breve: última chance de dar seu lance"
-            href="/leiloes"
-            cta="Todos os leilões"
-          />
-          <Suspense fallback={<div className="h-80 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
-            <LiveAuctions />
-          </Suspense>
-        </section>
-
-        <section>
-          <SectionHeader
-            badge={
-              <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-                <Timer className="h-3.5 w-3.5" aria-hidden="true" /> AGENDA
-              </span>
-            }
-            title="Próximos leilões"
-            subtitle="Lotes que abrem em breve"
-            href="/leiloes"
-            cta="Ver agenda"
-          />
-          <Suspense fallback={<div className="h-40 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
-            <ScheduledAuctions />
-          </Suspense>
-        </section>
-
-        <section>
-          <SectionHeader
-            badge={
-              <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-                <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI MARKET
-              </span>
-            }
-            title="Produtos em destaque e ofertas"
-            subtitle="Compra imediata, sem disputa"
-            href="/market"
-            cta="Ir ao Market"
-          />
-          <Suspense fallback={<div className="h-72 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
-            <FeaturedProducts />
-          </Suspense>
-        </section>
-
-        <section>
-          <SectionHeader title="Lojas em destaque" href="/market" cta="Ver lojas" />
-          <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <Shelf title="Lojas em destaque" href="/market" cta="Ver lojas" track={false}>
+          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {stores.map((s) => (
               <li key={s.id}>
-                <Link href="/market" className="flex items-center gap-3 rounded-[var(--radius-card)] border border-line bg-white p-3 hover:border-brand">
+                <Link href="/market" className="flex items-center gap-3 rounded-lg border border-line p-3 hover:border-brand">
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand">
                     <s.icon className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold">{s.name}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold text-navy">{s.name}</span>
                     <span className="block truncate text-xs text-muted">{s.tagline}</span>
-                    <DemoTag className="mt-1 inline-block" />
                   </span>
+                  <DemoTag className="shrink-0" />
                 </Link>
               </li>
             ))}
           </ul>
-        </section>
+        </Shelf>
 
         <section
           aria-labelledby="vendedores"
-          className="overflow-hidden rounded-[var(--radius-card)] border border-line bg-white shadow-[var(--shadow-card)] md:grid md:grid-cols-[1.3fr_1fr]"
+          className="overflow-hidden rounded-xl bg-white shadow-[0_1px_2px_rgba(15,17,21,0.08)] md:grid md:grid-cols-[1.3fr_1fr]"
         >
-          <div className="p-6 md:p-10">
+          <div className="p-5 md:p-10">
             <p className="text-xs font-bold tracking-wider text-brand">ZEXI SELLER</p>
             <h2 id="vendedores" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-navy md:text-3xl">
               Venda do seu jeito: vitrine, live ou leilão.
@@ -275,7 +221,7 @@ export default function HomePage() {
               Cadastre seus produtos uma vez e escolha como vender: preço fixo no Market, apresentação ao vivo ou lote em
               leilão.
             </p>
-            <ButtonLink href="/vender" size="lg" className="mt-6">
+            <ButtonLink href="/vender" size="lg" className="mt-6 w-full sm:w-auto">
               Quero vender na Zexi <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </ButtonLink>
           </div>

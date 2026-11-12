@@ -29,7 +29,7 @@ const groups = [
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-line bg-surface pb-24 text-navy md:pb-0">
+    <footer className="mt-10 border-t border-line bg-white pb-24 text-navy md:pb-0">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-4">
         <div>
           <Logo />

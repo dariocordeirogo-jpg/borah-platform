@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
-import { CalendarClock, Radio } from "lucide-react";
+import { LiveCard } from "@/components/listing";
 import { EmptyState } from "@/components/market";
 import { ButtonLink } from "@/components/ui/button";
 import { listLives } from "@/lib/live/queries";
@@ -17,26 +16,10 @@ const when = (iso: string) =>
 
 type Card = { id: string; title: string; scheduled_at: string; stores: { name: string; slug: string } | null };
 
-function LiveCard({ l, live }: { l: Card; live: boolean }) {
+function Item({ l, live }: { l: Card; live: boolean }) {
   return (
     <li>
-      <Link
-        href={`/live/${l.id}`}
-        className="flex h-full flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-white p-4 shadow-[var(--shadow-card)] hover:border-navy-2"
-      >
-        <span
-          className={
-            live
-              ? "inline-flex w-fit items-center gap-1 rounded-full bg-brand px-2.5 py-0.5 text-xs font-bold text-white"
-              : "inline-flex w-fit items-center gap-1 rounded-full bg-navy-soft px-2.5 py-0.5 text-xs font-semibold text-navy"
-          }
-        >
-          {live ? <Radio className="h-3.5 w-3.5" aria-hidden="true" /> : <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />}
-          {live ? "AO VIVO" : when(l.scheduled_at)}
-        </span>
-        <span className="font-semibold text-navy">{l.title}</span>
-        <span className="text-sm text-muted">{l.stores?.name}</span>
-      </Link>
+      <LiveCard href={`/live/${l.id}`} title={l.title} store={l.stores?.name} live={live} when={live ? undefined : when(l.scheduled_at)} />
     </li>
   );
 }
@@ -55,9 +38,9 @@ async function Lives() {
       {live.length > 0 && (
         <section>
           <h2 className="mb-3 font-display text-lg font-bold text-navy">No ar agora</h2>
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {live.map((l) => (
-              <LiveCard key={l.id} l={l} live />
+              <Item key={l.id} l={l} live />
             ))}
           </ul>
         </section>
@@ -65,9 +48,9 @@ async function Lives() {
       {upcoming.length > 0 && (
         <section>
           <h2 className="mb-3 font-display text-lg font-bold text-navy">Próximas lives</h2>
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {upcoming.map((l) => (
-              <LiveCard key={l.id} l={l} live={false} />
+              <Item key={l.id} l={l} live={false} />
             ))}
           </ul>
         </section>

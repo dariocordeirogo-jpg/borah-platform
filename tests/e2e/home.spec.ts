@@ -7,8 +7,8 @@ test("home Zexi: slogan, três modalidades e aviso de demonstração", async ({ 
   for (const name of [/Compre agora/, /Assista e compre/, /Dê seu lance/]) {
     await expect(page.getByRole("link", { name }).first()).toBeVisible();
   }
-  await expect(page.getByText(/são demonstrações/).first()).toBeVisible();
-  for (const h of ["Transmissões ao vivo", "Leilões em andamento", "Produtos em destaque e ofertas"]) {
+  await expect(page.getByText(/“Demonstração” não são reais/).first()).toBeVisible();
+  for (const h of ["Transmissões ao vivo", "Leilões terminando", "Ofertas do Market", "Próximos leilões"]) {
     await expect(page.getByRole("heading", { name: h })).toBeVisible();
   }
 });
@@ -78,10 +78,26 @@ test("cronômetro anda no navegador", async ({ page }) => {
   expect(await timer.textContent()).not.toBe(first);
 });
 
-test("sem rolagem horizontal", async ({ page }) => {
+test("sem rolagem horizontal nas páginas principais", async ({ page }) => {
+  for (const path of ["/", "/market", "/leiloes", "/ao-vivo", "/vender", "/carrinho", "/entrar"]) {
+    await page.goto(path);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow, path).toBeLessThanOrEqual(0);
+  }
+});
+
+test("vitrine no padrão marketplace: card inteiro clicável, foto, preço e marca de demonstração", async ({ page }) => {
   await page.goto("/");
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  expect(overflow).toBeLessThanOrEqual(0);
+  const ofertas = page.getByRole("list", { name: "Ofertas do Market" });
+  await expect(ofertas.getByRole("listitem").first()).toBeVisible();
+  await expect(ofertas.locator("article img").first()).toBeVisible();
+  for (const card of await ofertas.locator("article").all()) {
+    await expect(card).toContainText("R$");
+    // O card inteiro é o link (um só link por card)
+    await expect(card.getByRole("link")).toHaveCount(1);
+  }
+  // Nenhuma promessa que a plataforma ainda não cumpre
+  await expect(page.locator("main")).not.toContainText(/em até \d+x|frete grátis/i);
 });
 
 test("todos os links internos da home abrem (nenhum botão sem destino)", async ({ page, request }) => {
