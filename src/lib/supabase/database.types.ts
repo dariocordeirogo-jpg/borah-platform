@@ -335,6 +335,7 @@ export type Database = {
           created_at: string;
           description: string | null;
           id: string;
+          imported_from: string | null;
           price_cents: number;
           search: unknown;
           status: Database["public"]["Enums"]["product_status"];
@@ -352,6 +353,7 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           id?: string;
+          imported_from?: string | null;
           price_cents: number;
           search?: unknown;
           status?: Database["public"]["Enums"]["product_status"];
