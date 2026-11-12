@@ -14,6 +14,12 @@ async function liveAuthorized(): Promise<boolean> {
   return data?.enabled === true;
 }
 
+/**
+ * Contas das lojas: Accounts v2 com painel Express e a Stripe responsável pelo risco (Managed Risk).
+ * Essa combinação está em prévia pública e só é aceita com a versão de prévia da API.
+ */
+export const CONNECT_ACCOUNTS_API_VERSION = "2026-10-28.preview";
+
 let cached: Stripe | null = null;
 
 export async function getStripe(): Promise<Stripe | null> {

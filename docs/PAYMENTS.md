@@ -1,16 +1,29 @@
 # ZEXI PAY (Stripe)
 
-Pagamentos com **Stripe Connect**. Cada loja tem uma conta conectada (Express, Brasil). Cada pedido vira uma cobrança
-com destino à conta da loja (*destination charge*): a Stripe repassa o valor para a loja e a comissão da Zexi
-(`application_fee_amount`) fica com a plataforma.
+Pagamentos com **Stripe Connect**, no modelo em que **a Stripe cuida do risco** (Managed Risk):
+
+- Cada loja tem uma conta conectada criada pela **Accounts v2** (`/v2/core/accounts`), Brasil, com:
+  - painel **Express** (`dashboard: "express"`);
+  - configuração **merchant** (`card_payments` e `boleto_payments`): a loja vende na própria conta;
+  - **taxa da Stripe cobrada da loja** (`fees_collector: "stripe"`);
+  - **saldo negativo de responsabilidade da Stripe** (`losses_collector: "stripe"`): a Stripe analisa fraude e
+    assume perdas que a loja não pagar.
+- Cada pedido vira uma **cobrança direta** na conta da loja (Checkout criado com `Stripe-Account`). A comissão da
+  Zexi sai como `application_fee_amount`. Na fatura do cartão aparece o nome da loja.
+- Painel Express com Managed Risk está em **prévia pública** e exige a versão de prévia da API
+  (`CONNECT_ACCOUNTS_API_VERSION` em `src/lib/pay/stripe.ts`). Só vale para contas novas; o tipo de painel de uma conta não
+  muda depois.
+- A Zexi **não** pode ser responsável pelos saldos negativos nesta conta Stripe sem a aceitação formal em
+  Connect → Platform profile; por isso o modelo anterior (cobrança com destino, conta Express v1) foi trocado.
 
 ## Quem decide o quê
 
 | Etapa | Onde | Detalhe |
 | --- | --- | --- |
 | Valor, comissão e conta de destino | Banco (`start_order_payment`) | Total do pedido; comissão = `private.payment_settings.platform_fee_bps` (padrão 1000 = 10%) |
-| Abrir o Checkout | Servidor (`payOrder`) | Usa exatamente os valores do banco; chave de idempotência por pagamento |
-| Pedido "Pago" | Banco (`stripe_ingest_event`) | Só com aviso **assinado** pela Stripe; assinatura conferida no banco com o segredo do Vault |
+| Abrir o Checkout | Servidor (`payOrder`) | Na conta da loja, com exatamente os valores do banco; chave de idempotência por pagamento |
+| Pedido "Pago" | Banco (`stripe_ingest_event`) | Só com aviso **assinado** pela Stripe e vindo da **conta da loja registrada no pagamento** (campo `account`) |
+| Situação da loja | Servidor (`syncPayoutAccount`) + aviso `account.updated` | Pela capacidade v2: vende com `card_payments` ativo, recebe com `payouts` ativo |
 | Navegador | — | Nunca decide valor nem status |
 
 Avisos tratados: `checkout.session.completed` (cartão pago, ou Pix/boleto gerado → "processando"),
@@ -18,25 +31,27 @@ Avisos tratados: `checkout.session.completed` (cartão pago, ou Pix/boleto gerad
 Avisos repetidos são ignorados (`payment_events`). Aviso de produção (`livemode`) é ignorado enquanto a flag `payments`
 estiver desligada.
 
-Proteções testadas (`supabase/tests/pay_fase4.sql`, 47/47): assinatura errada, replay (aviso com mais de 5 min), payload
-alterado, sessão de outro pagamento, valor diferente do combinado (marca para devolução), pagamento de pedido já
+Proteções testadas (`supabase/tests/pay_fase4.sql`, 50/50): assinatura errada, replay (aviso com mais de 5 min), payload
+alterado, sessão de outro pagamento, sessão ou reembolso vindos de outra conta conectada, valor diferente do combinado (marca para devolução), pagamento de pedido já
 cancelado (o servidor reembolsa sozinho), Pix em processamento bloqueia cancelamento, reembolso total cancela o pedido e
 devolve o estoque.
 
 ## Limitações
 
-- **Um pagamento por loja:** carrinho com duas lojas gera dois pedidos e dois pagamentos. Cobrança única com repasse
-  depois (*separate charges and transfers*) exige pedir acesso à Stripe.
-- **Pix e boleto** aparecem no Checkout só se estiverem ativos na conta Stripe (Pix pode exigir convite).
+- **Um pagamento por loja:** carrinho com duas lojas gera dois pedidos e dois pagamentos (cobrança direta é sempre
+  na conta de uma loja só).
+- **Pix:** a Accounts v2 ainda não oferece a capacidade de Pix para as lojas; no Checkout aparecem cartão e boleto.
+- **Boleto** aparece no Checkout só se estiver ativo na conta da loja.
 - Frete continua "a combinar".
 - Reembolso parcial não muda o pedido (só o total).
 
 ## Configurar (modo de teste primeiro)
 
 1. **Stripe → Modo de teste → Desenvolvedores → Chaves de API:** copie a chave secreta `sk_test_...`.
-2. **Stripe → Connect:** ative o Connect para plataforma/marketplace no Brasil (contas Express).
+2. **Stripe → Connect:** ative o Connect. Use um **sandbox** (Stripe → Sandboxes) e, de preferência, uma chave
+   restrita (`rk_test_...`) com permissão de escrita em contas v2, Checkout Sessions, reembolsos e login links.
 3. **Stripe → Desenvolvedores → Webhooks → Adicionar endpoint:** `https://<domínio>/api/webhooks/stripe`,
-   marcando também **"Eventos de contas conectadas"**, com os eventos:
+   escolhendo **"Eventos de contas conectadas"** (as cobranças acontecem nas contas das lojas), com os eventos:
    `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`,
    `checkout.session.expired`, `account.updated`, `charge.refunded`. Copie o segredo de assinatura `whsec_...`.
 4. **Vercel → variáveis de ambiente (só servidor):** `STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET`.

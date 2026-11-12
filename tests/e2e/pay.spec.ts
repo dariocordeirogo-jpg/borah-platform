@@ -164,7 +164,8 @@ test.describe("ZEXI PAY: pedido pago pelo aviso assinado", () => {
       status: "complete",
       payment_intent: `pi_e2e_${run}`,
     };
-    const evt = { id: `evt_e2e_paid_${run}`, object: "event", type: "checkout.session.completed", livemode: false, data: { object: session } };
+    // Cobrança direta: o aviso vem da conta da loja (campo "account")
+    const evt = { id: `evt_e2e_paid_${run}`, object: "event", type: "checkout.session.completed", livemode: false, account: accountId, data: { object: session } };
     const first = signed(evt);
     const res = await request.post("/api/webhooks/stripe", { data: first.payload, headers: { "stripe-signature": first.signature } });
     expect((await res.json()).result).toBe("paid");
@@ -193,6 +194,7 @@ test.describe("ZEXI PAY: pedido pago pelo aviso assinado", () => {
       object: "event",
       type: "charge.refunded",
       livemode: false,
+      account: accountId,
       data: { object: { id: `ch_e2e_${run}`, object: "charge", payment_intent: `pi_e2e_${run}`, refunded: true } },
     });
     const res = await request.post("/api/webhooks/stripe", { data: payload, headers: { "stripe-signature": signature } });
