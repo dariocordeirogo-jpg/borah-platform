@@ -13,7 +13,7 @@ async function db() {
 export type AuctionTab = "andamento" | "programados" | "encerrados";
 
 const CARD =
-  "id, title, starting_price_cents, min_increment_cents, current_price_cents, bids_count, starts_at, ends_at, status, outcome, leader_alias, products(product_images(path, position)), stores(name, slug)" as const;
+  "id, title, starting_price_cents, min_increment_cents, current_price_cents, bids_count, starts_at, ends_at, status, outcome, leader_alias, live_id, products(product_images(path, position)), stores(name, slug)" as const;
 
 type CardRow = Pick<
   Row<"auctions">,
@@ -28,6 +28,7 @@ type CardRow = Pick<
   | "status"
   | "outcome"
   | "leader_alias"
+  | "live_id"
 > & {
   products: { product_images: { path: string; position: number }[] } | null;
   stores: { name: string; slug: string } | null;
@@ -51,6 +52,8 @@ function toCard(r: CardRow) {
     leaderAlias: r.leader_alias,
     imageUrl: img ? productImageUrl(img.path) : null,
     store: r.stores,
+    /** Leilão aberto dentro de uma transmissão (ZEXI LIVE) */
+    liveId: r.live_id,
   };
 }
 

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { ExternalLink, Pin, PinOff } from "lucide-react";
+import Image from "next/image";
+import { ExternalLink, Gavel, Pin, PinOff, ShoppingBag } from "lucide-react";
 import { LiveChat } from "@/components/live/chat";
 import { LiveRefresh } from "@/components/live/live-refresh";
 import { Notice } from "@/components/market";
@@ -17,6 +18,10 @@ export const metadata: Metadata = { title: "Estúdio da live" };
 type SP = { erro?: string; nova?: string };
 
 const input = "h-10 w-full rounded-xl border border-line bg-white px-3 text-sm";
+/** 12345 → "123,45" (valor sugerido nos campos; quem decide e valida é o banco) */
+const asInput = (cents: number) => (cents / 100).toFixed(2).replace(".", ",");
+const suggestedStart = (price: number) => Math.max(100, Math.round(price / 2 / 100) * 100);
+const suggestedIncrement = (price: number) => Math.max(100, Math.round((price * 0.02) / 100) * 100);
 
 async function Studio({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<SP> }) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
@@ -71,47 +76,85 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
           <ul className="divide-y divide-line">
             {products.map((p) => {
               const pinned = live.pinned_product_id === p.id;
+              const canAuction = isLive && !auctionRunning && p.stock > 0;
               return (
-                <li key={p.id} className="space-y-2 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm">
-                      <span className="font-semibold text-navy">{p.title}</span>{" "}
+                <li key={p.id} className="space-y-3 p-4">
+                  <div className="flex items-center gap-3">
+                    {p.imageUrl ? (
+                      <Image src={p.imageUrl} alt="" width={48} height={48} className="h-12 w-12 shrink-0 rounded-lg border border-line object-contain" />
+                    ) : (
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface">
+                        <ShoppingBag className="h-5 w-5 text-muted" aria-hidden="true" />
+                      </span>
+                    )}
+                    <span className="min-w-0 flex-1 text-sm">
+                      <span className="block truncate font-semibold text-navy">{p.title}</span>
                       <span className="text-muted">
                         {formatBRL(p.priceCents)} · estoque {p.stock}
                       </span>
-                      {pinned && <span className="ml-2 rounded-full bg-brand px-2 py-0.5 text-xs font-bold text-white">Em destaque</span>}
+                      {pinned && <span className="ml-2 rounded-full bg-brand px-2 py-0.5 text-xs font-bold text-white">À venda agora</span>}
                     </span>
-                    {isLive && (
-                      <form action={pinProduct}>
-                        <input type="hidden" name="liveId" value={live.id} />
-                        {!pinned && <input type="hidden" name="productId" value={p.id} />}
-                        <Button type="submit" size="sm" variant="outline" aria-label={pinned ? `Tirar destaque de ${p.title}` : `Destacar ${p.title}`}>
-                          {pinned ? <PinOff className="h-4 w-4" aria-hidden="true" /> : <Pin className="h-4 w-4" aria-hidden="true" />}
-                          {pinned ? "Tirar destaque" : "Destacar"}
-                        </Button>
-                      </form>
-                    )}
                   </div>
-                  {isLive && !auctionRunning && p.stock > 0 && (
-                    <details className="rounded-xl bg-surface p-3">
-                      <summary className="cursor-pointer text-sm font-semibold text-navy">Leilão relâmpago</summary>
-                      <form action={startLiveAuction} className="mt-3 grid gap-2 sm:grid-cols-4">
-                        <input type="hidden" name="liveId" value={live.id} />
-                        <input type="hidden" name="productId" value={p.id} />
-                        <input name="starting" inputMode="decimal" placeholder="Lance inicial" aria-label={`Lance inicial de ${p.title}`} className={input} />
-                        <input name="increment" inputMode="decimal" placeholder="Incremento" aria-label={`Incremento de ${p.title}`} className={input} />
-                        <select name="minutes" aria-label={`Duração do leilão de ${p.title}`} className={input} defaultValue="5">
-                          {liveAuctionMinutes.map((m) => (
-                            <option key={m} value={m}>
-                              {m} min
-                            </option>
-                          ))}
-                        </select>
-                        <Button type="submit" size="sm">
-                          Abrir leilão
-                        </Button>
-                      </form>
-                    </details>
+                  {isLive && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted">Como vender agora</p>
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <form action={pinProduct}>
+                          <input type="hidden" name="liveId" value={live.id} />
+                          {!pinned && <input type="hidden" name="productId" value={p.id} />}
+                          <Button
+                            type="submit"
+                            variant={pinned ? "secondary" : "outline"}
+                            className="w-full"
+                            aria-label={pinned ? `Tirar destaque de ${p.title}` : `Destacar ${p.title}`}
+                          >
+                            {pinned ? <PinOff className="h-4 w-4" aria-hidden="true" /> : <Pin className="h-4 w-4" aria-hidden="true" />}
+                            {pinned ? "Tirar da vitrine" : "Vender a preço fixo"}
+                          </Button>
+                        </form>
+                        {canAuction ? (
+                          <details className="group rounded-full sm:col-span-1 [&[open]]:col-span-full [&[open]]:rounded-xl [&[open]]:bg-surface [&[open]]:p-3">
+                            <summary className="flex h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-full border border-brand px-4 text-sm font-semibold text-brand hover:bg-brand-soft group-open:mb-3 group-open:h-auto group-open:justify-start group-open:border-0 group-open:px-0 [&::-webkit-details-marker]:hidden">
+                              <Gavel className="h-4 w-4" aria-hidden="true" /> Leiloar ao vivo
+                            </summary>
+                            <form action={startLiveAuction} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                              <input type="hidden" name="liveId" value={live.id} />
+                              <input type="hidden" name="productId" value={p.id} />
+                              <label className="text-xs text-muted">
+                                Lance inicial (R$)
+                                <input name="starting" inputMode="decimal" defaultValue={asInput(suggestedStart(p.priceCents))} aria-label={`Lance inicial de ${p.title}`} className={input} />
+                              </label>
+                              <label className="text-xs text-muted">
+                                Incremento (R$)
+                                <input name="increment" inputMode="decimal" defaultValue={asInput(suggestedIncrement(p.priceCents))} aria-label={`Incremento de ${p.title}`} className={input} />
+                              </label>
+                              <label className="text-xs text-muted">
+                                Duração
+                                <select name="minutes" aria-label={`Duração do leilão de ${p.title}`} className={input} defaultValue="5">
+                                  {liveAuctionMinutes.map((m) => (
+                                    <option key={m} value={m}>
+                                      {m} min
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                              <Button type="submit" className="col-span-2 self-end sm:col-span-1">
+                                Abrir leilão
+                              </Button>
+                            </form>
+                            <p className="mt-2 text-xs text-muted">Quem está assistindo dá lances sem sair da live. Uma unidade fica reservada para o leilão.</p>
+                          </details>
+                        ) : (
+                          isLive &&
+                          p.stock > 0 &&
+                          auctionRunning && (
+                            <span className="flex h-11 items-center justify-center rounded-full border border-line px-4 text-center text-xs text-muted">
+                              Um leilão por vez: aguarde o atual terminar
+                            </span>
+                          )
+                        )}
+                      </div>
+                    </div>
                   )}
                 </li>
               );
@@ -119,7 +162,7 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
           </ul>
           {auctionRunning && auction && (
             <p className="border-t border-line p-4 text-sm text-navy">
-              Leilão relâmpago em andamento: <Link href={`/leilao/${auction.id}`} className="font-semibold text-brand hover:underline">{auction.title}</Link>
+              Leilão ao vivo em andamento: <Link href={`/leilao/${auction.id}`} className="font-semibold text-brand hover:underline">{auction.title}</Link>
             </p>
           )}
         </section>

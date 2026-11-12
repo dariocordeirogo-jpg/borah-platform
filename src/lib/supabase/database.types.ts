@@ -93,6 +93,13 @@ export type Database = {
             referencedRelation: "products";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "auctions_live_id_fkey";
+            columns: ["live_id"];
+            isOneToOne: false;
+            referencedRelation: "lives";
+            referencedColumns: ["id"];
+          },
         ];
       };
       auction_bids: {

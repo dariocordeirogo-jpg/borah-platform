@@ -89,7 +89,7 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     await studio.getByRole("button", { name: "Começar live" }).click();
     await expect(studio.getByTestId("estado-live")).toHaveText("Ao vivo");
     await studio.getByRole("button", { name: `Destacar ${bag}` }).click();
-    await expect(studio.getByText("Em destaque")).toBeVisible();
+    await expect(studio.getByText("À venda agora")).toBeVisible();
 
     // Sem o token do Mux no ambiente de teste: transmissão integrada "em configuração", link HLS manual
     await expect(studio.getByTestId("transmissao")).toContainText("em configuração");
@@ -122,18 +122,25 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     await expect(viewer.getByTestId("chat-mensagens")).not.toContainText(text);
   });
 
-  test("leilão relâmpago aparece para quem está assistindo", async () => {
+  test("vendedor escolhe leiloar ao vivo e quem assiste dá lance sem sair da live", async () => {
     const item = studio.getByRole("listitem").filter({ hasText: wallet });
-    await item.getByText("Leilão relâmpago").click();
+    await expect(item.getByRole("button", { name: `Destacar ${wallet}` })).toContainText("Vender a preço fixo");
+    await item.getByText("Leiloar ao vivo").click();
+    // Valores sugeridos já vêm preenchidos; o vendedor pode trocar
+    await expect(item.getByLabel(`Lance inicial de ${wallet}`)).not.toHaveValue("");
     await item.getByLabel(`Lance inicial de ${wallet}`).fill("50,00");
     await item.getByLabel(`Incremento de ${wallet}`).fill("5,00");
     await item.getByRole("button", { name: "Abrir leilão" }).click();
-    await expect(studio.getByText("Leilão relâmpago em andamento")).toBeVisible();
+    await expect(studio.getByText("Leilão ao vivo em andamento")).toBeVisible();
 
-    const box = viewer.getByRole("region", { name: "Leilão relâmpago" });
+    const box = viewer.getByRole("region", { name: "Leilão ao vivo" });
     await expect(box).toContainText(wallet, { timeout: 15_000 });
     await expect(viewer.getByTestId("leilao-live-preco")).toHaveText("R$ 50,00");
-    await expect(box.getByRole("link", { name: "Dar lance" })).toHaveAttribute("href", /\/leilao\/[0-9a-f-]{36}$/);
+    // O painel de lance está dentro da live (botão de lance ou o passo que falta para poder dar lance)
+    await expect(
+      box.getByRole("button", { name: /Dar lance/ }).or(box.getByRole("link", { name: /Entrar|Confirmar CPF/ })).first(),
+    ).toBeVisible();
+    await expect(box.getByRole("link", { name: "Ver detalhes do lote e histórico" })).toHaveAttribute("href", /\/leilao\/[0-9a-f-]{36}$/);
   });
 
   test("loja encerra e a sala fecha para o público", async () => {
