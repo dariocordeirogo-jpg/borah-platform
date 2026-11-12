@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { ArrowRight, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Timer, Video } from "lucide-react";
@@ -119,6 +120,8 @@ const modes = [
     verb: "Compre agora",
     text: "Preço fixo, carrinho e entrega. Sem disputa.",
     iconClass: "bg-navy-soft text-navy",
+    image: "/images/home/compre.webp",
+    alt: "Tênis, fones, relógios e bolsas sobre fundo azul-marinho com sacolas vermelhas",
   },
   {
     href: "/ao-vivo",
@@ -127,6 +130,8 @@ const modes = [
     verb: "Assista e compre",
     text: "Vendedores apresentam ao vivo. Pergunte no chat e compre sem sair da transmissão.",
     iconClass: "bg-brand-soft text-brand",
+    image: "/images/home/live.webp",
+    alt: "Vendedor mostra uma bolsa para o celular durante uma transmissão ao vivo em uma loja",
   },
   {
     href: "/leiloes",
@@ -135,57 +140,93 @@ const modes = [
     verb: "Dê seu lance",
     text: "Lotes com lance inicial, incremento mínimo e cronômetro oficial. Quem der o maior lance arremata.",
     iconClass: "bg-brand text-white",
+    image: "/images/home/leilao.webp",
+    alt: "Martelo de leilão ao lado de uma câmera antiga e relógios de colecionador",
   },
 ];
 
 export default function HomePage() {
   return (
     <>
-      <section className="border-b border-line bg-gradient-to-b from-white to-surface">
-        <div className="mx-auto max-w-7xl px-4 pb-8 pt-10 md:pb-12 md:pt-14">
-          <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-center">
-            <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-bold tracking-wide text-navy">
-                <span className="h-2 w-2 rounded-full bg-brand" aria-hidden="true" /> MARKET · LIVE · LEILÕES
-              </p>
-              <h1 className="mt-4 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-navy md:text-6xl">
-                Tudo acontece
-                <br />
-                <span className="text-brand">ao vivo.</span>
-              </h1>
-              <p className="mt-4 max-w-lg text-base text-muted md:text-lg">
-                Marketplace, transmissões de venda e leilões digitais em uma única plataforma brasileira.
-              </p>
-              <p className="mt-3 text-sm font-semibold tracking-wide text-navy-2">{site.tagline}</p>
-            </div>
-            <div className="ml-auto hidden w-full max-w-sm md:block">
-              <AuctionCard auction={liveAuctions[0]} />
-            </div>
-          </div>
-
-          <ul className="mt-8 grid gap-3 md:grid-cols-3">
-            {modes.map((m) => (
-              <li key={m.href}>
-                <Link
-                  href={m.href}
-                  className="group flex h-full items-start gap-3 rounded-[var(--radius-card)] border border-line bg-white p-4 text-ink shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:border-brand/40"
-                >
-                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${m.iconClass}`}>
-                    <m.icon className="h-6 w-6" aria-hidden="true" />
-                  </span>
-                  <span>
-                    <span className="block text-[11px] font-bold tracking-wider text-brand">{m.name}</span>
-                    <span className="flex items-center gap-1 font-display text-lg font-bold text-navy">
-                      {m.verb}
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-                    </span>
-                    <span className="mt-0.5 block text-sm text-muted">{m.text}</span>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+      <section className="relative isolate overflow-hidden bg-navy" aria-labelledby="hero-titulo">
+        <div className="relative h-60 sm:h-80 md:absolute md:inset-0 md:-z-10 md:h-auto">
+          <Image
+            src="/images/home/hero.webp"
+            alt="Vendedora sorridente mostra um tênis para o celular durante uma live de vendas"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[65%_20%] md:object-[70%_center]"
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-navy via-transparent to-transparent md:bg-gradient-to-r md:from-navy md:via-navy/85 md:to-transparent"
+            aria-hidden="true"
+          />
         </div>
+        <div className="mx-auto flex max-w-7xl flex-col px-4 pb-10 pt-2 md:min-h-[540px] md:justify-center md:pb-16 md:pt-16">
+          <div className="max-w-xl text-white">
+            <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold tracking-wide text-white ring-1 ring-white/25 backdrop-blur-sm">
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75 motion-reduce:animate-none" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-brand" />
+              </span>
+              MARKET · LIVE · LEILÕES
+            </p>
+            <h1 id="hero-titulo" className="mt-4 font-display text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">
+              Tudo acontece
+              <br />
+              <span className="text-brand-bright">ao vivo.</span>
+            </h1>
+            <p className="mt-4 max-w-lg text-base text-white/85 md:text-lg">
+              Compre com preço fixo, assista vendedores apresentando ao vivo e dispute leilões com cronômetro oficial — tudo
+              em uma plataforma brasileira.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <ButtonLink href="/market" size="lg">
+                Explorar ofertas <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </ButtonLink>
+              <ButtonLink href="/ao-vivo" size="lg" variant="outline" className="border-white/60 bg-white/10 text-white backdrop-blur-sm hover:bg-white hover:text-navy">
+                <Radio className="h-5 w-5" aria-hidden="true" /> Ver lives
+              </ButtonLink>
+            </div>
+            <p className="mt-5 text-sm font-semibold tracking-wide text-white/70">{site.tagline}</p>
+          </div>
+        </div>
+        <p className="absolute right-3 top-2 text-[10px] text-white/70 md:bottom-2 md:top-auto">Imagem ilustrativa</p>
+      </section>
+
+      <section className="border-b border-line bg-surface" aria-label="Modalidades">
+        <ul className="mx-auto grid max-w-7xl gap-4 px-4 py-8 md:grid-cols-3 md:py-10">
+          {modes.map((m) => (
+            <li key={m.href}>
+              <Link
+                href={m.href}
+                className="group flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white text-ink shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lg"
+              >
+                <span className="relative block aspect-[2/1] overflow-hidden bg-navy-soft md:aspect-[16/9]">
+                  <Image
+                    src={m.image}
+                    alt={m.alt}
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none"
+                  />
+                  <span className={`absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-xl shadow ${m.iconClass}`}>
+                    <m.icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                </span>
+                <span className="flex flex-1 flex-col p-4">
+                  <span className="block text-[11px] font-bold tracking-wider text-brand">{m.name}</span>
+                  <span className="flex items-center gap-1 font-display text-lg font-bold text-navy">
+                    {m.verb}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  </span>
+                  <span className="mt-0.5 block text-sm text-muted">{m.text}</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <div className="border-b border-line bg-white">

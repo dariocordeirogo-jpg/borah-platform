@@ -16,6 +16,8 @@
   --color-brand: #D71920;
   --color-brand-dark: #A90F18;
   --color-brand-soft: #FDECEC;
+  /* Vermelho mais claro para texto sobre fundo azul-marinho (contraste AA) */
+  --color-brand-bright: #FF5A61;
   --color-navy: #10243A;
   --color-navy-2: #183B5B;
   --color-navy-soft: #E9EEF4;

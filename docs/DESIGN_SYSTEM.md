@@ -65,3 +65,11 @@ Sora (títulos e wordmark, `font-display`) e Inter (texto).
 `Button`/`ButtonLink` (primary vermelho, secondary azul-marinho, outline, ghost, **buy dourado**), `AuctionCard`
 (maior lance em destaque azul-marinho, botão Dar lance dourado), `UpcomingCard`, `ProductCard` (Comprar agora dourado),
 `Countdown`, `Header`, `BottomNav` (item ativo em vermelho), `Footer` (claro), `ComingSoon`, formulários em `auth-forms.tsx`.
+
+## Imagens da home
+
+`public/images/home/` — banner principal (`hero.webp`) e fotos das modalidades (`compre`, `live`, `leilao`).
+Geradas por IA (Higgsfield, modelo Z Image) em 12/11/2026, sem marcas de terceiros, convertidas para WebP.
+São ilustrativas (o banner mostra "Imagem ilustrativa"); trocar por fotos próprias da LIVELANCE quando houver.
+Texto sobre foto: degradê azul-marinho à esquerda (desktop) ou foto em cima e texto embaixo (celular);
+"ao vivo." usa `text-brand-bright` (#FF5A61), versão clara do vermelho para contraste sobre o azul-marinho.
