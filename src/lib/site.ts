@@ -1,7 +1,7 @@
 /**
  * Identidade pública da plataforma. Fonte única para nome, slogan, SEO e módulos.
- * O domínio de produção vem de NEXT_PUBLIC_SITE_URL: só troque para https://zexi.com.br
- * depois que o domínio estiver registrado e apontado para a Vercel.
+ * A URL do site vem de NEXT_PUBLIC_SITE_URL. O endereço oficial é https://www.zexi.com.br
+ * (na Vercel, zexi.com.br redireciona para o www).
  */
 export const site = {
   name: "Zexi",
@@ -13,7 +13,7 @@ export const site = {
   productionDomain: "zexi.com.br",
   url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
   /** Só é produção quando o site responde no domínio oficial. */
-  production: (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "") === "https://zexi.com.br",
+  production: (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "") === "https://www.zexi.com.br",
 } as const;
 
 /** Módulos da plataforma (nomes oficiais). */

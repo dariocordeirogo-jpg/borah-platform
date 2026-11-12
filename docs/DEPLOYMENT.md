@@ -8,7 +8,8 @@ e o Supabase ainda não conhece as URLs de produção. Siga na ordem.
 1. Registrar `zexi.com.br` no Registro.br (e, se quiser, `zexi.com` em outro registrador).
 2. Na Vercel → projeto → Settings → Domains: adicionar `zexi.com.br` e `www.zexi.com.br`.
 3. Configurar o DNS conforme a Vercel indicar (registro A para o apex, CNAME para `www`).
-4. O código já redireciona `www.zexi.com.br` → `zexi.com.br` (`next.config.ts`).
+4. Endereço oficial: **`https://www.zexi.com.br`**. Na Vercel, `zexi.com.br` redireciona (308) para o `www`.
+   O código **não** redireciona entre os dois: redirecionar também no `next.config.ts` cria um loop.
    `zexi.com`, se adquirido, pode ser adicionado na Vercel como redirecionamento para `zexi.com.br`.
 
 ## 2. Vercel
@@ -19,7 +20,7 @@ Variáveis de ambiente (Production e Preview):
 | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://elygbieuroidqxkifgou.supabase.co` | igual |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | chave publishable do projeto | igual |
-| `NEXT_PUBLIC_SITE_URL` | `https://zexi.com.br` **só depois do passo 1 funcionar** | URL do preview ou deixar vazio |
+| `NEXT_PUBLIC_SITE_URL` | `https://www.zexi.com.br` **só depois do passo 1 funcionar** | URL do preview ou deixar vazio |
 | `STRIPE_SECRET_KEY` | `sk_live_...` só com a flag `payments` ligada; antes disso `sk_test_...` | `sk_test_...` |
 | `MUX_TOKEN_ID` / `MUX_TOKEN_SECRET` | token do ambiente de produção do Mux | token do ambiente de desenvolvimento |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` do endpoint de produção (o mesmo vai no Vault) | `whsec_...` de teste |
@@ -27,7 +28,7 @@ Variáveis de ambiente (Production e Preview):
 | `SITE_ACCESS_SECRET` | texto aleatório longo (opcional; trocar derruba todos os acessos) | vazio |
 
 `NEXT_PUBLIC_SITE_URL` controla canonical, Open Graph, sitemap e robots. Enquanto não for exatamente
-`https://zexi.com.br`, o `robots.txt` bloqueia indexação (evita o Google indexar previews).
+`https://www.zexi.com.br`, o `robots.txt` bloqueia indexação (evita o Google indexar previews).
 
 ### Página "Em construção" (acesso interno com senha)
 
@@ -40,8 +41,8 @@ A proteção SSO da Vercel não vale para domínios próprios; no domínio, quem
 
 ## 3. Supabase Auth (painel → Authentication)
 
-- **URL Configuration → Site URL:** `https://zexi.com.br` (até lá, a URL da Vercel).
-- **Redirect URLs:** `http://localhost:3000/**`, `https://zexi.com.br/**`, `https://*-<time>.vercel.app/**` (previews).
+- **URL Configuration → Site URL:** `https://www.zexi.com.br` (até lá, a URL da Vercel).
+- **Redirect URLs:** `http://localhost:3000/**`, `https://www.zexi.com.br/**`, `https://zexi.com.br/**`, `https://*-<time>.vercel.app/**` (previews).
   Todos os links de e-mail e o Google voltam em `/auth/callback`.
 - **Providers → Google:** Client ID e Secret do Google Cloud; no Google, a URI de redirecionamento autorizada é
   `https://elygbieuroidqxkifgou.supabase.co/auth/v1/callback`.

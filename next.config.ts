@@ -27,13 +27,8 @@ const nextConfig: NextConfig = {
       { source: "/lances", destination: "/leiloes", permanent: true },
       // Busca do cabeçalho → catálogo do Market (a query ?q= é repassada)
       { source: "/busca", destination: "/market", permanent: false },
-      // www → domínio principal (só tem efeito quando o domínio estiver apontado para a Vercel)
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "www.zexi.com.br" }],
-        destination: "https://zexi.com.br/:path*",
-        permanent: true,
-      },
+      // zexi.com.br → www.zexi.com.br é feito pela Vercel (Settings → Domains), não aqui:
+      // os dois redirecionamentos juntos criam um loop.
     ];
   },
   async headers() {

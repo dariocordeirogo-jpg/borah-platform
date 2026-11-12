@@ -4,7 +4,7 @@ import { siteLocked } from "@/lib/site-lock";
 
 export default function robots(): MetadataRoute.Robots {
   // Fora de produção (preview/dev) ou com o site fechado para construção, não indexar.
-  const isProduction = site.url === `https://${site.productionDomain}` && !siteLocked();
+  const isProduction = site.production && !siteLocked();
   return {
     rules: isProduction
       ? [{ userAgent: "*", allow: "/", disallow: ["/conta", "/auth/", "/carrinho", "/busca"] }]
