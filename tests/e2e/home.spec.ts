@@ -13,6 +13,25 @@ test("home LIVELANCE: slogan, três modalidades e aviso de demonstração", asyn
   }
 });
 
+test("carrossel de banners troca pelas setas e pelas bolinhas; atalhos levam às modalidades", async ({ page }, info) => {
+  await page.goto("/");
+  const first = page.getByTestId("slide-ao-vivo");
+  await expect(first).toHaveAttribute("aria-hidden", "false");
+  await expect(first.getByRole("heading", { name: /Tudo acontece ao vivo/ })).toBeVisible();
+  await page.getByRole("button", { name: "Ir para o banner 3" }).click();
+  await expect(page.getByTestId("slide-leiloes")).toHaveAttribute("aria-hidden", "false");
+  await expect(first).toHaveAttribute("aria-hidden", "true");
+  if (info.project.name === "desktop") {
+    await page.getByRole("button", { name: "Próximo banner" }).click();
+    await expect(page.getByTestId("slide-cupons")).toHaveAttribute("aria-hidden", "false");
+    await page.getByRole("button", { name: "Banner anterior" }).click();
+    await expect(page.getByTestId("slide-leiloes")).toHaveAttribute("aria-hidden", "false");
+  }
+  const atalhos = page.getByRole("region", { name: "Atalhos" });
+  await expect(atalhos.getByRole("link", { name: /Até R\$ 100/ })).toHaveAttribute("href", "/market?preco_max=100");
+  await expect(atalhos.getByRole("link", { name: /Venda na LIVELANCE/ })).toHaveAttribute("href", "/vender");
+});
+
 test("nenhuma menção à marca antiga na página", async ({ page }) => {
   for (const path of ["/", "/entrar", "/cadastro", "/recuperar-senha", "/leiloes", "/ao-vivo", "/market", "/vender", "/termos"]) {
     await page.goto(path);

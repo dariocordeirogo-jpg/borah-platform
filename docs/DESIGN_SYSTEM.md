@@ -73,3 +73,12 @@ Geradas por IA (Higgsfield, modelo Z Image) em 12/11/2026, sem marcas de terceir
 São ilustrativas (o banner mostra "Imagem ilustrativa"); trocar por fotos próprias da LIVELANCE quando houver.
 Texto sobre foto: degradê azul-marinho à esquerda (desktop) ou foto em cima e texto embaixo (celular);
 "ao vivo." usa `text-brand-bright` (#FF5A61), versão clara do vermelho para contraste sobre o azul-marinho.
+
+## Home no estilo vitrine
+
+- `src/components/home/hero-carousel.tsx`: carrossel com 4 banners (Tudo acontece ao vivo, Lives, Leilões, Cupons),
+  fundo de cor forte da marca, foto à direita (em cima no celular), setas, bolinhas e troca a cada 6 s
+  (pausa com mouse/foco e com "reduzir movimento"). Slides fora da tela ficam `inert`/`aria-hidden`.
+  O `h1` da página é fixo (`sr-only`); os títulos dos slides são `h2`.
+- Faixa de 6 atalhos sobre o fim do carrossel (cartão branco, ícone em círculo, texto curto, link em vermelho).
+- Textos não prometem o que ainda não existe (sem "frete grátis" nem "parcelamento").
