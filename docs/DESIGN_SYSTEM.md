@@ -10,9 +10,9 @@ Tokens em `src/app/globals.css` (`@theme`), usados como classes Tailwind (`bg-br
 
 | Token | Hex | Uso |
 | --- | --- | --- |
-| `brand` | #D9391B | Coral de ação: botão principal, links e navegação ativos, ícones (contraste AA com branco) |
-| `brand-vivid` | #FF4D2D | Coral vivo da marca: ponto AO VIVO do logo, pingo do i, selos e fios. Não usar com texto branco pequeno |
-| `brand-dark` | #B32D14 | Hover/active do coral |
+| `brand` | #FF4D2D | Laranja Zexi: botão principal, links e navegação ativos, ícones, ponto AO VIVO |
+| `brand-vivid` | #FF4D2D | Mesmo laranja (nome usado no logo, pingo do i, selos e fios) |
+| `brand-dark` | #E23A1C | Hover/active do laranja |
 | `brand-soft` | #FDECEC | Fundo de ícones e hover leve |
 | `navy` | #0F1115 | Grafite: títulos, preços, maior lance, logo, fundos escuros |
 | `navy-2` | #1F232B | Grafite claro: textos de apoio, rótulos, foco |
@@ -36,7 +36,7 @@ O teste `tests/e2e/palette.spec.ts` falha se aparecer dourado fora de um botão 
 
 | Combinação | Razão |
 | --- | --- |
-| coral de ação sobre branco / branco sobre coral de ação | 4,6:1 |
+| branco sobre laranja (botões, texto em negrito) | 3,3:1 — escolha da marca; abaixo do AA para texto pequeno |
 | grafite sobre branco | 18,9:1 |
 | grafite sobre dourado | ≥ 7:1 |
 | cinza `muted` sobre branco | 5,70:1 |
@@ -44,9 +44,12 @@ O teste `tests/e2e/palette.spec.ts` falha se aparecer dourado fora de um botão 
 
 ## Logomarca
 
+Os arquivos do logo foram **vetorizados da arte original** enviada pelo dono da marca (não redesenhados):
+`zexi-logo.svg` / `zexi-logo-branco.svg` (horizontal), `zexi-simbolo*.svg`, `zexi-palavra.svg`, ícones de app.
+
 Símbolo: **"Z" geométrico** com cortes diagonais; o braço central sugere o "X" (o encontro de quem compra e quem
 vende, o ponto exato do lance) e o **ponto coral** no alto à direita é o indicador AO VIVO/REC. Wordmark **zexi** em
-minúsculas (Sora ExtraBold), com o pingo do i no coral vivo. Arquivos em `public/brand/`: `zexi-simbolo.svg` (fundo
+minúsculas, com o pingo do i em laranja. Arquivos em `public/brand/`: `zexi-simbolo.svg` (fundo
 claro), `zexi-simbolo-branco.svg` (fundo escuro), `zexi-simbolo-mono.svg` (uma cor), `zexi-icone-app.svg` e PNGs.
 Sem dourado na marca. Nas lives, o símbolo translúcido pode ir no canto como marca d'água.
 
@@ -78,3 +81,12 @@ Geradas por IA (Higgsfield, modelo Z Image) em 12/11/2026, sem marcas de terceir
 São ilustrativas (o banner mostra "Imagem ilustrativa"); trocar por fotos próprias da Zexi quando houver.
 Texto sobre foto: degradê grafite à esquerda (desktop) ou foto em cima e texto embaixo (celular);
 "ao vivo." usa `text-brand-bright` (#FF6A4F), coral claro para contraste sobre o grafite.
+
+## Home no estilo vitrine
+
+- `src/components/home/hero-carousel.tsx`: carrossel com 4 banners (Tudo acontece ao vivo, Lives, Leilões, Cupons),
+  fundo de cor forte da marca, foto à direita (em cima no celular), setas, bolinhas e troca a cada 6 s
+  (pausa com mouse/foco e com "reduzir movimento"). Slides fora da tela ficam `inert`/`aria-hidden`.
+  O `h1` da página é fixo (`sr-only`); os títulos dos slides são `h2`.
+- Faixa de 6 atalhos sobre o fim do carrossel (cartão branco, ícone em círculo, texto curto, link em coral).
+- Textos não prometem o que ainda não existe (sem "frete grátis" nem "parcelamento").

@@ -8,8 +8,8 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function Image() {
-  const icon = await readFile(join(process.cwd(), "public/brand/icon-512.png"));
-  const iconSrc = `data:image/png;base64,${icon.toString("base64")}`;
+  const logo = await readFile(join(process.cwd(), "public/brand/zexi-logo-branco.png"));
+  const logoSrc = `data:image/png;base64,${logo.toString("base64")}`;
   return new ImageResponse(
     (
       <div
@@ -26,12 +26,8 @@ export default async function Image() {
           borderBottom: "14px solid #FF4D2D",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-          <img src={iconSrc} width={150} height={150} alt="" />
-          <div style={{ display: "flex", alignItems: "flex-start", fontSize: 120, fontWeight: 800, letterSpacing: -4 }}>
-            <span>zexi</span>
-            <span style={{ width: 26, height: 26, marginTop: 18, marginLeft: 6, borderRadius: 13, background: "#FF4D2D" }} />
-          </div>
+        <div style={{ display: "flex" }}>
+          <img src={logoSrc} width={560} height={189} alt="" />
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 80, fontWeight: 800, letterSpacing: -2 }}>{site.slogan}</div>

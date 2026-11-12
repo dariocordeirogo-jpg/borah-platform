@@ -1,14 +1,12 @@
 @import "tailwindcss";
 
 /*
- * Zexi — tokens de design (paleta grafite · coral · branco).
- * Os nomes dos tokens (`brand`, `navy`) foram mantidos para não espalhar a troca de marca pelo código:
- * `brand` = coral de ação e `navy` = grafite.
- * Contraste WCAG AA medido:
- *  - coral de ação #D9391B em branco 4,6:1 · branco em coral de ação 4,6:1 (botões e links)
- *  - coral vivo #FF4D2D: só destaque (ponto AO VIVO, selos, fios); sobre grafite 5,7:1
+ * Zexi — tokens de design (paleta grafite · laranja · branco), fiéis à arte da marca.
+ * Os nomes dos tokens (`brand`, `navy`) foram mantidos da marca anterior: `brand` = laranja Zexi, `navy` = grafite.
+ * Contraste medido:
+ *  - laranja #FF4D2D com texto branco 3,3:1 (botões usam texto em negrito; decisão da marca)
+ *  - laranja #FF4D2D sobre grafite 5,7:1
  *  - grafite #0F1115 em branco 18,9:1
- *  - grafite sobre dourado #D6A638 (botões de compra/lance)
  *  - cinza de texto #5A6878 em branco 5,70:1
  *
  * REGRA DO DOURADO: os tokens `buy*` e o utilitário `btn-buy` existem SÓ para
@@ -16,12 +14,12 @@
  * Nunca em logo, menu, títulos, ícones, fundos, bordas ou ações administrativas.
  */
 @theme {
-  --color-brand: #D9391B;
-  --color-brand-dark: #B32D14;
+  --color-brand: #FF4D2D;
+  --color-brand-dark: #E23A1C;
   --color-brand-soft: #FFEDE8;
-  /* Coral vivo da marca (ponto AO VIVO, selos). Não usar com texto branco pequeno. */
+  /* Laranja da marca (ponto AO VIVO, pingo do i, selos) — o mesmo do botão */
   --color-brand-vivid: #FF4D2D;
-  /* Coral claro para texto sobre fundo grafite (contraste AA) */
+  /* Laranja claro para texto sobre fundo grafite */
   --color-brand-bright: #FF6A4F;
   --color-navy: #0F1115;
   --color-navy-2: #1F232B;

@@ -17,8 +17,9 @@
   As marcas antigas (BORAH, LIVELANCE) só podem aparecer em migrations já aplicadas, no relatório
   `docs/BRAND_MIGRATION.md`, nos e-mails/loja das contas de teste (`@livelance.test`, "Loja E2E LIVELANCE") e no
   tempero interno do hash de CPF (não pode mudar).
-- Cores: grafite `#0F1115` + branco; coral vivo `#FF4D2D` só como destaque (ponto AO VIVO, selos); coral de ação
-  `#D9391B` em botões e links (contraste AA). Dourado só em botões de comprar/dar lance; verde só em status.
+- Logo: só os arquivos de `public/brand/` (vetorizados da arte original); nunca redesenhar nem digitar o logo como texto.
+- Cores: grafite `#0F1115` + branco; laranja Zexi `#FF4D2D` em botões, links, ponto AO VIVO e selos.
+  Dourado só em botões de comprar/dar lance; verde só em status.
 - Módulos: ZEXI MARKET (`/market`), ZEXI LIVE (`/ao-vivo`), ZEXI LEILÕES (`/leiloes`), ZEXI SELLER (`/vender`), ZEXI PAY.
 
 ## Next.js 16
