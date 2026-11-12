@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { describe, expect, it } from "vitest";
-import { bpsToPercent, payErrorMessage, payoutState, previewFee, stripeKeyMode } from "@/lib/pay/format";
+import { accountStatusFromV2, bpsToPercent, payErrorMessage, payoutState, previewFee, stripeKeyMode } from "@/lib/pay/format";
 import { signStripePayload } from "@/lib/pay/signature";
 
 describe("assinatura dos avisos", () => {
@@ -53,5 +53,41 @@ describe("comissão e textos", () => {
     expect(payErrorMessage("store_cannot_receive")).toMatch(/ativando os recebimentos/);
     expect(payErrorMessage("payment_processing")).toMatch(/Pix ou boleto/);
     expect(payErrorMessage("qualquer")).toMatch(/Tente de novo/);
+  });
+});
+
+describe("accountStatusFromV2 (Accounts v2 → situação da loja)", () => {
+  const base = { id: "acct_1LOJA", livemode: false, metadata: { store_id: "s1" } };
+
+  it("conta nova: sem vender, sem receber e com pendências da loja", () => {
+    const s = accountStatusFromV2({
+      ...base,
+      configuration: { merchant: { capabilities: { card_payments: { status: "restricted" }, stripe_balance: { payouts: { status: "restricted" } } } } },
+      requirements: {
+        entries: [
+          { awaiting_action_from: "user", description: "external_account", minimum_deadline: { status: "past_due" } },
+          { awaiting_action_from: "user", description: "defaults.profile.product_description", minimum_deadline: { status: "currently_due" } },
+          { awaiting_action_from: "user", description: "identity.individual.dob", minimum_deadline: { status: "eventually_due" } },
+          { awaiting_action_from: "stripe", description: "revisão", minimum_deadline: { status: "currently_due" } },
+        ],
+      },
+    });
+    expect(s).toMatchObject({ id: "acct_1LOJA", charges_enabled: false, payouts_enabled: false, details_submitted: false, metadata: { store_id: "s1" } });
+    expect(s.requirements.currently_due).toEqual(["external_account", "defaults.profile.product_description"]);
+    expect(payoutState({ verified: true, ...s, requirements_due: s.requirements.currently_due })).toBe("pending");
+  });
+
+  it("conta pronta: vende e recebe", () => {
+    const s = accountStatusFromV2({
+      ...base,
+      configuration: { merchant: { capabilities: { card_payments: { status: "active" }, stripe_balance: { payouts: { status: "active" } } } } },
+      requirements: { entries: [] },
+    });
+    expect(s).toMatchObject({ charges_enabled: true, payouts_enabled: true, details_submitted: true });
+    expect(payoutState({ verified: true, ...s, requirements_due: [] })).toBe("active");
+  });
+
+  it("sem configuração merchant: nada ativo", () => {
+    expect(accountStatusFromV2(base)).toMatchObject({ charges_enabled: false, payouts_enabled: false, details_submitted: true, requirements: { currently_due: [] } });
   });
 });
