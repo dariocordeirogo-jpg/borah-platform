@@ -12,13 +12,13 @@ export default function Page() {
         RASCUNHO — este texto ainda não foi revisado por advogado e não vale como termo definitivo. Ele descreve as regras
         que o sistema aplica hoje, para servir de base à versão final.
       </p>
-      <h1 className="mt-6 font-display text-3xl font-extrabold">Termos de uso da LIVELANCE</h1>
+      <h1 className="mt-6 font-display text-3xl font-extrabold">Termos de uso da Zexi</h1>
       <div className="mt-6 space-y-3 text-sm leading-relaxed text-ink/90">
-        <H2>1. O que é a LIVELANCE</H2>
+        <H2>1. O que é a Zexi</H2>
         <p>
-          A LIVELANCE (livelance.com.br) é uma plataforma de intermediação que conecta compradores e lojas em três
-          modalidades: marketplace (LIVELANCE MARKET), vendas em transmissões ao vivo (LIVELANCE LIVE) e leilões
-          digitais (LIVELANCE LEILÕES). Quem vende é a loja; a LIVELANCE intermedeia.
+          A Zexi (zexi.com.br) é uma plataforma de intermediação que conecta compradores e lojas em três
+          modalidades: marketplace (ZEXI MARKET), vendas em transmissões ao vivo (ZEXI LIVE) e leilões
+          digitais (ZEXI LEILÕES). Quem vende é a loja; a Zexi intermedeia.
         </p>
 
         <H2>2. Conta</H2>
@@ -31,8 +31,8 @@ export default function Page() {
         <ul className="list-disc space-y-1 pl-5">
           <li>Preço, estoque e total do pedido são confirmados pelo sistema no momento do pedido, não pelo navegador.</li>
           <li>
-            Pagamentos são processados por provedor autorizado (LIVELANCE PAY, via Stripe), com repasse direto à loja. A
-            LIVELANCE retém apenas a sua taxa de intermediação e não mantém saldo em custódia.
+            Pagamentos são processados por provedor autorizado (ZEXI PAY, via Stripe), com repasse direto à loja. A
+            Zexi retém apenas a sua taxa de intermediação e não mantém saldo em custódia.
           </li>
           <li>Direito de arrependimento em compras a distância (art. 49 do CDC) e regras do Decreto 7.962/2013.</li>
         </ul>

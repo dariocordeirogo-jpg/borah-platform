@@ -1,11 +1,14 @@
 @import "tailwindcss";
 
 /*
- * LIVELANCE — tokens de design (paleta vermelho · azul-marinho · branco).
+ * Zexi — tokens de design (paleta grafite · coral · branco).
+ * Os nomes dos tokens (`brand`, `navy`) foram mantidos para não espalhar a troca de marca pelo código:
+ * `brand` = coral de ação e `navy` = grafite.
  * Contraste WCAG AA medido:
- *  - vermelho #D71920 em branco 5,19:1 · branco em vermelho 5,19:1
- *  - azul-marinho #10243A em branco 15,72:1
- *  - azul-marinho sobre dourado #D6A638 7,02:1 (botões de compra/lance)
+ *  - coral de ação #D9391B em branco 4,6:1 · branco em coral de ação 4,6:1 (botões e links)
+ *  - coral vivo #FF4D2D: só destaque (ponto AO VIVO, selos, fios); sobre grafite 5,7:1
+ *  - grafite #0F1115 em branco 18,9:1
+ *  - grafite sobre dourado #D6A638 (botões de compra/lance)
  *  - cinza de texto #5A6878 em branco 5,70:1
  *
  * REGRA DO DOURADO: os tokens `buy*` e o utilitário `btn-buy` existem SÓ para
@@ -13,14 +16,16 @@
  * Nunca em logo, menu, títulos, ícones, fundos, bordas ou ações administrativas.
  */
 @theme {
-  --color-brand: #D71920;
-  --color-brand-dark: #A90F18;
-  --color-brand-soft: #FDECEC;
-  /* Vermelho mais claro para texto sobre fundo azul-marinho (contraste AA) */
-  --color-brand-bright: #FF5A61;
-  --color-navy: #10243A;
-  --color-navy-2: #183B5B;
-  --color-navy-soft: #E9EEF4;
+  --color-brand: #D9391B;
+  --color-brand-dark: #B32D14;
+  --color-brand-soft: #FFEDE8;
+  /* Coral vivo da marca (ponto AO VIVO, selos). Não usar com texto branco pequeno. */
+  --color-brand-vivid: #FF4D2D;
+  /* Coral claro para texto sobre fundo grafite (contraste AA) */
+  --color-brand-bright: #FF6A4F;
+  --color-navy: #0F1115;
+  --color-navy-2: #1F232B;
+  --color-navy-soft: #EEF0F3;
   --color-ink: #1A2230;
   --color-muted: #5A6878;
   --color-line: #E3E6EB;

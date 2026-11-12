@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps<"/leilao/[id]">): P
   if (!d) return { title: "Leilão não encontrado" };
   return {
     title: `Leilão: ${d.auction.title}`,
-    description: `Lance inicial ${formatBRL(d.auction.starting_price_cents)} na LIVELANCE LEILÕES.`,
+    description: `Lance inicial ${formatBRL(d.auction.starting_price_cents)} na ZEXI LEILÕES.`,
     alternates: { canonical: `/leilao/${d.auction.id}` },
     openGraph: { images: d.images[0] ? [d.images[0].url] : undefined },
   };
@@ -46,7 +46,7 @@ async function Auction({ params, searchParams }: { params: Promise<{ id: string 
         {sp.criado && <Notice tone="success">Leilão criado! Uma unidade do produto ficou reservada para ele.</Notice>}
         <div>
           <p className="inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-            <Gavel className="h-3.5 w-3.5" aria-hidden="true" /> LIVELANCE LEILÕES
+            <Gavel className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI LEILÕES
             {a.relist_count > 0 && <span className="text-muted">· relançado</span>}
           </p>
           <h1 className="mt-1 font-display text-2xl font-bold leading-tight tracking-tight text-navy md:text-3xl">{a.title}</h1>

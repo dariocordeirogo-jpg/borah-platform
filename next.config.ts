@@ -30,8 +30,8 @@ const nextConfig: NextConfig = {
       // www → domínio principal (só tem efeito quando o domínio estiver apontado para a Vercel)
       {
         source: "/:path*",
-        has: [{ type: "host", value: "www.livelance.com.br" }],
-        destination: "https://livelance.com.br/:path*",
+        has: [{ type: "host", value: "www.zexi.com.br" }],
+        destination: "https://zexi.com.br/:path*",
         permanent: true,
       },
     ];

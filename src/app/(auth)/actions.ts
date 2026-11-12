@@ -23,7 +23,7 @@ function authErrorMessage(code: string | undefined): string {
     case "invalid_credentials":
       return "E-mail ou senha incorretos.";
     case "email_not_confirmed":
-      return "Confirme seu e-mail antes de entrar. Procure a mensagem da LIVELANCE na sua caixa de entrada.";
+      return "Confirme seu e-mail antes de entrar. Procure a mensagem da Zexi na sua caixa de entrada.";
     case "over_request_rate_limit":
     case "over_email_send_rate_limit":
       return "Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente de novo.";

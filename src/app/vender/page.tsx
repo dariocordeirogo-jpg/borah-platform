@@ -8,8 +8,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { getMyStore } from "@/lib/market/queries";
 
 export const metadata: Metadata = {
-  title: "Venda na LIVELANCE",
-  description: "LIVELANCE SELLER: abra sua loja e venda com preço fixo, ao vivo ou em leilão.",
+  title: "Venda na Zexi",
+  description: "ZEXI SELLER: abra sua loja e venda com preço fixo, ao vivo ou em leilão.",
   alternates: { canonical: "/vender" },
 };
 
@@ -35,7 +35,7 @@ export default function Page() {
   return (
     <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 md:grid-cols-[1.1fr_1fr] md:py-14">
       <div>
-        <p className="text-xs font-bold tracking-wider text-brand">LIVELANCE SELLER</p>
+        <p className="text-xs font-bold tracking-wider text-brand">ZEXI SELLER</p>
         <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-navy md:text-4xl">
           Abra sua loja e venda do seu jeito.
         </h1>

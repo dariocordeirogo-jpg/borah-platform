@@ -1,4 +1,4 @@
--- LIVELANCE — limpeza dos dados de TESTE antes do lançamento.
+-- Zexi — limpeza dos dados de TESTE antes do lançamento.
 -- NÃO é migration e NÃO roda sozinho. Rodar só com autorização explícita, no SQL Editor do Supabase.
 --
 -- Apaga tudo que pertence às contas de teste (e-mails @livelance.test): lojas, produtos, pedidos, pagamentos,

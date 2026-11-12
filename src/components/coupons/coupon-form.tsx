@@ -21,11 +21,11 @@ export function CouponForm() {
         <legend className="font-semibold text-navy">Tipo de desconto</legend>
         <div className="flex h-10 items-center gap-4">
           <label className="flex items-center gap-1.5">
-            <input type="radio" name="kind" value="percent" checked={kind === "percent"} onChange={() => setKind("percent")} className="accent-[#D71920]" />
+            <input type="radio" name="kind" value="percent" checked={kind === "percent"} onChange={() => setKind("percent")} className="accent-brand" />
             Porcentagem
           </label>
           <label className="flex items-center gap-1.5">
-            <input type="radio" name="kind" value="fixed" checked={kind === "fixed"} onChange={() => setKind("fixed")} className="accent-[#D71920]" />
+            <input type="radio" name="kind" value="fixed" checked={kind === "fixed"} onChange={() => setKind("fixed")} className="accent-brand" />
             Valor em R$
           </label>
         </div>

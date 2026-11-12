@@ -1,4 +1,4 @@
-# LIVELANCE — instruções para o Claude Code
+# Zexi — instruções para o Claude Code
 
 @AGENTS.md
 
@@ -13,9 +13,13 @@
 - Dados de demonstração ficam em `src/lib/demo-data.ts` e são sempre marcados como "Demonstração" na tela.
 - Uma fase só fecha com build, lint, testes unitários, e2e e o teste de RLS (`supabase/tests/`) passando.
 - Toda migration aplicada no Supabase precisa existir em `supabase/migrations/` com o mesmo conteúdo.
-- Marca: o nome público é **LIVELANCE** (slogan "Tudo acontece ao vivo."). Nome, slogan, SEO e módulos vêm de `src/lib/site.ts`.
-  A marca antiga só pode aparecer em migrations já aplicadas e no relatório `docs/BRAND_MIGRATION.md`.
-- Módulos: LIVELANCE MARKET (`/market`), LIVE (`/ao-vivo`), LEILÕES (`/leiloes`), SELLER (`/vender`), PAY.
+- Marca: o nome público é **Zexi** (slogan "Tudo acontece ao vivo."). Nome, slogan, SEO e módulos vêm de `src/lib/site.ts`.
+  As marcas antigas (BORAH, LIVELANCE) só podem aparecer em migrations já aplicadas, no relatório
+  `docs/BRAND_MIGRATION.md`, nos e-mails/loja das contas de teste (`@livelance.test`, "Loja E2E LIVELANCE") e no
+  tempero interno do hash de CPF (não pode mudar).
+- Cores: grafite `#0F1115` + branco; coral vivo `#FF4D2D` só como destaque (ponto AO VIVO, selos); coral de ação
+  `#D9391B` em botões e links (contraste AA). Dourado só em botões de comprar/dar lance; verde só em status.
+- Módulos: ZEXI MARKET (`/market`), ZEXI LIVE (`/ao-vivo`), ZEXI LEILÕES (`/leiloes`), ZEXI SELLER (`/vender`), ZEXI PAY.
 
 ## Next.js 16
 

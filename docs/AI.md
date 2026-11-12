@@ -1,4 +1,4 @@
-# IA da LIVELANCE (Claude)
+# IA da Zexi (Claude)
 
 Três usos, todos com a decisão final nas mãos de uma pessoa:
 

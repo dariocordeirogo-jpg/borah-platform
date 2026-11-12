@@ -7,7 +7,7 @@ const E2E_PASSWORD = process.env.E2E_PASSWORD ?? "Teste12345";
 test("/conta sem login manda para /entrar", async ({ page }) => {
   await page.goto("/conta");
   await expect(page).toHaveURL(/\/entrar\?next=%2Fconta|\/entrar\?next=\/conta/);
-  await expect(page.getByRole("heading", { name: "Entrar na LIVELANCE" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Entrar na Zexi" })).toBeVisible();
 });
 
 test("cadastro mostra erros de validação", async ({ page }) => {

@@ -47,3 +47,29 @@ LIVELANCE e os nomes de módulo de `src/lib/site.ts`.
 - Logo redesenhada a partir da referência enviada: play 3D vermelho com martelo, órbita e ondas; ícone do app em 3D.
 - Rodapé, topo da home e área do vendedor passaram a ser claros (sem grandes áreas escuras).
 - Templates de e-mail e imagem de compartilhamento na nova paleta. Banco de dados não foi alterado nesta etapa.
+
+## 6. Nova marca: LIVELANCE → Zexi (12/11/2026)
+
+Decisões do dono do projeto: nome **Zexi**, domínio **zexi.com.br**, slogan mantido ("Tudo acontece ao vivo."),
+destaque **coral #FF4D2D** sobre **grafite #0F1115** e branco, módulos **ZEXI MARKET, ZEXI LIVE, ZEXI LEILÕES,
+ZEXI SELLER, ZEXI PAY**.
+
+- Logo novo (símbolo "Z" geométrico + ponto AO VIVO; wordmark "zexi" com o pingo do i em coral), ícones do app,
+  favicon, ícone Apple, manifesto e imagem de compartilhamento.
+- Tokens de cor trocados em `src/app/globals.css` (nomes mantidos). Coral de ação #D9391B nos botões por contraste AA.
+- Textos do site, SEO, e-mails, prompts da IA, documentos e testes trocados para Zexi.
+- Banco (migration `20261112142831_marca_zexi`): descrições das flags, nome padrão de usuário ("Usuário Zexi") e
+  prefixo padrão do código de indicação (`zexi`). Nenhum dado de usuário alterado.
+
+Ficam com o nome antigo, de propósito:
+
+| Item | Por quê |
+| --- | --- |
+| Migrations já aplicadas | Histórico; editar quebraria a correspondência com o banco |
+| Tempero do hash de CPF (`livelance:cpf:`) | Mudar quebraria a regra de um CPF por conta para quem já se verificou |
+| Rotina agendada `livelance-auction-jobs` (pg_cron) | Nome interno, invisível; está numa migration aplicada |
+| Contas e loja de teste (`@livelance.test`, "Loja E2E LIVELANCE") | Dados do banco de desenvolvimento usados pelos testes; somem na limpeza antes do lançamento |
+| Projeto "live" na Vercel e repositório `borah-platform` | Nomes internos; renomear pelo painel quando quiser |
+
+Pendências do dono: registrar **zexi.com.br** e verificar a marca **Zexi no INPI** (classes de comércio eletrônico e
+leilões) antes de investir em divulgação.

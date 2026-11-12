@@ -28,7 +28,7 @@ export function VerificationForm({ next }: { next?: string }) {
         {err("phone") && <p id="phone-erro" className="mt-1 text-sm text-danger">{err("phone")}</p>}
       </div>
       <label className="flex items-start gap-3 text-sm">
-        <input type="checkbox" name="consent" className="mt-0.5 h-5 w-5 accent-[#D71920]" />
+        <input type="checkbox" name="consent" className="mt-0.5 h-5 w-5 accent-brand" />
         <span>
           Li e concordo com as{" "}
           <Link href="/leiloes/regras" className="font-semibold text-brand underline">regras dos leilões</Link>: lance é compromisso de compra.

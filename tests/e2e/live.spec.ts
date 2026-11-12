@@ -1,5 +1,5 @@
 /**
- * LIVELANCE LIVE de ponta a ponta: loja programa a live → aparece em "Próximas" → começa →
+ * ZEXI LIVE de ponta a ponta: loja programa a live → aparece em "Próximas" → começa →
  * destaca produto → chat em tempo real com moderação → leilão relâmpago aparece para quem assiste → encerra.
  * O vídeo em si depende do serviço de transmissão; aqui o player mostra os estados.
  */
@@ -31,7 +31,7 @@ async function browserAs(browser: Browser, email: string, next: string): Promise
   return page;
 }
 
-test.describe("LIVELANCE LIVE: da programação ao leilão relâmpago", () => {
+test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
   test.describe.configure({ mode: "serial" });
   test.beforeEach(({}, info) => test.skip(info.project.name !== "desktop", "roda uma vez (desktop)"));
 

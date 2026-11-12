@@ -20,7 +20,7 @@ async function logout(page: Page) {
   await page.waitForURL((u) => u.pathname === "/");
 }
 
-test.describe("LIVELANCE MARKET: do anúncio ao pedido", () => {
+test.describe("ZEXI MARKET: do anúncio ao pedido", () => {
   test.describe.configure({ mode: "serial" });
   test.beforeEach(({}, info) => test.skip(info.project.name !== "desktop", "fluxo completo roda uma vez (desktop)"));
 

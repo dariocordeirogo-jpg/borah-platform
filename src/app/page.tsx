@@ -116,7 +116,7 @@ const modes = [
   {
     href: "/market",
     icon: ShoppingBag,
-    name: "LIVELANCE MARKET",
+    name: "ZEXI MARKET",
     verb: "Compre agora",
     text: "Preço fixo, carrinho e entrega. Sem disputa.",
     iconClass: "bg-navy-soft text-navy",
@@ -126,7 +126,7 @@ const modes = [
   {
     href: "/ao-vivo",
     icon: Radio,
-    name: "LIVELANCE LIVE",
+    name: "ZEXI LIVE",
     verb: "Assista e compre",
     text: "Vendedores apresentam ao vivo. Pergunte no chat e compre sem sair da transmissão.",
     iconClass: "bg-brand-soft text-brand",
@@ -136,7 +136,7 @@ const modes = [
   {
     href: "/leiloes",
     icon: Gavel,
-    name: "LIVELANCE LEILÕES",
+    name: "ZEXI LEILÕES",
     verb: "Dê seu lance",
     text: "Lotes com lance inicial, incremento mínimo e cronômetro oficial. Quem der o maior lance arremata.",
     iconClass: "bg-brand text-white",
@@ -260,7 +260,7 @@ export default function HomePage() {
           <SectionHeader
             badge={
               <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-                <Radio className="h-3.5 w-3.5" aria-hidden="true" /> LIVELANCE LIVE
+                <Radio className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI LIVE
               </span>
             }
             title="Transmissões ao vivo"
@@ -279,7 +279,7 @@ export default function HomePage() {
           <SectionHeader
             badge={
               <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-                <Gavel className="h-3.5 w-3.5" aria-hidden="true" /> LIVELANCE LEILÕES
+                <Gavel className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI LEILÕES
               </span>
             }
             title="Leilões em andamento"
@@ -313,7 +313,7 @@ export default function HomePage() {
           <SectionHeader
             badge={
               <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-                <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" /> LIVELANCE MARKET
+                <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI MARKET
               </span>
             }
             title="Produtos em destaque e ofertas"
@@ -351,7 +351,7 @@ export default function HomePage() {
           className="overflow-hidden rounded-[var(--radius-card)] border border-line bg-white shadow-[var(--shadow-card)] md:grid md:grid-cols-[1.3fr_1fr]"
         >
           <div className="p-6 md:p-10">
-            <p className="text-xs font-bold tracking-wider text-brand">LIVELANCE SELLER</p>
+            <p className="text-xs font-bold tracking-wider text-brand">ZEXI SELLER</p>
             <h2 id="vendedores" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-navy md:text-3xl">
               Venda do seu jeito: vitrine, live ou leilão.
             </h2>
@@ -360,7 +360,7 @@ export default function HomePage() {
               leilão.
             </p>
             <ButtonLink href="/vender" size="lg" className="mt-6">
-              Quero vender na LIVELANCE <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              Quero vender na Zexi <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </ButtonLink>
           </div>
           <ul className="grid gap-px border-t border-line bg-line md:border-l md:border-t-0">

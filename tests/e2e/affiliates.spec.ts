@@ -86,7 +86,7 @@ test.describe("Indique e ganhe: venda indicada gera comissão", () => {
     await expect(page.getByTestId("link-geral")).toHaveValue(new RegExp(`/r/${code}$`));
 
     await page.getByLabel("Endereço de um produto, leilão ou loja").fill(`https://golpe.com/produto/${productId}`);
-    await expect(page.getByText("Use um endereço da LIVELANCE.")).toBeVisible();
+    await expect(page.getByText("Use um endereço da Zexi.")).toBeVisible();
     await page.getByLabel("Endereço de um produto, leilão ou loja").fill(`/produto/${productId}`);
     await expect(page.getByTestId("link-gerado")).toHaveValue(new RegExp(`/r/${code}\\?to=%2Fproduto%2F${productId}$`));
     await page.context().close();

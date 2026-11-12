@@ -144,7 +144,7 @@ function ShippingOptions({ addressId, productsCents }: { addressId: string | nul
         className="flex flex-1 cursor-pointer items-center justify-between gap-2 rounded-xl border border-line bg-white p-3 text-sm has-[:checked]:border-brand has-[:checked]:bg-brand-soft/40"
       >
         <span className="flex items-center gap-2">
-          <input type="radio" name="shippingService" value={s} checked={service === s} onChange={() => setService(s)} className="accent-[#D71920]" />
+          <input type="radio" name="shippingService" value={s} checked={service === s} onChange={() => setService(s)} className="accent-brand" />
           <span>
             <span className="block font-semibold text-navy">{shippingServiceLabel[s]}</span>
             <span className="block text-xs text-muted">até {formatDays(days)}</span>
@@ -226,7 +226,7 @@ export function PlaceOrderForm({
                 value={a.id}
                 checked={addressId === a.id}
                 onChange={() => setAddressId(a.id)}
-                className="mt-1 accent-[#D71920]"
+                className="mt-1 accent-brand"
               />
               <span className="text-sm">
                 <span className="block font-semibold text-navy">{a.recipient}</span>

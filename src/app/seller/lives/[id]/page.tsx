@@ -182,7 +182,7 @@ function StreamPanel({ liveId, playbackUrl, stream }: { liveId: string; playback
       )}
       {stream.kind === "none" && (
         <>
-          <p className="text-muted">Gere a chave e transmita pelo OBS (computador) ou por um app de celular. Quem assiste recebe o vídeo aqui na LIVELANCE.</p>
+          <p className="text-muted">Gere a chave e transmita pelo OBS (computador) ou por um app de celular. Quem assiste recebe o vídeo aqui na Zexi.</p>
           <form action={openStream}>
             <input type="hidden" name="liveId" value={liveId} />
             <Button type="submit">Gerar chave de transmissão</Button>
@@ -198,7 +198,7 @@ function StreamPanel({ liveId, playbackUrl, stream }: { liveId: string; playback
       {stream.kind === "unconfigured" && (
         <>
           <p className="text-muted">
-            A transmissão integrada da LIVELANCE está em configuração. Por enquanto, transmita por um serviço de vídeo e cole
+            A transmissão integrada da Zexi está em configuração. Por enquanto, transmita por um serviço de vídeo e cole
             aqui o link de reprodução HLS (https, termina em .m3u8).
           </p>
           <ManualPlayback liveId={liveId} playbackUrl={playbackUrl} />

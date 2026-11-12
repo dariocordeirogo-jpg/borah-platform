@@ -17,7 +17,7 @@ async function Cart() {
   if (!cart.items.length) {
     return (
       <EmptyState title="Seu carrinho está vazio" action={<ButtonLink href="/market">Explorar o Market</ButtonLink>}>
-        Encontre produtos no LIVELANCE MARKET.
+        Encontre produtos no ZEXI MARKET.
       </EmptyState>
     );
   }

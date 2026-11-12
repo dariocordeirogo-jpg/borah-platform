@@ -1,4 +1,4 @@
-# Arquitetura — LIVELANCE (Fase 1)
+# Arquitetura — Zexi (Fase 1)
 
 | Camada | Tecnologia | Onde |
 | --- | --- | --- |
@@ -23,7 +23,7 @@
 - Cronômetros da home são só de exibição. Na Fase 3, o fim do leilão vem do banco (pg_cron + função `place_bid`).
 - Cabeçalhos de segurança básicos em `next.config.ts` (nosniff, frame DENY, referrer, permissions).
 
-## LIVELANCE MARKET + SELLER (Fase 2)
+## ZEXI MARKET + SELLER (Fase 2)
 
 | Parte | Onde |
 | --- | --- |
@@ -41,8 +41,8 @@ frete "a combinar" até a integração de logística; nenhum pagamento real até
 
 - Nome, slogan, título, descrição e módulos: `src/lib/site.ts` (fonte única).
 - `metadataBase`, canonical, Open Graph e Twitter: `src/app/layout.tsx`; imagem de compartilhamento: `src/app/opengraph-image.tsx`.
-- `src/app/robots.ts` (bloqueia indexação fora de `https://livelance.com.br`), `src/app/sitemap.ts`, `src/app/manifest.ts` (PWA).
-- Redirecionamentos: `/lances` → `/leiloes`; `www.livelance.com.br` → `livelance.com.br`.
+- `src/app/robots.ts` (bloqueia indexação fora de `https://zexi.com.br`), `src/app/sitemap.ts`, `src/app/manifest.ts` (PWA).
+- Redirecionamentos: `/lances` → `/leiloes`; `www.zexi.com.br` → `zexi.com.br`.
 
 ## Configuração pendente
 

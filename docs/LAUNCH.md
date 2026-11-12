@@ -16,10 +16,10 @@ limpeza de dados só acontecem com autorização explícita do dono do projeto. 
 
 - [ ] Stripe: conta da plataforma ativa, Connect habilitado, **chave de teste** `sk_test_` para homologar.
   A chave `live` salva no ambiente de desenvolvimento deve ser removida de lá.
-- [ ] Webhook da Stripe apontando para `https://livelance.com.br/api/webhooks/stripe`; segredo na Vercel e no Vault
+- [ ] Webhook da Stripe apontando para `https://zexi.com.br/api/webhooks/stripe`; segredo na Vercel e no Vault
   (`stripe_webhook_secret`) — ver [PAYMENTS.md](PAYMENTS.md).
 - [ ] `ANTHROPIC_API_KEY` na Vercel (ver [AI.md](AI.md)) e flag `ai` ligada.
-- [ ] Domínio `livelance.com.br`, projeto na Vercel e Supabase Auth configurados — ver [DEPLOYMENT.md](DEPLOYMENT.md).
+- [ ] Domínio `zexi.com.br`, projeto na Vercel e Supabase Auth configurados — ver [DEPLOYMENT.md](DEPLOYMENT.md).
 - [ ] SMTP próprio no Supabase Auth e proteção contra senhas vazadas ligada.
 
 ## 3. Homologação (com chave de teste)
@@ -39,9 +39,9 @@ limpeza de dados só acontecem com autorização explícita do dono do projeto. 
 - [ ] Rodar `supabase/manual/limpar-dados-de-teste.sql` (termina em ROLLBACK; conferir e trocar por COMMIT)
   e apagar as pastas das lojas de teste no Storage.
 - [ ] Dar o papel de admin à conta do dono (SQL em [DATABASE.md](DATABASE.md)).
-- [ ] `NEXT_PUBLIC_SITE_URL=https://livelance.com.br` na Vercel (libera indexação e troca o aviso do rodapé).
+- [ ] `NEXT_PUBLIC_SITE_URL=https://zexi.com.br` na Vercel (libera indexação e troca o aviso do rodapé).
 - [ ] Ligar a flag `payments` e trocar para a chave `sk_live_` — **só com autorização explícita**.
-- [ ] Monitor externo (ex.: UptimeRobot) em `https://livelance.com.br/api/health`.
+- [ ] Monitor externo (ex.: UptimeRobot) em `https://zexi.com.br/api/health`.
 - [ ] Backups: confirmar o plano do Supabase com backup diário (PITR se possível).
 
 ## 5. Depois do lançamento (escala)

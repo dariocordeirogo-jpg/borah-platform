@@ -1,6 +1,6 @@
 # Frete (Correios: PAC e SEDEX)
 
-Enquanto não há contrato com os Correios, o frete é calculado por uma **tabela da LIVELANCE** (zona × peso), no
+Enquanto não há contrato com os Correios, o frete é calculado por uma **tabela da Zexi** (zona × peso), no
 formato PAC/SEDEX. Quando o contrato sair, só a função de cotação (`private.quote_shipping`) passa a chamar a API
 oficial; checkout, pedidos e pagamentos continuam iguais.
 
@@ -13,7 +13,7 @@ oficial; checkout, pedidos e pagamentos continuam iguais.
 - **Peso:** soma de peso × quantidade dos produtos da loja no pedido; faixas até 300 g, 1, 2, 5, 10, 20 e 30 kg.
 - **Checkout:** o comprador vê PAC e SEDEX com preço e prazo por loja e escolhe um serviço para o pedido.
   O banco recalcula o frete ao fechar o pedido (nunca o navegador).
-- **Dinheiro:** o frete entra no total pago e vai **inteiro para a loja**. A taxa da LIVELANCE e a comissão de
+- **Dinheiro:** o frete entra no total pago e vai **inteiro para a loja**. A taxa da Zexi e a comissão de
   indicação são calculadas só sobre os produtos. Cupom: o desconto é sobre os produtos e o pedido nunca fica abaixo de R$ 1,00.
 
 ## Tabela

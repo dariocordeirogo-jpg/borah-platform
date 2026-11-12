@@ -236,7 +236,7 @@ export function BidPanel(props: BidPanelProps) {
       <p className="flex items-start gap-2 text-xs text-muted">
         <ShieldCheck className="h-4 w-4 shrink-0 text-navy-2" aria-hidden="true" />
         <span>
-          Cada lance é validado pelo servidor da LIVELANCE: valor mínimo, horário oficial e prorrogação automática de 2 minutos
+          Cada lance é validado pelo servidor da Zexi: valor mínimo, horário oficial e prorrogação automática de 2 minutos
           quando um lance chega nos últimos 2 minutos.{" "}
           <Link href="/leiloes/regras" className="whitespace-nowrap text-brand underline">
             Regras dos leilões

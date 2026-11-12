@@ -1,5 +1,5 @@
 /**
- * LIVELANCE PAY de ponta a ponta, sem chamar a Stripe: os avisos (webhooks) são simulados e assinados
+ * ZEXI PAY de ponta a ponta, sem chamar a Stripe: os avisos (webhooks) são simulados e assinados
  * com o segredo de desenvolvimento, e entram pela rota real /api/webhooks/stripe → banco.
  * A chamada à API da Stripe (abrir o Checkout, criar a conta da loja) fica para quando houver chave de teste.
  */
@@ -47,7 +47,7 @@ async function browserAs(browser: Browser, email: string, next: string): Promise
   return page;
 }
 
-test.describe("LIVELANCE PAY: pedido pago pelo aviso assinado", () => {
+test.describe("ZEXI PAY: pedido pago pelo aviso assinado", () => {
   test.describe.configure({ mode: "serial" });
   test.beforeEach(({}, info) => test.skip(info.project.name !== "desktop", "roda uma vez (desktop)"));
 
@@ -142,7 +142,7 @@ test.describe("LIVELANCE PAY: pedido pago pelo aviso assinado", () => {
     const box = page.getByRole("region", { name: "Pagamento" });
     await expect(box).toBeVisible();
     // Sem chave Stripe neste ambiente: nada de botão de pagar, só o aviso
-    await expect(box.getByText("O LIVELANCE PAY está em configuração")).toBeVisible();
+    await expect(box.getByText("O ZEXI PAY está em configuração")).toBeVisible();
     await expect(page.getByRole("button", { name: /Pagar R\$/ })).toHaveCount(0);
     await page.context().close();
   });

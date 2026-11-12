@@ -4,7 +4,7 @@ import { stripeKeyMode } from "@/lib/pay/format";
 import { createAnonClient } from "@/lib/supabase/anon";
 
 /**
- * Stripe só no servidor. Sem STRIPE_SECRET_KEY o LIVELANCE PAY fica "em configuração".
+ * Stripe só no servidor. Sem STRIPE_SECRET_KEY o ZEXI PAY fica "em configuração".
  * Chave de produção (sk_live_/rk_live_) só funciona com a flag `payments` ligada no banco:
  * pagamento real exige autorização explícita.
  */
@@ -24,7 +24,7 @@ export async function getStripe(): Promise<Stripe | null> {
   cached ??= new Stripe(key, {
     httpClient: Stripe.createFetchHttpClient(),
     maxNetworkRetries: 2,
-    appInfo: { name: "LIVELANCE" },
+    appInfo: { name: "Zexi" },
   });
   return cached;
 }

@@ -1,4 +1,4 @@
--- Teste do motor de LIVELANCE LEILÕES (Fase 3). Roda numa transação e desfaz tudo (rollback).
+-- Teste do motor de ZEXI LEILÕES (Fase 3). Roda numa transação e desfaz tudo (rollback).
 -- Dentro de uma transação now() é fixo; o teste ajusta horários direto na tabela (como superusuário).
 begin;
 insert into auth.users (id, email, raw_user_meta_data, aud, role) values

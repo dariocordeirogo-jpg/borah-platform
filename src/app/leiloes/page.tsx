@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Leilões online",
-  description: "LIVELANCE LEILÕES: lotes com lance inicial, incremento mínimo, cronômetro oficial e histórico de lances.",
+  description: "ZEXI LEILÕES: lotes com lance inicial, incremento mínimo, cronômetro oficial e histórico de lances.",
   alternates: { canonical: "/leiloes" },
 };
 
@@ -69,7 +69,7 @@ export default function Page({ searchParams }: PageProps<"/leiloes">) {
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-            <Gavel className="h-3.5 w-3.5" aria-hidden="true" /> LIVELANCE LEILÕES
+            <Gavel className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI LEILÕES
           </p>
           <h1 className="font-display text-2xl font-bold tracking-tight text-navy md:text-3xl">Leilões</h1>
           <p className="text-sm text-muted">Cronômetro oficial, lance validado pelo servidor e prorrogação automática no fim.</p>

@@ -77,7 +77,7 @@ export async function payOrder(formData: FormData) {
             application_fee_amount: p.fee_cents,
             transfer_data: { destination: p.destination },
             metadata: { payment_id: p.payment_id, order_id: orderId },
-            description: `LIVELANCE · Pedido #${p.order_number}`,
+            description: `Zexi · Pedido #${p.order_number}`,
           },
           // A sessão expira antes do registro no banco (60 min)
           expires_at: Math.floor(Date.now() / 1000) + 55 * 60,

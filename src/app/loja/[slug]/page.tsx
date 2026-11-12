@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: PageProps<"/loja/[slug]">): P
   if (!store) return { title: "Loja não encontrada" };
   return {
     title: store.name,
-    description: store.description?.slice(0, 160) ?? `Loja ${store.name} na LIVELANCE.`,
+    description: store.description?.slice(0, 160) ?? `Loja ${store.name} na Zexi.`,
     alternates: { canonical: `/loja/${store.slug}` },
   };
 }
@@ -32,7 +32,7 @@ async function StorePage({ params, searchParams }: { params: Promise<{ slug: str
         <div className="min-w-0">
           <h1 className="font-display text-2xl font-bold tracking-tight text-navy">{store.name}</h1>
           <p className="text-sm text-muted">
-            Na LIVELANCE desde {since} · {result.total} {result.total === 1 ? "produto" : "produtos"}
+            Na Zexi desde {since} · {result.total} {result.total === 1 ? "produto" : "produtos"}
           </p>
           {store.description && <p className="mt-2 text-sm text-ink">{store.description}</p>}
         </div>

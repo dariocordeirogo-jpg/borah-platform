@@ -21,7 +21,7 @@ async function Checkout() {
         <AddressForm open={!addresses.length} />
         <p className="flex items-start gap-2 rounded-xl bg-navy-soft px-4 py-3 text-sm text-navy">
           <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-          Ao finalizar, seu pedido é registrado e o estoque fica reservado para você. Em seguida você paga pelo LIVELANCE
+          Ao finalizar, seu pedido é registrado e o estoque fica reservado para você. Em seguida você paga pelo Zexi
           PAY (Stripe) na página do pedido. Um pedido por loja.
         </p>
       </div>

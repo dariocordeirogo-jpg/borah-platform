@@ -1,4 +1,4 @@
-/** LIVELANCE LIVE: textos e validações que podem ir ao navegador. */
+/** ZEXI LIVE: textos e validações que podem ir ao navegador. */
 
 export const liveStatusLabel = {
   scheduled: "Programada",

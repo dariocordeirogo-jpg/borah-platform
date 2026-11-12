@@ -92,7 +92,7 @@ reset role;
 insert into r select 'comissão de indicação sem o frete',
   bool_and(base_cents = o.subtotal_cents) from public.affiliate_commissions c join public.orders o on o.id = c.order_id where c.order_id in (select id from made);
 insert into r select 'ajuste auditado', count(*) = 1 from public.audit_logs where action = 'admin.shipping_rate.update' and actor_id = '00000000-0000-0000-0000-0000000000f5';
-insert into r select 'taxa da LIVELANCE sem o frete', private.fee_for(o.total_cents - o.shipping_cents) = private.fee_for(o.subtotal_cents)
+insert into r select 'taxa da Zexi sem o frete', private.fee_for(o.total_cents - o.shipping_cents) = private.fee_for(o.subtotal_cents)
   from public.orders o where o.id in (select id from made) and o.store_id = (select v::uuid from ids where k='store_f');
 
 set local role anon;

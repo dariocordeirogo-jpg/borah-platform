@@ -73,8 +73,8 @@ async function Account() {
         {[
           { icon: Receipt, title: "Meus pedidos", text: "Acompanhe suas compras", href: "/conta/pedidos" },
           user.roles.includes("seller")
-            ? { icon: Store, title: "Minha loja", text: "Painel LIVELANCE SELLER", href: "/seller" }
-            : { icon: Store, title: "Abrir minha loja", text: "Venda na LIVELANCE", href: "/vender" },
+            ? { icon: Store, title: "Minha loja", text: "Painel ZEXI SELLER", href: "/seller" }
+            : { icon: Store, title: "Abrir minha loja", text: "Venda na Zexi", href: "/vender" },
           { icon: Gavel, title: "Meus lances", text: "Leilões em que você participa", href: "/conta/lances" },
           ...(isStaff(user.roles) ? [{ icon: ShieldCheck, title: "Painel da equipe", text: "Denúncias, moderação e números", href: "/admin" }] : []),
           { icon: Megaphone, title: "Minhas indicações", text: "Indique e ganhe comissão", href: user.roles.includes("affiliate") ? "/conta/indicacoes" : "/indique" },

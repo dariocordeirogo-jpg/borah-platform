@@ -24,7 +24,7 @@ async function ReportForm({ searchParams }: { searchParams: Promise<SP> }) {
   if (sp.enviado) {
     return (
       <div className="space-y-4">
-        <Notice tone="success">Denúncia enviada. Obrigado! A equipe da LIVELANCE vai analisar.</Notice>
+        <Notice tone="success">Denúncia enviada. Obrigado! A equipe da Zexi vai analisar.</Notice>
         <Link href={next} className="text-sm font-semibold text-brand hover:underline">
           ← Voltar
         </Link>

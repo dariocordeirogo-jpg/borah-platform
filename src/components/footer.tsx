@@ -6,15 +6,15 @@ const groups = [
   {
     title: "Comprar",
     links: [
-      { href: "/market", label: "LIVELANCE MARKET" },
-      { href: "/ao-vivo", label: "LIVELANCE LIVE" },
-      { href: "/leiloes", label: "LIVELANCE LEILÕES" },
+      { href: "/market", label: "ZEXI MARKET" },
+      { href: "/ao-vivo", label: "ZEXI LIVE" },
+      { href: "/leiloes", label: "ZEXI LEILÕES" },
     ],
   },
   {
     title: "Vender e indicar",
     links: [
-      { href: "/vender", label: "LIVELANCE SELLER" },
+      { href: "/vender", label: "ZEXI SELLER" },
       { href: "/indique", label: "Indique e ganhe" },
     ],
   },

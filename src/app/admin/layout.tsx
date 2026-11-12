@@ -17,7 +17,7 @@ async function Gate({ children }: { children: React.ReactNode }) {
   return (
     <>
       <nav aria-label="Painel da equipe" className="mb-5 flex gap-1 overflow-x-auto rounded-[var(--radius-card)] bg-navy p-2 text-sm text-white">
-        <span className="hidden px-3 py-2 text-[11px] font-bold tracking-wider text-white/70 md:block">LIVELANCE ADMIN</span>
+        <span className="hidden px-3 py-2 text-[11px] font-bold tracking-wider text-white/70 md:block">Zexi ADMIN</span>
         {items.map((i) => (
           <Link key={i.href} href={i.href} className="whitespace-nowrap rounded-lg px-3 py-2 font-medium hover:bg-white/10">
             {i.label}

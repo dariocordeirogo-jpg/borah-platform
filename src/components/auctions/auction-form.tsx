@@ -58,10 +58,10 @@ export function AuctionForm({ products }: { products: { id: string; title: strin
         <legend className="mb-1 text-sm font-medium text-navy">Início</legend>
         <div className="flex flex-wrap gap-4 text-sm">
           <label className="flex items-center gap-2">
-            <input type="radio" name="startMode" value="now" checked={mode === "now"} onChange={() => setMode("now")} className="accent-[#D71920]" /> Agora
+            <input type="radio" name="startMode" value="now" checked={mode === "now"} onChange={() => setMode("now")} className="accent-brand" /> Agora
           </label>
           <label className="flex items-center gap-2">
-            <input type="radio" name="startMode" value="scheduled" checked={mode === "scheduled"} onChange={() => setMode("scheduled")} className="accent-[#D71920]" /> Programar
+            <input type="radio" name="startMode" value="scheduled" checked={mode === "scheduled"} onChange={() => setMode("scheduled")} className="accent-brand" /> Programar
           </label>
         </div>
         {mode === "scheduled" && (
