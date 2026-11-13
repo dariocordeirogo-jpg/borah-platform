@@ -212,7 +212,13 @@ export async function getMyAddresses() {
 }
 
 const ORDER_SELECT =
-  "id, number, status, subtotal_cents, shipping_cents, shipping_service, shipping_days, discount_cents, coupon_code, total_cents, shipping_address, cancelled_reason, created_at, buyer_id, store_id, stores(name, slug, owner_id), order_items(id, title, unit_price_cents, quantity, product_id)" as const;
+  "id, number, status, subtotal_cents, shipping_cents, shipping_service, shipping_days, discount_cents, coupon_code, total_cents, shipping_address, cancelled_reason, created_at, buyer_id, store_id, carrier, tracking_code, shipped_at, delivered_at, delivery_confirmed_by, stores(name, slug, owner_id), order_items(id, title, unit_price_cents, quantity, product_id, products(product_images(path, position))), order_events(kind, detail, created_at)" as const;
+
+/** Primeira foto de cada item do pedido (para as listas de compras e vendas). */
+export function itemImage(item: { products?: { product_images?: { path: string; position: number }[] } | null }): string | null {
+  const first = [...(item.products?.product_images ?? [])].sort((a, b) => a.position - b.position)[0];
+  return first ? productImageUrl(first.path) : null;
+}
 
 export async function getMyOrders() {
   const supabase = await db();
@@ -280,14 +286,35 @@ export async function getSellerProduct(storeId: string, id: string) {
   };
 }
 
-export async function getSellerOrders(storeId: string) {
+export type SellerOrderTab = "enviar" | "pagamento" | "transito" | "finalizadas" | "canceladas";
+const TAB_STATUS: Record<SellerOrderTab, Enums<"order_status">> = {
+  enviar: "paid",
+  pagamento: "pending_payment",
+  transito: "shipped",
+  finalizadas: "delivered",
+  canceladas: "cancelled",
+};
+
+/** Central de vendas: pedidos da aba escolhida + contagem de todas as abas. */
+export async function getSellerOrders(storeId: string, tab: SellerOrderTab = "enviar") {
   const supabase = await db();
-  const { data } = await supabase
-    .from("orders")
-    .select("id, number, status, total_cents, coupon_code, created_at, shipping_address, order_items(title, quantity, unit_price_cents)")
-    .eq("store_id", storeId)
-    .order("created_at", { ascending: false });
-  return data ?? [];
+  const [{ data }, ...counts] = await Promise.all([
+    supabase
+      .from("orders")
+      .select(ORDER_SELECT)
+      .eq("store_id", storeId)
+      .eq("status", TAB_STATUS[tab])
+      .order(tab === "enviar" ? "created_at" : "updated_at", { ascending: tab === "enviar" })
+      .limit(100),
+    ...(Object.keys(TAB_STATUS) as SellerOrderTab[]).map((t) =>
+      supabase.from("orders").select("id", { count: "exact", head: true }).eq("store_id", storeId).eq("status", TAB_STATUS[t]),
+    ),
+  ]);
+  const keys = Object.keys(TAB_STATUS) as SellerOrderTab[];
+  return {
+    orders: data ?? [],
+    counts: Object.fromEntries(keys.map((k, i) => [k, counts[i].count ?? 0])) as Record<SellerOrderTab, number>,
+  };
 }
 
 export async function getSellerStats(storeId: string) {

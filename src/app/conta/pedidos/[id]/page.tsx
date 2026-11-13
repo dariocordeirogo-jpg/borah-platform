@@ -5,6 +5,8 @@ import { Suspense } from "react";
 import { Notice } from "@/components/market";
 import { PayBox } from "@/components/pay/pay-box";
 import { OrderStatus } from "@/components/order-status";
+import { OrderTimeline, TrackingInfo } from "@/components/orders/timeline";
+import { confirmDelivery } from "@/lib/orders/actions";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth";
 import { formatBRL } from "@/lib/format";
@@ -15,7 +17,7 @@ import { syncCheckoutReturn } from "@/lib/pay/sync";
 
 export const metadata: Metadata = { title: "Pedido", robots: { index: false } };
 
-type SP = { novo?: string; erro?: string; pagamento?: string; sessao?: string };
+type SP = { novo?: string; erro?: string; pagamento?: string; sessao?: string; recebido?: string };
 type Addr = { recipient: string; street: string; number: string; complement: string | null; district: string; city: string; state: string; cep: string };
 
 async function Order({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<SP> }) {
@@ -37,6 +39,7 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
       )}
       {sp.pagamento === "cancelado" && <Notice>Pagamento não concluído. Você pode tentar de novo quando quiser.</Notice>}
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
+      {sp.recebido && <Notice tone="success">Obrigado por confirmar! Esperamos que goste da compra.</Notice>}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold tracking-tight text-navy">Pedido #{o.number}</h1>
         <OrderStatus status={o.status} />
@@ -48,6 +51,21 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
         </Link>
       </p>
       {o.status === "cancelled" && o.cancelled_reason && <Notice>{o.cancelled_reason}</Notice>}
+
+      <section aria-label="Acompanhe sua compra" className="space-y-4 rounded-[var(--radius-card)] border border-line bg-white p-4 shadow-[var(--shadow-card)]">
+        <h2 className="font-semibold text-navy">Acompanhe sua compra</h2>
+        <OrderTimeline order={o} />
+        {o.status === "shipped" && (
+          <div className="space-y-3 border-t border-line pt-3">
+            <TrackingInfo order={o} />
+            <form action={confirmDelivery} className="flex flex-wrap items-center gap-3">
+              <input type="hidden" name="orderId" value={o.id} />
+              <Button type="submit">Já recebi</Button>
+              <span className="text-xs text-muted">Confirme quando o pacote chegar. Sem confirmação, consideramos entregue 21 dias após o envio.</span>
+            </form>
+          </div>
+        )}
+      </section>
 
       <section className="rounded-[var(--radius-card)] border border-line bg-white shadow-[var(--shadow-card)]">
         <ul className="divide-y divide-line">

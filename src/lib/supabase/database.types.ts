@@ -264,6 +264,14 @@ export type Database = {
           },
         ];
       };
+      order_events: {
+        Row: { id: number; order_id: string; kind: string; detail: Json; created_at: string };
+        Insert: { order_id: string; kind: string; detail?: Json; created_at?: string };
+        Update: { [k: string]: never };
+        Relationships: [
+          { foreignKeyName: "order_events_order_id_fkey"; columns: ["order_id"]; isOneToOne: false; referencedRelation: "orders"; referencedColumns: ["id"] },
+        ];
+      };
       orders: {
         Row: {
           buyer_id: string;
@@ -282,6 +290,11 @@ export type Database = {
           subtotal_cents: number;
           total_cents: number;
           updated_at: string;
+          carrier: string | null;
+          tracking_code: string | null;
+          shipped_at: string | null;
+          delivered_at: string | null;
+          delivery_confirmed_by: "buyer" | "auto" | null;
         };
         Insert: {
           buyer_id: string;
@@ -695,6 +708,8 @@ export type Database = {
         }[];
       };
       cancel_order: { Args: { _order_id: string; _reason?: string }; Returns: undefined };
+      ship_order: { Args: { _order_id: string; _carrier: string; _tracking_code: string }; Returns: undefined };
+      confirm_delivery: { Args: { _order_id: string }; Returns: undefined };
       checkout: { Args: { _address_id: string }; Returns: string[] };
       create_store: { Args: { _description?: string; _name: string; _slug: string }; Returns: string };
       platform_fee_bps: { Args: Record<string, never>; Returns: number };

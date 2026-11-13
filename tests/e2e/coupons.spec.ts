@@ -129,7 +129,8 @@ test.describe("Cupons: loja cria, compradora usa", () => {
   test("loja vê o uso e o cupom no pedido", async ({ browser }) => {
     const page = await browserAs(browser, SELLER, "/seller/cupons");
     await expect(page.getByTestId("cupom").filter({ hasText: code })).toContainText("1 uso");
-    await page.goto("/seller/pedidos");
+    // Pedido ainda não pago: aba "Aguardando pagamento" da central de vendas
+    await page.goto("/seller/pedidos?aba=pagamento");
     await expect(page.getByText(`cupom ${code}`).first()).toBeVisible();
     await page.context().close();
   });
