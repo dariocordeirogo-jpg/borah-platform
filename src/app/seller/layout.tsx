@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: { default: "Painel do vendedor", temp
 
 export default function SellerLayout({ children }: LayoutProps<"/seller">) {
   return (
-    <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 md:grid-cols-[220px_1fr] md:py-8">
+    <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 py-4 [&>*]:min-w-0 md:grid-cols-[230px_1fr] md:gap-6 md:py-8">
       <aside className="md:sticky md:top-32 md:self-start">
         <SellerNav />
       </aside>

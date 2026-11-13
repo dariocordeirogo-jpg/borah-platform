@@ -120,7 +120,8 @@ test.describe("ZEXI MARKET: do anúncio ao pedido", () => {
 
     await page.goBack();
     await page.goto("/conta/pedidos");
-    await page.getByRole("link", { name: /Pedido #/ }).first().click();
+    // Minhas compras: o pedido deste teste fica em "Aguardando pagamento"
+    await page.getByTestId(/^compra-/).filter({ hasText: title }).first().getByRole("link", { name: "Pagar" }).click();
     await page.getByRole("button", { name: "Cancelar pedido" }).click();
     await expect(page.getByText("Cancelado", { exact: true }).filter({ visible: true }).first()).toBeVisible();
     await page.goto(productUrl);
@@ -129,8 +130,10 @@ test.describe("ZEXI MARKET: do anúncio ao pedido", () => {
   });
 
   test("vendedor vê o pedido cancelado e tira o produto de venda (limpeza)", async ({ page }) => {
-    await login(page, SELLER, "/seller/pedidos");
-    await expect(page.getByText(`2× ${title}`).filter({ visible: true }).first()).toBeVisible();
+    await login(page, SELLER, "/seller/pedidos?aba=canceladas");
+    const venda = page.getByTestId(/^venda-/).filter({ hasText: title }).first();
+    await expect(venda).toContainText("Venda cancelada. Não envie.");
+    await expect(venda).toContainText("2 unidades");
     await page.goto(productUrl.replace("/produto/", "/seller/produtos/"));
     await page.getByLabel("Situação").selectOption("paused");
     await page.getByRole("button", { name: "Salvar produto" }).click();
