@@ -150,6 +150,7 @@ export function LiveCard({
   viewers,
   when,
   demo,
+  auction,
 }: {
   href: string;
   title: string;
@@ -159,6 +160,8 @@ export function LiveCard({
   viewers?: number;
   when?: string;
   demo?: boolean;
+  /** Há um leilão aberto nesta live */
+  auction?: boolean;
 }) {
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-line bg-white transition-shadow duration-200 hover:shadow-[0_6px_20px_rgba(15,17,21,0.12)]">
@@ -178,6 +181,7 @@ export function LiveCard({
         )}
         <div className="absolute inset-x-0 top-0 flex items-center gap-1.5 p-2">
           {live ? <Badge kind="live" /> : <Badge kind="scheduled" />}
+          {live && auction && <Badge kind="auction" />}
           {live && viewers !== undefined && (
             <span className="inline-flex items-center gap-1 rounded bg-black/60 px-1.5 py-0.5 text-[11px] font-semibold leading-4 text-white">
               <Users className="h-3 w-3" aria-hidden="true" /> {viewers.toLocaleString("pt-BR")}

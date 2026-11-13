@@ -4,13 +4,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Gavel, ShoppingBag } from "lucide-react";
+import { BidPanel } from "@/components/auctions/bid-panel";
 import { LiveChat } from "@/components/live/chat";
 import { LivePlayer } from "@/components/live/player";
 import { LiveRefresh } from "@/components/live/live-refresh";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth";
 import { formatBRL } from "@/lib/format";
 import { liveStatusLabel } from "@/lib/live/format";
+import { getAuction } from "@/lib/auctions/queries";
 import { getLive, type LiveProduct } from "@/lib/live/queries";
 import { addToCart } from "@/lib/market/actions";
 
@@ -54,6 +56,8 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
   if (!data) notFound();
   const { live, products, pinned, auction, messages } = data;
   const activeAuction = auction && auction.status === "active" ? auction : null;
+  // Leilão aberto na live: lance aqui mesmo, sem sair da transmissão (mesmo painel e regras da página do leilão)
+  const lot = activeAuction ? await getAuction(activeAuction.id) : null;
 
   return (
     <div className="grid grid-cols-1 gap-5 [&>*]:min-w-0 lg:grid-cols-[1fr_360px]">
@@ -81,21 +85,48 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
       </div>
 
       <aside className="space-y-4">
-        {activeAuction && (
-          <section aria-label="Leilão relâmpago" className="rounded-[var(--radius-card)] border-2 border-brand bg-white p-4">
-            <p className="flex items-center gap-2 text-xs font-bold tracking-wider text-brand">
-              <Gavel className="h-4 w-4" aria-hidden="true" /> LEILÃO RELÂMPAGO
-            </p>
-            <p className="mt-1 font-semibold text-navy">{activeAuction.title}</p>
-            <p className="text-sm text-muted">
-              {activeAuction.bids_count ? "Maior lance" : "Lance inicial"}{" "}
-              <span className="font-bold text-navy" data-testid="leilao-live-preco">
-                {formatBRL(activeAuction.current_price_cents ?? activeAuction.starting_price_cents)}
-              </span>
-            </p>
-            <ButtonLink href={`/leilao/${activeAuction.id}`} variant="buy" className="mt-3 w-full">
-              Dar lance
-            </ButtonLink>
+        {activeAuction && lot && (
+          <section aria-label="Leilão ao vivo" className="space-y-3 rounded-[var(--radius-card)] border-2 border-brand bg-white p-4" data-testid="leilao-live">
+            <div className="flex items-start gap-3">
+              {lot.images[0] ? (
+                <Image src={lot.images[0].url} alt="" width={64} height={64} className="h-16 w-16 shrink-0 rounded-lg border border-line object-contain" />
+              ) : null}
+              <div className="min-w-0">
+                <p className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-brand">
+                  <Gavel className="h-4 w-4" aria-hidden="true" /> LEILÃO AO VIVO
+                </p>
+                <p className="font-semibold leading-snug text-navy">{lot.auction.title}</p>
+                <p className="sr-only" data-testid="leilao-live-preco">
+                  {formatBRL(lot.auction.current_price_cents ?? lot.auction.starting_price_cents)}
+                </p>
+                <Link href={`/leilao/${lot.auction.id}`} className="text-xs text-muted hover:text-brand hover:underline">
+                  Ver detalhes do lote e histórico
+                </Link>
+              </div>
+            </div>
+            <BidPanel
+              auctionId={lot.auction.id}
+              serverNow={lot.serverNow}
+              startsAt={lot.auction.starts_at}
+              startingCents={lot.auction.starting_price_cents}
+              incrementCents={lot.auction.min_increment_cents}
+              reserveCents={lot.auction.reserve_price_cents}
+              initial={{
+                current: lot.auction.current_price_cents,
+                endsAt: lot.auction.ends_at,
+                bidsCount: lot.auction.bids_count,
+                leaderAlias: lot.auction.leader_alias,
+                status: lot.auction.status,
+              }}
+              bids={lot.bids}
+              me={{
+                loggedIn: !!lot.me?.logged_in,
+                isSeller: !!lot.me?.is_seller,
+                isLeader: !!lot.me?.is_leader,
+                blocker: lot.me ? lot.me.blocker : "not_authenticated",
+              }}
+              returnTo={`/live/${live.id}`}
+            />
           </section>
         )}
         {pinned && !activeAuction && (

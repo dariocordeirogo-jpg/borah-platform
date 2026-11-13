@@ -46,7 +46,7 @@ async function LivesShelf() {
     <Shelf title="Transmissões ao vivo" eyebrow={eyebrow(Radio, "ZEXI LIVE")} href="/ao-vivo" cta="Ver lives" size="live">
       {real.map(({ l, on }) => (
         <li key={l.id}>
-          <LiveCard href={`/live/${l.id}`} title={l.title} store={l.stores?.name} live={on} when={on ? undefined : whenBR(l.scheduled_at)} />
+          <LiveCard href={`/live/${l.id}`} title={l.title} store={l.stores?.name} live={on} when={on ? undefined : whenBR(l.scheduled_at)} auction={(l.auctions ?? []).some((a) => a.status === "active")} />
         </li>
       ))}
       {(real.length ? [] : demoLives).map((l) => (

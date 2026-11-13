@@ -29,15 +29,18 @@ export type BidPanelProps = {
   bids: Bid[];
   me: { loggedIn: boolean; isSeller: boolean; isLeader: boolean; blocker: string | null };
   reserveCents: number | null;
+  /** Para onde voltar depois de entrar ou confirmar o cadastro (ex.: a própria live) */
+  returnTo?: string;
 };
 
-function blockerCta(blocker: string, auctionId: string) {
+function blockerCta(blocker: string, auctionId: string, returnTo?: string) {
+  const back = returnTo ?? `/leilao/${auctionId}`;
   if (blocker === "not_authenticated")
-    return { text: "Entre na sua conta para dar lances.", href: `/entrar?next=/leilao/${auctionId}`, cta: "Entrar" };
+    return { text: "Entre na sua conta para dar lances.", href: `/entrar?next=${back}`, cta: "Entrar" };
   if (blocker === "verification_required" || blocker === "phone_unverified")
     return {
       text: "Para dar lances, confirme seu CPF e telefone. Leva menos de 1 minuto.",
-      href: `/conta/verificacao?next=/leilao/${auctionId}`,
+      href: `/conta/verificacao?next=${back}`,
       cta: "Confirmar CPF e telefone",
     };
   if (blocker === "bid_blocked")
@@ -159,7 +162,7 @@ export function BidPanel(props: BidPanelProps) {
             <p className="text-sm text-muted">Este leilão é da sua loja. Acompanhe os lances em tempo real.</p>
           ) : props.me.blocker ? (
             (() => {
-              const c = blockerCta(props.me.blocker, auctionId);
+              const c = blockerCta(props.me.blocker, auctionId, props.returnTo);
               return (
                 <div className="space-y-3">
                   <p className="text-sm text-ink">{c.text}</p>

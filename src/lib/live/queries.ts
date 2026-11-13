@@ -10,7 +10,7 @@ async function db() {
   return createClient();
 }
 
-const LIVE_CARD = "id, title, status, scheduled_at, started_at, stores(name, slug)" as const;
+const LIVE_CARD = "id, title, status, scheduled_at, started_at, stores(name, slug), auctions(id, status)" as const;
 
 /** /ao-vivo: no ar agora e próximas (até 7 dias). */
 export async function listLives() {

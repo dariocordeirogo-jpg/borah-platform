@@ -13,7 +13,7 @@ export function AuctionCardLive({ a, serverNow, priority }: { a: AuctionCardData
       href={`/leilao/${a.id}`}
       title={a.title}
       imageUrl={a.imageUrl}
-      badge={scheduled ? "scheduled" : ended ? "ended" : "auction"}
+      badge={scheduled ? "scheduled" : ended ? "ended" : a.liveId ? "live" : "auction"}
       priceLabel={a.currentCents === null ? "Lance inicial" : ended ? "Lance final" : "Maior lance"}
       priceCents={a.currentCents ?? a.startingCents}
       store={a.store?.name}

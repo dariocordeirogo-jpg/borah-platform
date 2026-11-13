@@ -14,12 +14,18 @@ export const metadata: Metadata = {
 const when = (iso: string) =>
   new Date(iso).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
 
-type Card = { id: string; title: string; scheduled_at: string; stores: { name: string; slug: string } | null };
+type Card = {
+  id: string;
+  title: string;
+  scheduled_at: string;
+  stores: { name: string; slug: string } | null;
+  auctions: { id: string; status: string }[] | null;
+};
 
 function Item({ l, live }: { l: Card; live: boolean }) {
   return (
     <li>
-      <LiveCard href={`/live/${l.id}`} title={l.title} store={l.stores?.name} live={live} when={live ? undefined : when(l.scheduled_at)} />
+      <LiveCard href={`/live/${l.id}`} title={l.title} store={l.stores?.name} live={live} when={live ? undefined : when(l.scheduled_at)} auction={(l.auctions ?? []).some((a) => a.status === "active")} />
     </li>
   );
 }
