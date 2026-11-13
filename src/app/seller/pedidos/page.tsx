@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { CheckCircle2, Clock, PackageCheck, PackageOpen, ShoppingBag, Truck, XCircle } from "lucide-react";
 import { cancelStoreOrder } from "@/app/seller/actions";
+import { refundStoreOrder } from "@/lib/pay/actions";
+import { payoutLabel } from "@/lib/pay/format";
 import { EmptyState, Notice } from "@/components/market";
 import { ShipForm } from "@/components/orders/ship-form";
 import { TrackingInfo } from "@/components/orders/timeline";
@@ -28,6 +30,10 @@ const tabs: { key: SellerOrderTab; label: string; icon: typeof Truck }[] = [
   { key: "canceladas", label: "Canceladas", icon: XCircle },
 ];
 const isTab = (v: unknown): v is SellerOrderTab => tabs.some((t) => t.key === v);
+
+type PaymentPart = { status: "created" | "processing" | "succeeded" | "failed" | "expired" | "refunded"; payout_status: "none" | "held" | "ready" | "processing" | "transferred" | "cancelled"; net_cents: number; transferred_at: string | null };
+/** Pagamento confirmado da venda (a parte desta loja). */
+const paidPart = (o: { payments?: PaymentPart[] | null }) => (o.payments ?? []).find((p) => p.status === "succeeded" || p.status === "refunded") ?? null;
 
 /** Mensagem principal de cada venda (como nas centrais de marketplace). */
 const headline: Record<SellerOrderTab, { text: string; tone: string }> = {
@@ -183,6 +189,19 @@ async function Sales({ searchParams }: { searchParams: Promise<SP> }) {
                       <span className="font-bold text-navy">{formatBRL(o.total_cents)}</span>
                       {o.coupon_code && <span className="ml-2 text-xs text-muted">cupom {o.coupon_code}</span>}
                     </p>
+                    {paidPart(o) && (
+                      <p className="w-full text-xs text-muted sm:w-auto" data-testid="repasse">
+                        Você recebe {formatBRL(paidPart(o)!.net_cents)} · {payoutLabel(paidPart(o)!)}
+                      </p>
+                    )}
+                    {o.status === "paid" && paidPart(o)?.payout_status === "held" && (
+                      <form action={refundStoreOrder}>
+                        <input type="hidden" name="orderId" value={o.id} />
+                        <Button type="submit" variant="ghost" size="sm">
+                          Cancelar e devolver ao comprador
+                        </Button>
+                      </form>
+                    )}
                     {o.status === "pending_payment" && (
                       <form action={cancelStoreOrder}>
                         <input type="hidden" name="orderId" value={o.id} />

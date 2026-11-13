@@ -1,4 +1,4 @@
-// Gerado a partir do banco (Supabase → generate_typescript_types) em 2026-11-06, após a migração fase3_leiloes (tabelas de leilão adicionadas à mão, conferidas com a migration).
+// Gerado a partir do banco (Supabase → generate_typescript_types) em 2026-11-06, após a migração fase3_leiloes; tabelas e funções seguintes adicionadas à mão, conferidas com as migrations (última: pagamento_unico).
 // Regenerar sempre que uma migration mudar tabelas, enums ou funções.
 
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
@@ -501,6 +501,14 @@ export type Database = {
           status: Database["public"]["Enums"]["payment_status"];
           store_id: string;
           updated_at: string;
+          checkout_payment_id: string | null;
+          payout_status: "none" | "held" | "ready" | "processing" | "transferred" | "cancelled";
+          payout_ready_at: string | null;
+          payout_claimed_at: string | null;
+          payout_attempts: number;
+          payout_error: string | null;
+          transfer_id: string | null;
+          transferred_at: string | null;
         };
         Insert: Record<string, never>;
         Update: Record<string, never>;
@@ -508,6 +516,26 @@ export type Database = {
           { foreignKeyName: "payments_order_id_fkey"; columns: ["order_id"]; isOneToOne: false; referencedRelation: "orders"; referencedColumns: ["id"] },
           { foreignKeyName: "payments_store_id_fkey"; columns: ["store_id"]; isOneToOne: false; referencedRelation: "stores"; referencedColumns: ["id"] },
         ];
+      };
+      checkout_payments: {
+        Row: {
+          id: string;
+          buyer_id: string;
+          amount_cents: number;
+          currency: string;
+          status: Database["public"]["Enums"]["payment_status"];
+          checkout_session_id: string | null;
+          payment_intent_id: string | null;
+          needs_refund: boolean;
+          failure_reason: string | null;
+          expires_at: string | null;
+          paid_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
       };
       affiliates: {
         Row: { user_id: string; code: string; is_active: boolean; created_at: string };
@@ -715,6 +743,10 @@ export type Database = {
       platform_fee_bps: { Args: Record<string, never>; Returns: number };
       start_order_payment: { Args: { _order_id: string }; Returns: Json };
       attach_checkout_session: { Args: { _payment_id: string; _session_id: string }; Returns: undefined };
+      start_cart_payment: { Args: { _order_ids: string[] }; Returns: Json };
+      attach_cart_session: { Args: { _checkout_payment_id: string; _session_id: string }; Returns: undefined };
+      claim_payouts: { Args: { _payload: string; _signature: string }; Returns: Json };
+      request_order_refund: { Args: { _order_id: string }; Returns: Json };
       register_payout_account: { Args: { _account_id: string }; Returns: string };
       stripe_ingest_event: { Args: { _payload: string; _signature: string }; Returns: Json };
       store_accepts_payments: { Args: { _store_id: string }; Returns: boolean };

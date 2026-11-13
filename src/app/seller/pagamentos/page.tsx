@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { formatBRL } from "@/lib/format";
 import { requireStore } from "@/lib/market/seller-guard";
 import { connectPayoutAccount, openPayoutDashboard } from "@/lib/pay/actions";
-import { bpsToPercent, paymentStatusLabel, payoutState, payoutStateLabel } from "@/lib/pay/format";
+import { bpsToPercent, paymentStatusLabel, payoutLabel, payoutState, payoutStateLabel } from "@/lib/pay/format";
 import { getFeeBps, getMyPayoutAccount, getStorePayments } from "@/lib/pay/queries";
 import { payAvailable } from "@/lib/pay/stripe";
 import { syncPayoutAccount } from "@/lib/pay/sync";
@@ -31,6 +31,9 @@ async function Payments({ searchParams }: { searchParams: Promise<SP> }) {
     (acc, p) => ({ gross: acc.gross + p.amount_cents, fee: acc.fee + p.fee_cents, net: acc.net + p.net_cents }),
     { gross: 0, fee: 0, net: 0 },
   );
+  // Compra Garantida: o valor fica retido até a entrega e depois é transferido
+  const held = paid.filter((p) => ["held", "ready", "processing"].includes(p.payout_status)).reduce((s, p) => s + p.net_cents, 0);
+  const released = paid.filter((p) => p.payout_status === "transferred").reduce((s, p) => s + p.net_cents, 0);
 
   return (
     <div className="space-y-4">
@@ -43,8 +46,8 @@ async function Payments({ searchParams }: { searchParams: Promise<SP> }) {
           <div>
             <h2 className="font-semibold text-navy">Conta de recebimento</h2>
             <p className="mt-1 text-sm text-muted">
-              Os recebimentos passam pela Stripe. Cada venda cai direto na conta da sua loja, já descontada a comissão da
-              Zexi{feeBps != null ? ` (${bpsToPercent(feeBps)})` : ""}.
+              Compra Garantida: o comprador paga à Zexi, o valor fica retido e, quando a entrega é confirmada, cai na conta
+              Stripe da sua loja já descontada a comissão{feeBps != null ? ` (${bpsToPercent(feeBps)})` : ""}.
             </p>
           </div>
           <span
@@ -81,11 +84,13 @@ async function Payments({ searchParams }: { searchParams: Promise<SP> }) {
         )}
       </section>
 
-      <dl className="grid grid-cols-3 gap-3">
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-5" data-testid="resumo-recebimentos">
         {[
           ["Vendas pagas", totals.gross],
           ["Comissão", totals.fee],
           ["Para você", totals.net],
+          ["A liberar (até a entrega)", held],
+          ["Já transferido", released],
         ].map(([label, value]) => (
           <div key={label} className="rounded-[var(--radius-card)] border border-line bg-white p-4">
             <dt className="text-xs text-muted">{label}</dt>
@@ -98,12 +103,13 @@ async function Payments({ searchParams }: { searchParams: Promise<SP> }) {
         <EmptyState title="Nenhum pagamento ainda">Quando um comprador pagar um pedido da sua loja, ele aparece aqui.</EmptyState>
       ) : (
         <div className="overflow-x-auto rounded-[var(--radius-card)] border border-line bg-white">
-          <table className="w-full min-w-[560px] text-sm">
+          <table className="w-full min-w-[680px] text-sm">
             <thead className="bg-surface text-left text-xs text-muted">
               <tr>
                 <th className="p-3 font-semibold">Pedido</th>
                 <th className="p-3 font-semibold">Data</th>
                 <th className="p-3 font-semibold">Situação</th>
+                <th className="p-3 font-semibold">Repasse</th>
                 <th className="p-3 text-right font-semibold">Valor</th>
                 <th className="p-3 text-right font-semibold">Comissão</th>
                 <th className="p-3 text-right font-semibold">Para você</th>
@@ -115,6 +121,7 @@ async function Payments({ searchParams }: { searchParams: Promise<SP> }) {
                   <td className="p-3 font-medium text-navy">#{p.orders?.number}</td>
                   <td className="p-3 text-muted">{new Date(p.paid_at ?? p.created_at).toLocaleString("pt-BR")}</td>
                   <td className="p-3">{paymentStatusLabel[p.status]}</td>
+                  <td className="p-3 text-muted">{payoutLabel(p)}</td>
                   <td className="p-3 text-right">{formatBRL(p.amount_cents)}</td>
                   <td className="p-3 text-right text-muted">− {formatBRL(p.fee_cents)}</td>
                   <td className="p-3 text-right font-semibold text-navy">{formatBRL(p.net_cents)}</td>

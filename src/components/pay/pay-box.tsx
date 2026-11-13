@@ -49,8 +49,8 @@ export async function PayBox({ orderId, storeId, status, totalCents }: Props) {
       ) : (
         <>
           <p className="text-muted">
-            Você será levado à página segura da Stripe. Cartão, Pix e boleto aparecem conforme disponíveis. O valor só vai para a
-            loja depois da confirmação.
+            Você será levado à página segura da Stripe. Cartão, Pix e boleto aparecem conforme disponíveis. Compra Garantida: o
+            valor só é repassado à loja depois que você confirmar a entrega.
           </p>
           <form action={payOrder}>
             <input type="hidden" name="orderId" value={orderId} />
