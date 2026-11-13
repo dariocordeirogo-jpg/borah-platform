@@ -27,7 +27,8 @@ export default defineConfig({
     command: `npm run start -- -p ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: true,
-    env: { NEXT_IMAGE_UNOPTIMIZED: "1" },
+    // ZEXI_IMPORT_ALLOW_LOOPBACK: só nos testes, deixa o importador ler o servidor de exemplo em 127.0.0.1
+    env: { NEXT_IMAGE_UNOPTIMIZED: "1", ZEXI_IMPORT_ALLOW_LOOPBACK: "1" },
     timeout: 120_000,
   },
 });

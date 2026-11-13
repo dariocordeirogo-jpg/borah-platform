@@ -14,7 +14,9 @@ import { requireStore } from "@/lib/market/seller-guard";
 
 export const metadata: Metadata = { title: "Editar produto" };
 
-async function Edit({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ criado?: string }> }) {
+type SP = { criado?: string; importado?: string; fotos_falharam?: string };
+
+async function Edit({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<SP> }) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const store = await requireStore(`/seller/produtos/${id}`);
   const [product, categories] = await Promise.all([getSellerProduct(store.id, id), getCategories()]);
@@ -22,6 +24,14 @@ async function Edit({ params, searchParams }: { params: Promise<{ id: string }>;
   return (
     <div className="space-y-6">
       {sp.criado && <Notice tone="success">Produto criado. Agora envie as fotos.</Notice>}
+      {sp.importado !== undefined && (
+        <Notice tone="success">
+          Anúncio importado como rascunho
+          {Number(sp.importado) > 0 ? ` com ${sp.importado} ${sp.importado === "1" ? "foto" : "fotos"}` : ""}. Revise e mude a
+          situação para “Ativo” para publicar.
+          {sp.fotos_falharam ? ` ${sp.fotos_falharam} foto(s) não puderam ser copiadas; envie-as abaixo.` : ""}
+        </Notice>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold tracking-tight text-navy">{product.title}</h1>
         <Link href={`/produto/${product.id}`} className="inline-flex items-center gap-1 text-sm text-brand hover:underline">
@@ -63,7 +73,7 @@ async function Edit({ params, searchParams }: { params: Promise<{ id: string }>;
 export default function Page({ params, searchParams }: PageProps<"/seller/produtos/[id]">) {
   return (
     <Suspense fallback={<div className="h-96 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
-      <Edit params={params} searchParams={searchParams as Promise<{ criado?: string }>} />
+      <Edit params={params} searchParams={searchParams as Promise<SP>} />
     </Suspense>
   );
 }
