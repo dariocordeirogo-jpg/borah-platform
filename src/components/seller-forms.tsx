@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, startTransition } from "react";
 import { Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { FormState } from "@/lib/market/actions";
@@ -152,6 +152,7 @@ type ProductValues = {
   stock?: number;
   weight_grams?: number;
   status?: "draft" | "active" | "paused";
+  video_url?: string | null;
 };
 
 export function ProductForm({
@@ -171,7 +172,16 @@ export function ProductForm({
     "aria-describedby": `${name}-erro`,
   });
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form
+      onSubmit={(e) => {
+        // Envio manual: o React não limpa o formulário, então nada do que a loja digitou se perde num erro de validação
+        e.preventDefault();
+        const fd = new FormData(e.currentTarget);
+        startTransition(() => action(fd));
+      }}
+      className="space-y-4"
+      noValidate
+    >
       {product?.id && <input type="hidden" name="id" value={product.id} />}
       <Alerts state={state} />
       <div>
@@ -228,6 +238,22 @@ export function ProductForm({
           <input {...f("weight")} type="number" min={1} max={30000} defaultValue={product?.weight_grams ?? 500} className={`${input} h-11`} />
           <Err id="weight-erro" state={state} name="weight" />
         </div>
+      </div>
+      <div>
+        <Label htmlFor="video" hint="opcional">
+          Vídeo do produto
+        </Label>
+        <input
+          {...f("video")}
+          type="url"
+          inputMode="url"
+          maxLength={500}
+          placeholder="Link do YouTube, Instagram ou Facebook"
+          defaultValue={product?.video_url ?? ""}
+          className={`${input} h-11`}
+        />
+        <p className="mt-1 text-xs text-muted">O vídeo toca na página do produto, sem o cliente sair da Zexi.</p>
+        <Err id="video-erro" state={state} name="video" />
       </div>
       <div>
         <Label htmlFor="description" hint="opcional">

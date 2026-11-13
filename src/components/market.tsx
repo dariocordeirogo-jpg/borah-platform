@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ImageOff, PackageOpen } from "lucide-react";
+import { ImageOff, PackageOpen, ShoppingCart } from "lucide-react";
+import { addToCart } from "@/lib/market/actions";
 import type { ReactNode } from "react";
 import { ListingCard, ListingGrid } from "@/components/listing";
 import { formatBRL } from "@/lib/format";
@@ -50,6 +51,23 @@ export function Price({ cents, compareAt, size = "md" }: { cents: number; compar
   );
 }
 
+/** Botão redondo de carrinho sobre a foto do card (como nos apps de marketplace). */
+function QuickAdd({ productId, title }: { productId: string; title: string }) {
+  return (
+    <form action={addToCart}>
+      <input type="hidden" name="productId" value={productId} />
+      <input type="hidden" name="quantity" value="1" />
+      <button
+        type="submit"
+        aria-label={`Adicionar ${title} ao carrinho`}
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white text-brand shadow-[0_1px_4px_rgba(15,17,21,0.15)] transition-colors hover:bg-brand hover:text-white"
+      >
+        <ShoppingCart className="h-4 w-4" aria-hidden="true" />
+      </button>
+    </form>
+  );
+}
+
 /** Card de produto real do ZEXI MARKET. */
 export function MarketProductCard({ product, priority }: { product: ProductCardData; priority?: boolean }) {
   return (
@@ -62,6 +80,7 @@ export function MarketProductCard({ product, priority }: { product: ProductCardD
       store={product.store?.name}
       priority={priority}
       meta={product.stock > 0 ? conditionLabel[product.condition] : <span className="font-semibold text-danger">Esgotado</span>}
+      action={product.stock > 0 ? <QuickAdd productId={product.id} title={product.title} /> : undefined}
     />
   );
 }

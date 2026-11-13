@@ -79,6 +79,7 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
     stock: d.stock,
     weight_grams: d.weight,
     status: d.status,
+    video_url: d.video,
   };
 
   if (typeof id === "string" && id) {

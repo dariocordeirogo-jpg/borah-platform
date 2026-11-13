@@ -1,3 +1,4 @@
+import { Clock3 } from "lucide-react";
 import { AuctionTimer } from "@/components/auctions/auction-timer";
 import { ListingCard } from "@/components/listing";
 import { outcomeLabel } from "@/lib/auctions/format";
@@ -22,10 +23,12 @@ export function AuctionCardLive({ a, serverNow, priority }: { a: AuctionCardData
         ended ? (
           <span className="font-semibold">{a.outcome ? outcomeLabel[a.outcome] : "Encerrado"}</span>
         ) : (
-          <span className="flex flex-wrap items-center gap-x-1">
-            {!scheduled && <span>{lances} ·</span>}
-            <span>{scheduled ? "abre em" : "termina em"}</span>
-            <AuctionTimer target={scheduled ? a.startsAt : a.endsAt} serverNow={serverNow} className="font-semibold" />
+          <span className="flex flex-wrap items-center gap-x-1.5">
+            <span>{scheduled ? "Abre em" : lances}</span>
+            <span className="inline-flex items-center gap-0.5 font-semibold text-navy-2">
+              <Clock3 className="h-3 w-3" aria-label={scheduled ? undefined : "Termina em"} />
+              <AuctionTimer target={scheduled ? a.startsAt : a.endsAt} serverNow={serverNow} />
+            </span>
           </span>
         )
       }

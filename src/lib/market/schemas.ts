@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { parseBRLToCents } from "@/lib/market/format";
+import { parseVideoUrl } from "@/lib/market/video";
 
 const UF = [
   "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ",
@@ -72,6 +73,20 @@ export const productSchema = z
       .min(1, "Peso mínimo: 1 g.")
       .max(30000, "Peso máximo: 30 kg (limite dos Correios).")),
     status: z.enum(["draft", "active", "paused"]),
+    /** Link do vídeo (YouTube, Instagram ou Facebook); guardado já no endereço oficial */
+    video: z
+      .string()
+      .trim()
+      .optional()
+      .transform((v, ctx) => {
+        if (!v) return null;
+        const parsed = parseVideoUrl(v);
+        if (!parsed) {
+          ctx.addIssue({ code: "custom", message: "Use o link de um vídeo do YouTube, Instagram ou Facebook." });
+          return z.NEVER;
+        }
+        return parsed.watchUrl;
+      }),
   })
   .refine((d) => d.compareAt === null || d.compareAt > d.price, {
     path: ["compareAt"],
