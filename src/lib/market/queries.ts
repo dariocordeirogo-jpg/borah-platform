@@ -112,7 +112,7 @@ export async function getProduct(id: string) {
   const { data } = await supabase
     .from("products")
     .select(
-      "id, title, description, price_cents, compare_at_cents, stock, condition, status, store_id, product_images(id, path, position), stores(id, name, slug, owner_id), categories(name, slug)",
+      "id, title, description, price_cents, compare_at_cents, stock, condition, status, store_id, video_url, product_images(id, path, position), stores(id, name, slug, owner_id), categories(name, slug)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -266,7 +266,7 @@ export async function getSellerProduct(storeId: string, id: string) {
   const { data } = await supabase
     .from("products")
     .select(
-      "id, title, description, price_cents, compare_at_cents, stock, weight_grams, condition, status, category_id, product_images(id, path, position)",
+      "id, title, description, price_cents, compare_at_cents, stock, weight_grams, condition, status, category_id, video_url, product_images(id, path, position)",
     )
     .eq("store_id", storeId)
     .eq("id", id)

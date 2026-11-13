@@ -1,3 +1,4 @@
+import { Clock3 } from "lucide-react";
 import { Countdown } from "@/components/countdown";
 import { DemoMark, ListingCard, LiveCard } from "@/components/listing";
 import type { DemoAuction, DemoProduct, DemoUpcoming } from "@/lib/demo-data";
@@ -19,9 +20,12 @@ export function AuctionCard({ auction }: { auction: DemoAuction }) {
       priceLabel="Maior lance"
       priceCents={auction.currentBidCents}
       meta={
-        <span className="flex flex-wrap items-center gap-x-1">
-          <span>{auction.bids} lances · termina em</span>
-          <Countdown endsInSeconds={auction.endsInSeconds} className="font-semibold" />
+        <span className="flex flex-wrap items-center gap-x-1.5">
+          <span>{auction.bids} lances</span>
+          <span className="inline-flex items-center gap-0.5 font-semibold text-navy-2">
+            <Clock3 className="h-3 w-3" aria-label="Termina em" />
+            <Countdown endsInSeconds={auction.endsInSeconds} />
+          </span>
         </span>
       }
       store={auction.category}
@@ -40,9 +44,12 @@ export function UpcomingCard({ item }: { item: DemoUpcoming }) {
       priceLabel="Lance inicial"
       priceCents={item.startPriceCents}
       meta={
-        <span className="flex flex-wrap items-center gap-x-1">
-          <span>abre em</span>
-          <Countdown endsInSeconds={item.startsInSeconds} urgentBelow={0} className="font-semibold" />
+        <span className="flex flex-wrap items-center gap-x-1.5">
+          <span>Abre em</span>
+          <span className="inline-flex items-center gap-0.5 font-semibold text-navy-2">
+            <Clock3 className="h-3 w-3" aria-hidden="true" />
+            <Countdown endsInSeconds={item.startsInSeconds} urgentBelow={0} />
+          </span>
         </span>
       }
       store={item.seller}

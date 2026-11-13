@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Flag, PackageCheck, ShieldCheck, ShoppingCart, Store, Truck } from "lucide-react";
 import { Gallery } from "@/components/gallery";
+import { ProductVideo } from "@/components/product/product-video";
 import { Notice, Price } from "@/components/market";
 import { Button } from "@/components/ui/button";
 import { isStaff } from "@/lib/admin/format";
@@ -34,7 +35,10 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
 
   return (
     <div className="grid grid-cols-1 gap-8 [&>*]:min-w-0 md:grid-cols-[1.1fr_1fr]">
-      <Gallery images={p.images} title={p.title} />
+      <div className="space-y-4">
+        <Gallery images={p.images} title={p.title} />
+        <ProductVideo url={p.video_url} title={p.title} />
+      </div>
       <div>
         {p.categories && (
           <Link href={`/market?categoria=${p.categories.slug}`} className="text-xs font-semibold text-brand hover:underline">

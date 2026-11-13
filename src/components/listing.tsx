@@ -62,7 +62,7 @@ export function ListingImage({ src, alt, sizes, priority }: { src?: string | nul
           fill
           sizes={sizes ?? "(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 220px"}
           priority={priority}
-          className="object-contain p-2 transition-transform duration-300 group-hover:scale-[1.03] sm:p-3"
+          className="object-contain p-1 transition-transform duration-300 group-hover:scale-[1.03] sm:p-2"
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center bg-surface text-muted">
@@ -89,6 +89,8 @@ export type ListingCardProps = {
   store?: string | null;
   priority?: boolean;
   className?: string;
+  /** Ação rápida sobre a foto (ex.: adicionar ao carrinho); fica acima do link do card */
+  action?: ReactNode;
 };
 
 /** Card de vitrine (produto ou leilão). O card inteiro é o link. */
@@ -105,6 +107,7 @@ export function ListingCard({
   store,
   priority,
   className,
+  action,
 }: ListingCardProps) {
   const off = discountPercent(priceCents, compareAtCents);
   return (
@@ -118,23 +121,28 @@ export function ListingCard({
         <ListingImage src={imageUrl} alt={title} priority={priority} />
         {badge && <Badge kind={badge} className="absolute left-2 top-2" />}
         {demo && <DemoMark className="absolute bottom-2 left-2" />}
+        {action && <div className="absolute bottom-2 right-2 z-10">{action}</div>}
       </div>
-      <div className="flex flex-1 flex-col p-2.5 sm:p-3">
-        <h3 className="line-clamp-2 min-h-[2.5rem] text-[13px] leading-5 text-ink/85 sm:text-sm">
+      <div className="flex flex-1 flex-col p-2 sm:p-3">
+        <h3 className="line-clamp-2 min-h-[2.25rem] text-[13px] leading-[1.125rem] text-ink/85 sm:min-h-[2.5rem] sm:text-sm sm:leading-5">
           <Link href={href} className="after:absolute after:inset-0 focus-visible:outline-none">
             {title}
           </Link>
         </h3>
-        <div className="mt-1.5">
-          {priceLabel && <p className="text-[11px] font-medium uppercase tracking-wide text-muted">{priceLabel}</p>}
-          {off && compareAtCents ? <p className="text-xs leading-4 text-muted line-through">{formatBRL(compareAtCents)}</p> : null}
-          <p className="flex flex-wrap items-center gap-x-1.5">
-            <BigPrice cents={priceCents} className="text-xl sm:text-2xl" />
-            {off ? <span className="text-sm font-semibold text-brand">{off}% OFF</span> : null}
+        <div className="mt-1">
+          {priceLabel && <p className="text-[10px] font-semibold uppercase tracking-wide text-muted sm:text-[11px]">{priceLabel}</p>}
+          {off && compareAtCents ? (
+            <p className="flex flex-wrap items-center gap-1 text-xs leading-4">
+              <span className="rounded bg-brand px-1 py-px text-[11px] font-bold text-white">{off}% OFF</span>
+              <span className="text-muted line-through">{formatBRL(compareAtCents)}</span>
+            </p>
+          ) : null}
+          <p>
+            <BigPrice cents={priceCents} className="text-lg leading-tight sm:text-2xl" />
           </p>
         </div>
-        {meta ? <div className="mt-1 text-xs text-muted">{meta}</div> : null}
-        {store ? <p className="mt-auto truncate pt-2 text-xs text-muted">{store}</p> : null}
+        {meta ? <div className="mt-0.5 text-[11px] leading-4 text-muted sm:text-xs">{meta}</div> : null}
+        {store ? <p className="mt-auto truncate pt-1.5 text-[11px] text-muted sm:text-xs">{store}</p> : null}
       </div>
     </article>
   );
