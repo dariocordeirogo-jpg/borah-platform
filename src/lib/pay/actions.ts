@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { env } from "@/lib/env";
 import { payErrorMessage } from "@/lib/pay/format";
-import { getStripe } from "@/lib/pay/stripe";
+import { CONNECT_ACCOUNTS_API_VERSION, getStripe } from "@/lib/pay/stripe";
 import { syncStripeObject } from "@/lib/pay/ingest";
 import { createClient } from "@/lib/supabase/server";
 
@@ -35,7 +35,7 @@ function orderUrl(orderId: string, error?: string) {
 
 /**
  * Comprador paga um pedido: o banco calcula valor e comissão; o servidor abre o Checkout da Stripe
- * com a cobrança indo para a conta da loja (destination charge) e a comissão retida pela plataforma.
+ * na conta da loja (cobrança direta: a loja é quem vende) e a comissão da Zexi sai como application fee.
  */
 export async function payOrder(formData: FormData) {
   const orderId = uuid.parse(formData.get("orderId"));
@@ -49,11 +49,13 @@ export async function payOrder(formData: FormData) {
 
   let url: string | null = null;
   try {
+    // Tudo acontece na conta da loja (cobrança direta)
+    const onStore = { stripeAccount: p.destination };
     if (p.session_id) {
-      const existing = await stripe.checkout.sessions.retrieve(p.session_id);
+      const existing = await stripe.checkout.sessions.retrieve(p.session_id, {}, onStore);
       if (existing.status === "open") url = existing.url;
-      else if (existing.status === "complete") await syncStripeObject("checkout.session.completed", existing);
-      else await syncStripeObject("checkout.session.expired", existing);
+      else if (existing.status === "complete") await syncStripeObject("checkout.session.completed", existing, p.destination);
+      else await syncStripeObject("checkout.session.expired", existing, p.destination);
     } else {
       const session = await stripe.checkout.sessions.create(
         {
@@ -74,8 +76,8 @@ export async function payOrder(formData: FormData) {
             },
           ],
           payment_intent_data: {
+            // Comissão da Zexi; o restante fica na conta da loja, que paga a taxa da Stripe
             application_fee_amount: p.fee_cents,
-            transfer_data: { destination: p.destination },
             metadata: { payment_id: p.payment_id, order_id: orderId },
             description: `Zexi · Pedido #${p.order_number}`,
           },
@@ -84,7 +86,7 @@ export async function payOrder(formData: FormData) {
           success_url: `${env.NEXT_PUBLIC_SITE_URL}/conta/pedidos/${orderId}?pagamento=retorno&sessao={CHECKOUT_SESSION_ID}`,
           cancel_url: `${env.NEXT_PUBLIC_SITE_URL}/conta/pedidos/${orderId}?pagamento=cancelado`,
         },
-        { idempotencyKey: `checkout_${p.payment_id}` },
+        { idempotencyKey: `checkout_${p.payment_id}`, ...onStore },
       );
       await supabase.rpc("attach_checkout_session", { _payment_id: p.payment_id, _session_id: session.id });
       url = session.url;
@@ -114,27 +116,44 @@ export async function connectPayoutAccount() {
     const { data: current } = await supabase.from("store_payment_accounts").select("account_id").eq("store_id", store.id).maybeSingle();
     let accountId = current?.account_id;
     if (!accountId) {
-      const account = await stripe.accounts.create(
+      // Accounts v2: a loja vende na própria conta (merchant), vê o painel Express e a Stripe cuida do risco
+      // (Managed Risk) e cobra a taxa de processamento direto da loja.
+      const account = await stripe.v2.core.accounts.create(
         {
-          type: "express",
-          country: "BR",
-          email: user.email,
-          business_profile: { name: store.name, url: `${env.NEXT_PUBLIC_SITE_URL}/loja/${store.slug}` },
-          capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
+          contact_email: user.email,
+          display_name: store.name,
+          dashboard: "express",
+          identity: { country: "br" },
+          defaults: {
+            currency: "brl",
+            locales: ["pt-BR"],
+            profile: { business_url: `${env.NEXT_PUBLIC_SITE_URL}/loja/${store.slug}`, doing_business_as: store.name },
+            responsibilities: { fees_collector: "stripe", losses_collector: "stripe" },
+          },
+          configuration: {
+            merchant: { capabilities: { card_payments: { requested: true }, boleto_payments: { requested: true } } },
+          },
           metadata: { store_id: store.id },
         },
-        { idempotencyKey: `acct_${store.id}` },
+        { idempotencyKey: `acct_v2_${store.id}`, apiVersion: CONNECT_ACCOUNTS_API_VERSION },
       );
       const { data: registered, error } = await supabase.rpc("register_payout_account", { _account_id: account.id });
       if (error || !registered) throw new Error(error?.message ?? "register_failed");
       accountId = registered;
     }
-    const link = await stripe.accountLinks.create({
-      account: accountId,
-      type: "account_onboarding",
-      refresh_url: `${env.NEXT_PUBLIC_SITE_URL}/seller/pagamentos?refazer=1`,
-      return_url: `${env.NEXT_PUBLIC_SITE_URL}/seller/pagamentos?retorno=1`,
-    });
+    const link = await stripe.v2.core.accountLinks.create(
+      {
+        account: accountId,
+        use_case: {
+          type: "account_onboarding",
+          account_onboarding: {
+            refresh_url: `${env.NEXT_PUBLIC_SITE_URL}/seller/pagamentos?refazer=1`,
+            return_url: `${env.NEXT_PUBLIC_SITE_URL}/seller/pagamentos?retorno=1`,
+          },
+        },
+      },
+      { apiVersion: CONNECT_ACCOUNTS_API_VERSION },
+    );
     linkUrl = link.url;
   } catch (e) {
     const msg = e instanceof Error ? e.message : undefined;

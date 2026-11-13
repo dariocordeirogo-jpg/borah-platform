@@ -32,7 +32,7 @@ async function Auction({ params, searchParams }: { params: Promise<{ id: string 
   const ended = a.status !== "active";
 
   return (
-    <div className="grid gap-8 md:grid-cols-[1.05fr_1fr]">
+    <div className="grid grid-cols-1 gap-8 [&>*]:min-w-0 md:grid-cols-[1.05fr_1fr]">
       <div className="space-y-6">
         <Gallery images={d.images} title={a.title} />
         {a.products?.description && (

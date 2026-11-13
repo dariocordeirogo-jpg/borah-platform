@@ -84,7 +84,7 @@ async function Catalog({ searchParams }: { searchParams: SP }) {
   };
 
   return (
-    <div className="grid gap-6 md:grid-cols-[220px_1fr]">
+    <div className="grid grid-cols-1 gap-6 [&>*]:min-w-0 md:grid-cols-[220px_1fr]">
       <aside aria-label="Filtros" className="md:sticky md:top-32 md:self-start">
         <form action="/market" role="search" className="mb-4">
           {categoria && <input type="hidden" name="categoria" value={categoria} />}

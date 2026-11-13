@@ -15,7 +15,7 @@ async function Checkout() {
   const addresses = await getMyAddresses();
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+    <div className="grid grid-cols-1 gap-6 [&>*]:min-w-0 lg:grid-cols-[1fr_360px]">
       <div className="space-y-4">
         <h2 className="font-display text-lg font-bold text-navy">Endereço de entrega</h2>
         <AddressForm open={!addresses.length} />

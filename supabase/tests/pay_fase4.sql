@@ -19,16 +19,18 @@ $$;
 create function pg_temp.err(_sql text) returns text language plpgsql as $$
 begin execute _sql; return null; exception when others then return sqlerrm; end $$;
 -- Monta um evento e assina como a Stripe: t=<unix>,v1=hmac_sha256(t.payload)
-create function pg_temp.evt(_id text, _type text, _obj jsonb, _live boolean default false) returns text language sql as $$
-  select jsonb_build_object('id', _id, 'object', 'event', 'type', _type, 'livemode', _live, 'data', jsonb_build_object('object', _obj))::text
+-- Cobrança direta: o aviso vem da conta conectada da loja (campo "account")
+create function pg_temp.evt(_id text, _type text, _obj jsonb, _live boolean default false, _acct text default 'acct_1TESTLOJA4') returns text language sql as $$
+  select jsonb_build_object('id', _id, 'object', 'event', 'type', _type, 'livemode', _live, 'account', _acct,
+    'data', jsonb_build_object('object', _obj))::text
 $$;
 create function pg_temp.sig(_payload text, _age integer default 0) returns text language sql security definer as $$
   select format('t=%s,v1=%s', extract(epoch from now())::bigint - _age,
     encode(extensions.hmac(convert_to((extract(epoch from now())::bigint - _age)::text || '.' || _payload, 'UTF8'),
       convert_to((select decrypted_secret from vault.decrypted_secrets where name = 'stripe_webhook_secret' limit 1), 'UTF8'), 'sha256'), 'hex'))
 $$;
-create function pg_temp.send(_id text, _type text, _obj jsonb, _live boolean default false) returns jsonb language sql as $$
-  select public.stripe_ingest_event(pg_temp.evt(_id, _type, _obj, _live), pg_temp.sig(pg_temp.evt(_id, _type, _obj, _live)))
+create function pg_temp.send(_id text, _type text, _obj jsonb, _live boolean default false, _acct text default 'acct_1TESTLOJA4') returns jsonb language sql as $$
+  select public.stripe_ingest_event(pg_temp.evt(_id, _type, _obj, _live, _acct), pg_temp.sig(pg_temp.evt(_id, _type, _obj, _live, _acct)))
 $$;
 create function pg_temp.session(_id text, _pid text, _amount integer, _status text, _pi text) returns jsonb language sql as $$
   select jsonb_build_object('id', _id, 'object', 'checkout.session', 'client_reference_id', _pid,
@@ -113,6 +115,10 @@ insert into r select 'outro usuário não vê o pagamento', count(*) = 0 from pu
 
 -- Pix gerado (aguardando) → depois confirmado
 set local role anon;
+insert into r select 'sessão paga em outra conta conectada é recusada',
+  pg_temp.send('evt_outra', 'checkout.session.completed', pg_temp.session('cs_test_sessao1', (select v from ids where k='pay1'), 20000, 'paid', 'pi_test_1'), false, 'acct_1OUTRALOJA')->>'result' = 'account_mismatch';
+insert into r select 'sessão sem conta conectada (cobrança na plataforma) é recusada',
+  pg_temp.send('evt_nc', 'checkout.session.completed', pg_temp.session('cs_test_sessao1', (select v from ids where k='pay1'), 20000, 'paid', 'pi_test_1'), false, null)->>'result' = 'account_mismatch';
 insert into r select 'Pix gerado deixa em processamento',
   pg_temp.send('evt_s1', 'checkout.session.completed', pg_temp.session('cs_test_sessao1', (select v from ids where k='pay1'), 20000, 'unpaid', 'pi_test_1'))->>'result' = 'processing';
 set local role authenticated;
@@ -144,6 +150,8 @@ insert into r select 'pedido pago não paga de novo',
 set local role anon;
 insert into r select 'reembolso parcial é ignorado',
   pg_temp.send('evt_r0', 'charge.refunded', jsonb_build_object('payment_intent', 'pi_test_1', 'refunded', false))->>'result' = 'partial_refund_ignored';
+insert into r select 'reembolso vindo de outra conta é ignorado',
+  pg_temp.send('evt_r_outra', 'charge.refunded', jsonb_build_object('payment_intent', 'pi_test_1', 'refunded', true), false, 'acct_1OUTRALOJA')->>'result' = 'unknown_payment';
 insert into r select 'reembolso total registrado',
   pg_temp.send('evt_r1', 'charge.refunded', jsonb_build_object('payment_intent', 'pi_test_1', 'refunded', true))->>'result' = 'refunded';
 reset role;
@@ -161,7 +169,7 @@ select public.cancel_order((select v::uuid from ids where k='o2'));
 insert into r select 'cancelar expira o pagamento aberto', status = 'expired' from public.payments where id = (select v::uuid from ids where k='pay2');
 set local role anon;
 insert into r select 'pagou pedido cancelado → devolver',
-  (select x->>'result' = 'order_not_payable' and x->>'action' = 'refund' and x->>'payment_intent' = 'pi_test_2'
+  (select x->>'result' = 'order_not_payable' and x->>'action' = 'refund' and x->>'payment_intent' = 'pi_test_2' and x->>'account' = 'acct_1TESTLOJA4'
    from (select pg_temp.send('evt_c2', 'checkout.session.completed', pg_temp.session('cs_test_sessao2', (select v from ids where k='pay2'), 10000, 'paid', 'pi_test_2')) x) t);
 reset role;
 insert into r select 'pedido cancelado continua cancelado', status = 'cancelled' from public.orders where id = (select v::uuid from ids where k='o2');

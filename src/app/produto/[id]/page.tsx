@@ -33,7 +33,7 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
   const maxQty = Math.min(p.stock, 10);
 
   return (
-    <div className="grid gap-8 md:grid-cols-[1.1fr_1fr]">
+    <div className="grid grid-cols-1 gap-8 [&>*]:min-w-0 md:grid-cols-[1.1fr_1fr]">
       <Gallery images={p.images} title={p.title} />
       <div>
         {p.categories && (

@@ -30,7 +30,7 @@ async function Cart() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+    <div className="grid grid-cols-1 gap-6 [&>*]:min-w-0 lg:grid-cols-[1fr_340px]">
       <div className="space-y-4">
         {[...byStore.entries()].map(([id, group]) => (
           <section key={id} className="rounded-[var(--radius-card)] border border-line bg-white shadow-[var(--shadow-card)]">

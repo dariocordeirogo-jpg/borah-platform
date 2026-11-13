@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Gavel } from "lucide-react";
 import { AuctionCardLive } from "@/components/auctions/auction-card";
+import { ListingGrid } from "@/components/listing";
 import { EmptyState } from "@/components/market";
 import { ButtonLink } from "@/components/ui/button";
 import { listAuctions, type AuctionTab } from "@/lib/auctions/queries";
@@ -42,15 +43,13 @@ async function List({ searchParams }: { searchParams: Promise<{ aba?: string }> 
         ))}
       </nav>
       {items.length ? (
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {items.map((a) => (
-            <li key={a.id} className="flex">
-              <div className="w-full">
-                <AuctionCardLive a={a} serverNow={serverNow} />
-              </div>
+        <ListingGrid label="Leilões">
+          {items.map((a, i) => (
+            <li key={a.id}>
+              <AuctionCardLive a={a} serverNow={serverNow} priority={i < 4} />
             </li>
           ))}
-        </ul>
+        </ListingGrid>
       ) : (
         <EmptyState
           title={tab === "encerrados" ? "Nenhum leilão encerrado ainda" : tab === "programados" ? "Nenhum leilão programado" : "Nenhum leilão acontecendo agora"}

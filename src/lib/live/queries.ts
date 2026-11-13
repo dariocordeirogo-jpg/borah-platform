@@ -1,4 +1,5 @@
 import "server-only";
+import { hiddenStoreIds, notInList } from "@/lib/test-stores";
 import { connection } from "next/server";
 import { getMuxStream, MUX_RTMP_URL, muxConfigured, type MuxStreamStatus } from "@/lib/live/mux";
 import { productImageUrl } from "@/lib/market/images";
@@ -15,9 +16,11 @@ const LIVE_CARD = "id, title, status, scheduled_at, started_at, stores(name, slu
 export async function listLives() {
   const supabase = await db();
   const until = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  const hidden = notInList(await hiddenStoreIds(supabase));
+  const visible = <Q extends { not: (c: "store_id", o: "in", v: string) => Q }>(q: Q) => (hidden === "()" ? q : q.not("store_id", "in", hidden));
   const [{ data: live }, { data: upcoming }] = await Promise.all([
-    supabase.from("lives").select(LIVE_CARD).eq("status", "live").order("started_at", { ascending: false }).limit(24),
-    supabase.from("lives").select(LIVE_CARD).eq("status", "scheduled").lte("scheduled_at", until).order("scheduled_at").limit(24),
+    visible(supabase.from("lives").select(LIVE_CARD).eq("status", "live")).order("started_at", { ascending: false }).limit(24),
+    visible(supabase.from("lives").select(LIVE_CARD).eq("status", "scheduled").lte("scheduled_at", until)).order("scheduled_at").limit(24),
   ]);
   return { live: live ?? [], upcoming: upcoming ?? [] };
 }

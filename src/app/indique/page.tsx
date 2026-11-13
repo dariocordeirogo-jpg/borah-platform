@@ -54,7 +54,7 @@ async function Program({ searchParams }: { searchParams: Promise<{ erro?: string
         </div>
       </section>
 
-      <ol className="grid gap-4 md:grid-cols-3">
+      <ol className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {steps.map(({ icon: Icon, title, text }, i) => (
           <li key={title} className="rounded-[var(--radius-card)] border border-line bg-white p-5">
             <Icon className="h-6 w-6 text-brand" aria-hidden="true" />

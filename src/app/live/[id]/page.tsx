@@ -56,7 +56,7 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
   const activeAuction = auction && auction.status === "active" ? auction : null;
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+    <div className="grid grid-cols-1 gap-5 [&>*]:min-w-0 lg:grid-cols-[1fr_360px]">
       <LiveRefresh liveId={live.id} />
       <div className="space-y-4">
         <LivePlayer src={live.playback_url} status={live.status} title={live.title} />

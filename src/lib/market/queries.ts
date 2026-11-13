@@ -1,4 +1,5 @@
 import "server-only";
+import { hiddenStoreIds, notInList } from "@/lib/test-stores";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/lib/supabase/database.types";
@@ -81,6 +82,8 @@ export async function listProducts(opts: {
   }
 
   let query = supabase.from("products").select(CARD_SELECT, { count: "exact" }).eq("status", "active");
+  const hidden = await hiddenStoreIds(supabase);
+  if (hidden.length) query = query.not("store_id", "in", notInList(hidden));
   if (categoryId) query = query.eq("category_id", categoryId);
   if (opts.storeId) query = query.eq("store_id", opts.storeId);
   if (opts.minPriceCents) query = query.gte("price_cents", opts.minPriceCents);

@@ -20,7 +20,7 @@ async function Confirm({ params }: { params: Promise<{ id: string }> }) {
   if (d.auction.outcome !== "sold") redirect(`/leilao/${id}`);
   const addresses = await getMyAddresses();
   return (
-    <div className="grid gap-6 md:grid-cols-[1fr_340px]">
+    <div className="grid grid-cols-1 gap-6 [&>*]:min-w-0 md:grid-cols-[1fr_340px]">
       <div className="space-y-4">
         <AddressForm open={!addresses.length} next={`/leilao/${id}/arremate`} />
         <p className="flex items-start gap-2 rounded-xl bg-navy-soft px-4 py-3 text-sm text-navy">

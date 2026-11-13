@@ -148,12 +148,14 @@ test.describe("Indique e ganhe: venda indicada gera comissão", () => {
   test("pagamento confirma a comissão e o reembolso cancela", async ({ browser, request }) => {
     const { data: start, error } = await buyer.c.rpc("start_order_payment", { _order_id: orderId });
     if (error || !start) throw new Error(`pagamento: ${error?.message} (a loja de teste precisa da conta ativada pelo pay.spec)`);
-    const paymentId = (start as { payment_id: string }).payment_id;
+    const { payment_id: paymentId, destination } = start as { payment_id: string; destination: string };
+    // Cobrança direta: os avisos vêm da conta da loja (campo "account")
     const paid = sign({
       id: `evt_e2e_aff_paid_${run}`,
       object: "event",
       type: "checkout.session.completed",
       livemode: false,
+      account: destination,
       data: {
         object: {
           id: `cs_test_aff${run}`,
@@ -177,6 +179,7 @@ test.describe("Indique e ganhe: venda indicada gera comissão", () => {
       object: "event",
       type: "charge.refunded",
       livemode: false,
+      account: destination,
       data: { object: { payment_intent: `pi_e2e_aff_${run}`, refunded: true } },
     });
     await request.post("/api/webhooks/stripe", { data: refund.payload, headers: { "stripe-signature": refund.signature } });
