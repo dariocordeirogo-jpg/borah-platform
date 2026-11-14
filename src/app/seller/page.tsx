@@ -6,10 +6,13 @@ import { ButtonLink } from "@/components/ui/button";
 import { formatBRL } from "@/lib/format";
 import { getSellerStats } from "@/lib/market/queries";
 import { requireStore } from "@/lib/market/seller-guard";
+import { payoutState, payoutStateLabel } from "@/lib/pay/format";
+import { getMyPayoutAccount } from "@/lib/pay/queries";
 
 async function Dashboard({ searchParams }: { searchParams: Promise<{ bemvindo?: string }> }) {
   const [store, sp] = await Promise.all([requireStore("/seller"), searchParams]);
-  const s = await getSellerStats(store.id);
+  const [s, account] = await Promise.all([getSellerStats(store.id), getMyPayoutAccount(store.id)]);
+  const payout = payoutState(account);
   const cards = [
     { icon: Package, label: "Produtos ativos", value: `${s.activeProducts} de ${s.totalProducts}`, href: "/seller/produtos" },
     { icon: Receipt, label: "Pedidos", value: String(s.orders), hint: `${s.pendingOrders} aguardando pagamento`, href: "/seller/pedidos" },
@@ -19,6 +22,24 @@ async function Dashboard({ searchParams }: { searchParams: Promise<{ bemvindo?: 
   return (
     <div className="space-y-6">
       {sp.bemvindo && <Notice tone="success">Sua loja está aberta! Agora cadastre o primeiro produto.</Notice>}
+      {payout !== "active" && (
+        <section
+          aria-label="Ativar recebimentos"
+          data-testid="ativar-recebimentos"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-card)] border border-brand bg-brand-soft/40 p-4"
+        >
+          <div className="min-w-0">
+            <p className="flex items-center gap-2 font-semibold text-navy">
+              <Wallet className="h-4 w-4 text-brand" aria-hidden="true" />
+              {payout === "none" ? "Ative seus recebimentos para começar a vender" : `Recebimentos: ${payoutStateLabel[payout]}`}
+            </p>
+            <p className="mt-0.5 text-sm text-muted">
+              Conecte sua conta Stripe (leva poucos minutos). Sem ela, os compradores não conseguem pagar os seus produtos.
+            </p>
+          </div>
+          <ButtonLink href="/seller/pagamentos">{payout === "none" ? "Conectar conta Stripe" : "Continuar cadastro"}</ButtonLink>
+        </section>
+      )}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-navy">{store.name}</h1>
