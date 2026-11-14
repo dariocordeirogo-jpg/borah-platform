@@ -349,6 +349,7 @@ export type Database = {
           description: string | null;
           id: string;
           imported_from: string | null;
+          is_showcase: boolean;
           video_url: string | null;
           price_cents: number;
           search: unknown;
@@ -368,6 +369,7 @@ export type Database = {
           description?: string | null;
           id?: string;
           imported_from?: string | null;
+          is_showcase?: boolean;
           video_url?: string | null;
           price_cents: number;
           search?: unknown;

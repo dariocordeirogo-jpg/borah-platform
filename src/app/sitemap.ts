@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const db = createAnonClient();
   const [stores, products, auctions] = await Promise.all([
     db.from("stores").select("id, slug, updated_at").eq("is_active", true).eq("is_test", false).limit(5000),
-    db.from("products").select("id, updated_at, store_id, stores!inner(is_test)").eq("status", "active").eq("stores.is_test", false).order("updated_at", { ascending: false }).limit(20000),
+    db.from("products").select("id, updated_at, store_id, stores!inner(is_test)").eq("status", "active").eq("is_showcase", false).eq("stores.is_test", false).order("updated_at", { ascending: false }).limit(20000),
     db.from("auctions").select("id, updated_at, stores!inner(is_test)").eq("status", "active").eq("stores.is_test", false).limit(5000),
   ]);
   return [

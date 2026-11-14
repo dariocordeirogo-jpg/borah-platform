@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ArrowRight, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Tag, UserRound, Video } from "lucide-react";
+import { ArrowRight, Flame, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Tag, UserRound, Video } from "lucide-react";
 import { HeroCarousel } from "@/components/home/hero-carousel";
+import { DepartmentCards } from "@/components/home/department-cards";
+import { PromoBanners } from "@/components/home/promo-banners";
+import { RecentlyViewed } from "@/components/home/recently-viewed";
 import { AuctionCard, DemoLiveCard, DemoTag, ProductCard, UpcomingCard } from "@/components/cards";
 import { AuctionCardLive } from "@/components/auctions/auction-card";
 import { LiveCard, Shelf } from "@/components/listing";
@@ -117,6 +120,25 @@ async function ProductsShelf() {
   );
 }
 
+/** Ofertas do dia: produtos com preço "de/por" (maior desconto primeiro). */
+async function DealsShelf() {
+  const { items } = await listProducts({ limit: 48 });
+  const deals = items
+    .filter((p) => p.compareAtCents && p.compareAtCents > p.priceCents)
+    .sort((a, b) => b.compareAtCents! / b.priceCents - a.compareAtCents! / a.priceCents)
+    .slice(0, 12);
+  if (deals.length < 3) return null;
+  return (
+    <Shelf title="Ofertas do dia" eyebrow={eyebrow(Flame, "DESCONTOS")} href="/market" cta="Ver todas">
+      {deals.map((p) => (
+        <li key={p.id}>
+          <MarketProductCard product={p} />
+        </li>
+      ))}
+    </Shelf>
+  );
+}
+
 /** Atalhos logo abaixo do carrossel: os três jeitos de negociar e os caminhos mais procurados. */
 const shortcuts = [
   { href: "/market", icon: ShoppingBag, title: "Compre agora", hint: "Preço fixo" },
@@ -158,6 +180,14 @@ export default function HomePage() {
           desta vitrine é real.
         </p>
 
+        <Suspense fallback={null}>
+          <DepartmentCards />
+        </Suspense>
+        <RecentlyViewed />
+        <Suspense fallback={<ShelfSkeleton />}>
+          <DealsShelf />
+        </Suspense>
+
         <section aria-labelledby="categorias" className="rounded-xl bg-white p-4 shadow-[0_1px_2px_rgba(15,17,21,0.08)] md:p-5">
           <h2 id="categorias" className="mb-3 font-display text-lg font-bold tracking-tight text-navy md:text-xl">
             Categorias
@@ -188,6 +218,7 @@ export default function HomePage() {
         <Suspense fallback={<ShelfSkeleton />}>
           <ProductsShelf />
         </Suspense>
+        <PromoBanners />
         <Suspense fallback={<ShelfSkeleton />}>
           <ScheduledShelf />
         </Suspense>
