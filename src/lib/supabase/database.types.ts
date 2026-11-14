@@ -167,9 +167,9 @@ export type Database = {
         Relationships: [];
       };
       cart_items: {
-        Row: { added_at: string; product_id: string; quantity: number; user_id: string };
-        Insert: { added_at?: string; product_id: string; quantity: number; user_id: string };
-        Update: { added_at?: string; product_id?: string; quantity?: number; user_id?: string };
+        Row: { added_at: string; product_id: string; quantity: number; user_id: string; live_id: string | null };
+        Insert: { added_at?: string; product_id: string; quantity: number; user_id: string; live_id?: string | null };
+        Update: { added_at?: string; product_id?: string; quantity?: number; user_id?: string; live_id?: string | null };
         Relationships: [
           {
             foreignKeyName: "cart_items_product_id_fkey";
@@ -274,6 +274,7 @@ export type Database = {
       };
       orders: {
         Row: {
+          live_id: string | null;
           buyer_id: string;
           cancelled_reason: string | null;
           coupon_code: string | null;
@@ -715,6 +716,7 @@ export type Database = {
         Returns: {
           disabled_at: string
           playback_id: string
+          provider: "mux" | "cloudflare"
           stream_id: string
         }[]
       }
@@ -758,6 +760,10 @@ export type Database = {
       affiliate_program: { Args: Record<string, never>; Returns: Json };
       attach_live_stream: {
         Args: { _live_id: string; _playback_id: string; _stream_id: string }
+        Returns: undefined
+      }
+      attach_browser_stream: {
+        Args: { _live_id: string; _input_uid: string; _play_url: string }
         Returns: undefined
       }
       become_affiliate: { Args: Record<string, never>; Returns: string };

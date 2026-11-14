@@ -24,6 +24,11 @@ export function muxPlaybackId(url: string | null): string | null {
   return m ? m[1] : null;
 }
 
+/** Link de reprodução WebRTC (WHEP) do Cloudflare Stream: transmissão feita pelo navegador. */
+export function isWhepUrl(url: string | null): url is string {
+  return Boolean(url && /^https:\/\/customer-[a-z0-9]{8,40}\.cloudflarestream\.com\/[a-f0-9]{32}\/webRTC\/play$/.test(url));
+}
+
 export const liveAuctionMinutes = [5, 10, 15] as const;
 
 export function liveErrorMessage(message?: string): string {
