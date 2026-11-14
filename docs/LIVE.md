@@ -64,6 +64,11 @@ Teste: `supabase/tests/live_navegador.sql` e `tests/unit/cloudflare-stream.test.
 - O estúdio mostra "Vendas desta live" (pedidos pagos e aguardando pagamento).
 - Teste: `supabase/tests/live_atribuicao.sql` e o passo de compra em `tests/e2e/live.spec.ts`.
 
+## Quem está assistindo
+
+- Contador "N assistindo" na live e no estúdio, pela presença do Supabase Realtime (canal `live-presence-<id>`).
+- Só quem assiste entra na contagem; o estúdio observa. Número aproximado, só para exibição (nada de dinheiro depende dele).
+
 ## Avisos do Mux (webhook) e live abandonada
 
 - `POST /api/webhooks/mux` repassa o corpo cru para `mux_ingest_event`, que confere a assinatura `Mux-Signature`

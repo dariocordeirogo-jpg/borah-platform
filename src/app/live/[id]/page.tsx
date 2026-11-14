@@ -7,6 +7,7 @@ import { Gavel, ShoppingBag } from "lucide-react";
 import { BidPanel } from "@/components/auctions/bid-panel";
 import { LiveChat } from "@/components/live/chat";
 import { LivePlayer } from "@/components/live/player";
+import { ViewerCount } from "@/components/live/viewer-count";
 import { LiveRefresh } from "@/components/live/live-refresh";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth";
@@ -78,6 +79,7 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
             </Link>
           </p>
           <h1 className="font-display text-2xl font-bold tracking-tight text-navy">{live.title}</h1>
+          {live.status === "live" && <ViewerCount liveId={live.id} track />}
           {live.description && <p className="mt-1 text-sm text-muted">{live.description}</p>}
           <Link href={`/denunciar?tipo=live&id=${live.id}&next=/live/${live.id}`} className="mt-1 inline-block text-xs text-muted hover:text-brand hover:underline">
             Denunciar esta live
