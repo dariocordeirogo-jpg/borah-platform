@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { brasiliaLocalToISO } from "@/lib/auctions/schemas";
 import { isPlaybackUrl, liveErrorMessage } from "@/lib/live/format";
+import { cloudflareConfigured, createCfInput, deleteCfInput, playUrl } from "@/lib/live/cloudflare";
 import { createMuxStream, disableMuxStream, muxConfigured, publicPlaybackId } from "@/lib/live/mux";
 import { retireLiveStream } from "@/lib/live/stream";
 import { parseBRLToCents } from "@/lib/market/format";
@@ -72,6 +73,38 @@ export async function openStream(formData: FormData) {
   if (error) {
     // Não deixa transmissão solta no Mux
     await disableMuxStream(stream.id).catch(() => undefined);
+    redirect(studio(liveId, liveErrorMessage(error.message)));
+  }
+  revalidatePath(`/live/${liveId}`);
+  redirect(studio(liveId));
+}
+
+/** Loja: cria a entrada no Cloudflare Stream para transmitir pela câmera do navegador e liga à live. */
+export async function openBrowserStream(formData: FormData) {
+  const liveId = uuid.parse(formData.get("liveId"));
+  if (!cloudflareConfigured()) redirect(studio(liveId, liveErrorMessage("stream_unavailable")));
+  const supabase = await createClient();
+  // Mesmas travas da chave do Mux: só o dono e uma transmissão por live
+  const { data: ref, error: refError } = await supabase.rpc("live_stream_ref", { _live_id: liveId });
+  if (refError) redirect(studio(liveId, liveErrorMessage(refError.message)));
+  if (ref?.length) redirect(studio(liveId));
+  const { data: live } = await supabase.from("lives").select("status").eq("id", liveId).maybeSingle();
+  if (!live || !["scheduled", "live"].includes(live.status)) redirect(studio(liveId, liveErrorMessage("live_finished")));
+
+  let input;
+  try {
+    input = await createCfInput(liveId);
+  } catch (e) {
+    console.error("cloudflare: não foi possível criar a entrada", liveId, e);
+    redirect(studio(liveId, liveErrorMessage("stream_unavailable")));
+  }
+  const url = playUrl(input);
+  const { error } = url
+    ? await supabase.rpc("attach_browser_stream", { _live_id: liveId, _input_uid: input.uid, _play_url: url })
+    : { error: { message: "invalid_stream" } };
+  if (error) {
+    // Não deixa entrada solta na Cloudflare
+    await deleteCfInput(input.uid).catch(() => undefined);
     redirect(studio(liveId, liveErrorMessage(error.message)));
   }
   revalidatePath(`/live/${liveId}`);

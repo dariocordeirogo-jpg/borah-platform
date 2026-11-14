@@ -31,12 +31,38 @@ no navegador). Links HLS de outros serviços continuam no hls.js.
 2. Vercel: `MUX_TOKEN_ID` e `MUX_TOKEN_SECRET` (só no servidor).
 3. `GET /api/health` mostra `integrations.live: true`.
 
+## Transmitir pelo navegador (Cloudflare Stream)
+
+A loja também pode transmitir **pela câmera do celular ou do computador**, sem OBS. No estúdio, "Transmitir pelo
+navegador" cria uma entrada no Cloudflare Stream (WebRTC, atraso abaixo de 1 s):
+
+- Envio (WHIP): o endereço de envio é segredo da loja. Não vai para o banco; o servidor busca na Cloudflare na hora e
+  entrega só à tela do dono (`src/components/live/browser-broadcast.tsx`).
+- Reprodução (WHEP): o link público `https://customer-…cloudflarestream.com/<id>/webRTC/play` vira o `playback_url` da
+  live; o player conecta por WebRTC e tenta de novo a cada 5 s enquanto a loja não liga a câmera.
+- Câmera e microfone só são liberados na página do estúdio (`Permissions-Policy` em `next.config.ts`).
+- Ao encerrar a live (loja ou moderação) a entrada é apagada na Cloudflare.
+- Limites do WebRTC na Cloudflare hoje: sem gravação/replay, sem HLS e sem contagem de espectadores do lado deles
+  (o contador da Zexi continua funcionando). Custo: US$ 1 por 1.000 minutos assistidos.
+
+Configuração: token da Cloudflare com permissão **Account → Stream → Edit**; na Vercel, `CLOUDFLARE_API_TOKEN` e
+`CLOUDFLARE_ACCOUNT_ID` (só no servidor). `GET /api/health` mostra `integrations.liveBrowser: true`.
+Teste: `supabase/tests/live_navegador.sql` e `tests/unit/cloudflare-stream.test.ts`.
+
 ## Segurança
 
 - Tabela `private.live_streams` sem acesso pela API; leitura e escrita só por `attach_live_stream`,
   `live_stream_ref` (dono da loja ou moderação) e `mark_live_stream_disabled`.
 - IDs do Mux validados (`^[A-Za-z0-9]{10,100}$`) antes de virar URL.
 - Teste: `supabase/tests/live_mux.sql` e `tests/unit/mux.test.ts`.
+
+## Vendas por live
+
+- O botão de compra dentro da live manda `liveId` junto; o item entra no carrinho com `cart_items.live_id`.
+- O banco só aceita a marca se o produto estiver na live (programada ou no ar); senão grava sem marca.
+- No checkout o pedido herda a live (`orders.live_id`) — mesmo preço, estoque e pagamento de sempre.
+- O estúdio mostra "Vendas desta live" (pedidos pagos e aguardando pagamento).
+- Teste: `supabase/tests/live_atribuicao.sql` e o passo de compra em `tests/e2e/live.spec.ts`.
 
 ## Quem está assistindo
 

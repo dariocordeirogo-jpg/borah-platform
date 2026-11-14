@@ -3,16 +3,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Image from "next/image";
-import { ExternalLink, Gavel, Pin, PinOff, ShoppingBag } from "lucide-react";
+import { ExternalLink, Gavel, Pin, PinOff, ShoppingBag, TrendingUp } from "lucide-react";
+import { BrowserBroadcast } from "@/components/live/browser-broadcast";
 import { LiveChat } from "@/components/live/chat";
 import { ViewerCount } from "@/components/live/viewer-count";
 import { LiveRefresh } from "@/components/live/live-refresh";
 import { Notice } from "@/components/market";
 import { Button } from "@/components/ui/button";
 import { formatBRL } from "@/lib/format";
-import { endLive, openStream, pinProduct, setPlayback, startLive, startLiveAuction } from "@/lib/live/actions";
+import { endLive, openBrowserStream, openStream, pinProduct, setPlayback, startLive, startLiveAuction } from "@/lib/live/actions";
 import { liveAuctionMinutes, liveStatusLabel } from "@/lib/live/format";
-import { getLive, getStudioStream, type StudioStream } from "@/lib/live/queries";
+import { cloudflareConfigured } from "@/lib/live/cloudflare";
+import { getLive, getLiveSales, getStudioStream, type StudioStream } from "@/lib/live/queries";
+import { muxConfigured } from "@/lib/live/mux";
 import { requireStore } from "@/lib/market/seller-guard";
 
 export const metadata: Metadata = { title: "Estúdio da live" };
@@ -30,8 +33,10 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
   const data = await getLive(id);
   if (!data || data.live.store_id !== store.id) notFound();
   const { live, products, auction, messages } = data;
-  const stream: StudioStream =
-    live.status === "scheduled" || live.status === "live" ? await getStudioStream(live.id) : { kind: "none" };
+  const [stream, sales] = await Promise.all([
+    live.status === "scheduled" || live.status === "live" ? getStudioStream(live.id) : Promise.resolve<StudioStream>({ kind: "none" }),
+    getLiveSales(live.id),
+  ]);
   const isLive = live.status === "live";
   const auctionRunning = auction?.status === "active";
 
@@ -70,7 +75,23 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
         </div>
       </section>
 
-      {(live.status === "scheduled" || isLive) && <StreamPanel liveId={live.id} playbackUrl={live.playback_url} stream={stream} />}
+      <section
+        aria-label="Vendas da live"
+        data-testid="vendas-live"
+        className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-[var(--radius-card)] border border-line bg-white px-5 py-4"
+      >
+        <span className="inline-flex items-center gap-2 text-sm font-semibold text-navy">
+          <TrendingUp className="h-4 w-4 text-brand" aria-hidden="true" /> Vendas desta live
+        </span>
+        <span className="text-sm text-muted">
+          <strong className="text-navy">{formatBRL(sales.totalCents)}</strong> em {sales.paid} {sales.paid === 1 ? "pedido pago" : "pedidos pagos"}
+        </span>
+        {sales.orders > sales.paid && (
+          <span className="text-sm text-muted">{sales.orders - sales.paid} aguardando pagamento</span>
+        )}
+      </section>
+
+      {(live.status === "scheduled" || isLive) && <StreamPanel liveId={live.id} playbackUrl={live.playback_url} stream={stream} options={{ mux: muxConfigured(), browser: cloudflareConfigured() }} />}
 
       <div className="grid grid-cols-1 gap-4 [&>*]:min-w-0 lg:grid-cols-[1fr_360px]">
         <section className="rounded-[var(--radius-card)] border border-line bg-white" aria-label="Produtos da live">
@@ -192,7 +213,17 @@ function ManualPlayback({ liveId, playbackUrl }: { liveId: string; playbackUrl: 
   );
 }
 
-function StreamPanel({ liveId, playbackUrl, stream }: { liveId: string; playbackUrl: string | null; stream: StudioStream }) {
+function StreamPanel({
+  liveId,
+  playbackUrl,
+  stream,
+  options,
+}: {
+  liveId: string;
+  playbackUrl: string | null;
+  stream: StudioStream;
+  options: { mux: boolean; browser: boolean };
+}) {
   return (
     <section className="space-y-3 rounded-[var(--radius-card)] border border-line bg-white p-5 text-sm" data-testid="transmissao">
       <h2 className="font-semibold text-navy">Vídeo da transmissão</h2>
@@ -222,16 +253,33 @@ function StreamPanel({ liveId, playbackUrl, stream }: { liveId: string; playback
           </p>
         </>
       )}
+      {stream.kind === "browser" && <BrowserBroadcast publishUrl={stream.publishUrl} />}
       {stream.kind === "unreachable" && (
         <Notice tone="error">O serviço de transmissão não respondeu agora. Atualize a página em instantes.</Notice>
       )}
       {stream.kind === "none" && (
         <>
-          <p className="text-muted">Gere a chave e transmita pelo OBS (computador) ou por um app de celular. Quem assiste recebe o vídeo aqui na Zexi.</p>
-          <form action={openStream}>
-            <input type="hidden" name="liveId" value={liveId} />
-            <Button type="submit">Gerar chave de transmissão</Button>
-          </form>
+          <p className="text-muted">Escolha como transmitir. Quem assiste recebe o vídeo aqui na Zexi.</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {options.browser && (
+              <form action={openBrowserStream} className="space-y-2 rounded-xl border border-line p-3">
+                <input type="hidden" name="liveId" value={liveId} />
+                <p className="font-semibold text-navy">Pela câmera do celular ou do computador</p>
+                <p className="text-xs text-muted">Direto no navegador, sem instalar nada. Atraso de menos de 1 segundo.</p>
+                <Button type="submit">Transmitir pelo navegador</Button>
+              </form>
+            )}
+            {options.mux && (
+              <form action={openStream} className="space-y-2 rounded-xl border border-line p-3">
+                <input type="hidden" name="liveId" value={liveId} />
+                <p className="font-semibold text-navy">Pelo OBS ou app de transmissão</p>
+                <p className="text-xs text-muted">Para câmera profissional, várias cenas ou transmissão no computador.</p>
+                <Button type="submit" variant="outline">
+                  Gerar chave de transmissão
+                </Button>
+              </form>
+            )}
+          </div>
           <details>
             <summary className="cursor-pointer text-xs text-muted">Usar outro serviço (link HLS)</summary>
             <div className="mt-2">

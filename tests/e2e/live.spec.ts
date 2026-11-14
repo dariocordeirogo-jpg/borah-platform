@@ -77,6 +77,10 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     await expect(studio).toHaveURL(/\/seller\/lives\/[0-9a-f-]{36}\?nova=1$/);
     await expect(studio.getByTestId("estado-live")).toHaveText("Programada");
     livePath = `/live/${new URL(studio.url()).pathname.split("/").pop()}`;
+    // Câmera e microfone liberados só no estúdio (transmissão pelo navegador); no resto do site seguem bloqueados
+    const studioHeaders = (await studio.request.get(new URL(studio.url()).pathname)).headers();
+    expect(studioHeaders["permissions-policy"]).toContain("camera=(self)");
+    expect((await studio.request.get(livePath)).headers()["permissions-policy"]).toContain("camera=()");
 
     await page.goto("/ao-vivo");
     await expect(page.getByRole("heading", { name: "Próximas lives" })).toBeVisible();
@@ -123,6 +127,21 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
 
     await studio.getByTestId("chat-mensagens").getByRole("button", { name: "Esconder" }).last().click();
     await expect(viewer.getByTestId("chat-mensagens")).not.toContainText(text);
+  });
+
+  test("compra pelo destaque da live leva ao carrinho com a origem da live", async ({ browser }) => {
+    const buyer = await browserAs(browser, BUYER, livePath);
+    const highlight = buyer.getByRole("region", { name: "Produto em destaque" });
+    await highlight.getByRole("button", { name: "Comprar agora" }).click();
+    await expect(buyer).toHaveURL(/\/carrinho/);
+    await expect(buyer.getByText(bag).first()).toBeVisible();
+    // A marca da live fica no item do carrinho (o banco só aceita produto que está na live)
+    const me = await signIn(BUYER);
+    const { data: line } = await me.c.from("cart_items").select("live_id").eq("product_id", productIds[0]).single();
+    expect(line?.live_id).toBe(livePath.split("/").pop());
+    await me.c.from("cart_items").delete().eq("product_id", productIds[0]);
+    await expect(studio.getByTestId("vendas-live")).toContainText("Vendas desta live");
+    await buyer.context().close();
   });
 
   test("vendedor escolhe leiloar ao vivo e quem assiste dá lance sem sair da live", async () => {
