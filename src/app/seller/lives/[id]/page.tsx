@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Image from "next/image";
-import { ExternalLink, Gavel, Pin, PinOff, ShoppingBag } from "lucide-react";
+import { ExternalLink, Gavel, Pin, PinOff, ShoppingBag, TrendingUp } from "lucide-react";
 import { BrowserBroadcast } from "@/components/live/browser-broadcast";
 import { LiveChat } from "@/components/live/chat";
 import { LiveRefresh } from "@/components/live/live-refresh";
@@ -13,7 +13,7 @@ import { formatBRL } from "@/lib/format";
 import { endLive, openBrowserStream, openStream, pinProduct, setPlayback, startLive, startLiveAuction } from "@/lib/live/actions";
 import { liveAuctionMinutes, liveStatusLabel } from "@/lib/live/format";
 import { cloudflareConfigured } from "@/lib/live/cloudflare";
-import { getLive, getStudioStream, type StudioStream } from "@/lib/live/queries";
+import { getLive, getLiveSales, getStudioStream, type StudioStream } from "@/lib/live/queries";
 import { muxConfigured } from "@/lib/live/mux";
 import { requireStore } from "@/lib/market/seller-guard";
 
@@ -32,8 +32,10 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
   const data = await getLive(id);
   if (!data || data.live.store_id !== store.id) notFound();
   const { live, products, auction, messages } = data;
-  const stream: StudioStream =
-    live.status === "scheduled" || live.status === "live" ? await getStudioStream(live.id) : { kind: "none" };
+  const [stream, sales] = await Promise.all([
+    live.status === "scheduled" || live.status === "live" ? getStudioStream(live.id) : Promise.resolve<StudioStream>({ kind: "none" }),
+    getLiveSales(live.id),
+  ]);
   const isLive = live.status === "live";
   const auctionRunning = auction?.status === "active";
 
@@ -69,6 +71,22 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
             </form>
           )}
         </div>
+      </section>
+
+      <section
+        aria-label="Vendas da live"
+        data-testid="vendas-live"
+        className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-[var(--radius-card)] border border-line bg-white px-5 py-4"
+      >
+        <span className="inline-flex items-center gap-2 text-sm font-semibold text-navy">
+          <TrendingUp className="h-4 w-4 text-brand" aria-hidden="true" /> Vendas desta live
+        </span>
+        <span className="text-sm text-muted">
+          <strong className="text-navy">{formatBRL(sales.totalCents)}</strong> em {sales.paid} {sales.paid === 1 ? "pedido pago" : "pedidos pagos"}
+        </span>
+        {sales.orders > sales.paid && (
+          <span className="text-sm text-muted">{sales.orders - sales.paid} aguardando pagamento</span>
+        )}
       </section>
 
       {(live.status === "scheduled" || isLive) && <StreamPanel liveId={live.id} playbackUrl={live.playback_url} stream={stream} options={{ mux: muxConfigured(), browser: cloudflareConfigured() }} />}

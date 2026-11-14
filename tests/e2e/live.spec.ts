@@ -126,6 +126,21 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     await expect(viewer.getByTestId("chat-mensagens")).not.toContainText(text);
   });
 
+  test("compra pelo destaque da live leva ao carrinho com a origem da live", async ({ browser }) => {
+    const buyer = await browserAs(browser, BUYER, livePath);
+    const highlight = buyer.getByRole("region", { name: "Produto em destaque" });
+    await highlight.getByRole("button", { name: "Comprar agora" }).click();
+    await expect(buyer).toHaveURL(/\/carrinho/);
+    await expect(buyer.getByText(bag).first()).toBeVisible();
+    // A marca da live fica no item do carrinho (o banco só aceita produto que está na live)
+    const me = await signIn(BUYER);
+    const { data: line } = await me.c.from("cart_items").select("live_id").eq("product_id", productIds[0]).single();
+    expect(line?.live_id).toBe(livePath.split("/").pop());
+    await me.c.from("cart_items").delete().eq("product_id", productIds[0]);
+    await expect(studio.getByTestId("vendas-live")).toContainText("Vendas desta live");
+    await buyer.context().close();
+  });
+
   test("vendedor escolhe leiloar ao vivo e quem assiste dá lance sem sair da live", async () => {
     const item = studio.getByRole("listitem").filter({ hasText: wallet });
     await expect(item.getByRole("button", { name: `Destacar ${wallet}` })).toContainText("Vender a preço fixo");

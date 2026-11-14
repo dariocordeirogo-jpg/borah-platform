@@ -167,9 +167,9 @@ export type Database = {
         Relationships: [];
       };
       cart_items: {
-        Row: { added_at: string; product_id: string; quantity: number; user_id: string };
-        Insert: { added_at?: string; product_id: string; quantity: number; user_id: string };
-        Update: { added_at?: string; product_id?: string; quantity?: number; user_id?: string };
+        Row: { added_at: string; product_id: string; quantity: number; user_id: string; live_id: string | null };
+        Insert: { added_at?: string; product_id: string; quantity: number; user_id: string; live_id?: string | null };
+        Update: { added_at?: string; product_id?: string; quantity?: number; user_id?: string; live_id?: string | null };
         Relationships: [
           {
             foreignKeyName: "cart_items_product_id_fkey";
@@ -274,6 +274,7 @@ export type Database = {
       };
       orders: {
         Row: {
+          live_id: string | null;
           buyer_id: string;
           cancelled_reason: string | null;
           coupon_code: string | null;
