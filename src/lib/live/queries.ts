@@ -33,7 +33,7 @@ export async function getLive(id: string) {
   const supabase = await db();
   const { data: live } = await supabase
     .from("lives")
-    .select("id, store_id, title, description, status, scheduled_at, started_at, ended_at, playback_url, pinned_product_id, stores(name, slug)")
+    .select("id, store_id, title, description, status, scheduled_at, started_at, ended_at, playback_url, pinned_product_id, stream_signal, stores(name, slug)")
     .eq("id", id)
     .maybeSingle();
   if (!live) return null;

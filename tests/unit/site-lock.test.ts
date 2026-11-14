@@ -15,6 +15,7 @@ describe("site em construção", () => {
     ["/em-construcao", true],
     ["/api/health", true],
     ["/api/webhooks/stripe", true],
+    ["/api/webhooks/mux", true],
     ["/api/jobs/repasses", true],
     ["/brand/zexi-logo-branco.svg", true],
     ["/", false],

@@ -38,8 +38,20 @@ no navegador). Links HLS de outros serviços continuam no hls.js.
 - IDs do Mux validados (`^[A-Za-z0-9]{10,100}$`) antes de virar URL.
 - Teste: `supabase/tests/live_mux.sql` e `tests/unit/mux.test.ts`.
 
+## Avisos do Mux (webhook) e live abandonada
+
+- `POST /api/webhooks/mux` repassa o corpo cru para `mux_ingest_event`, que confere a assinatura `Mux-Signature`
+  com o segredo do Vault `mux_webhook_secret`, descarta avisos repetidos e marca `lives.stream_signal`
+  (`active` / `idle`). Quem assiste vê "O sinal da loja caiu" enquanto o sinal está parado.
+- Aviso de uma transmissão cuja live já saiu do ar (encerrada, cancelada, loja suspensa): o servidor desliga a
+  chave no Mux e confirma ao banco com um aviso interno assinado (`zexi.stream_disabled`).
+- `private.close_abandoned_lives()` (pg_cron a cada 5 min): encerra live sem sinal há 30 min ou no ar há 8 h e
+  cancela live programada há mais de 24 h sem começar. Fica no `audit_logs` como `live.auto_end`.
+- Configuração: Mux → Settings → Webhooks → URL `https://www.zexi.com.br/api/webhooks/mux`; copiar o
+  *signing secret* para a Vercel (`MUX_WEBHOOK_SECRET`) e para o Vault (`mux_webhook_secret`).
+- Testes: `supabase/tests/live_mux_webhook.sql` e `tests/unit/mux-webhook.test.ts`.
+
 ## Pendências
 
-- Suspensão de loja cancela as lives no banco, mas não desliga as transmissões no Mux (só o encerramento de uma
-  live desliga). Baixo risco: a live cancelada some do site; tratar com webhook do Mux se necessário.
+- Suspensão de loja: a chave é desligada no próximo aviso que o Mux mandar daquela transmissão.
 - Gravação/replay da live (custa armazenamento no Mux) — decidir antes de ligar.

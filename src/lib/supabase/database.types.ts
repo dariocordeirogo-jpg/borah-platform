@@ -646,6 +646,8 @@ export type Database = {
           ended_at: string | null;
           playback_url: string | null;
           pinned_product_id: string | null;
+          stream_signal: "active" | "idle" | null;
+          stream_signal_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -751,6 +753,7 @@ export type Database = {
       request_order_refund: { Args: { _order_id: string }; Returns: Json };
       register_payout_account: { Args: { _account_id: string }; Returns: string };
       stripe_ingest_event: { Args: { _payload: string; _signature: string }; Returns: Json };
+      mux_ingest_event: { Args: { _payload: string; _signature: string }; Returns: Json };
       store_accepts_payments: { Args: { _store_id: string }; Returns: boolean };
       affiliate_program: { Args: Record<string, never>; Returns: Json };
       attach_live_stream: {
