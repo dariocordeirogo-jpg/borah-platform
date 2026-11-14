@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { describe, expect, it } from "vitest";
-import { accountStatusFromV2, bpsToPercent, payErrorMessage, payoutState, previewFee, stripeKeyMode } from "@/lib/pay/format";
+import { accountStatusFromV2, bpsToPercent, payErrorMessage, payoutLabel, payoutState, previewFee, stripeKeyMode } from "@/lib/pay/format";
 import { signStripePayload } from "@/lib/pay/signature";
 
 describe("assinatura dos avisos", () => {
@@ -89,5 +89,36 @@ describe("accountStatusFromV2 (Accounts v2 → situação da loja)", () => {
 
   it("sem configuração merchant: nada ativo", () => {
     expect(accountStatusFromV2(base)).toMatchObject({ charges_enabled: false, payouts_enabled: false, details_submitted: true, requirements: { currently_due: [] } });
+  });
+});
+
+describe("Compra Garantida (repasse para a loja)", () => {
+  it("mostra a situação do repasse", () => {
+    expect(payoutLabel({ status: "succeeded", payout_status: "held" })).toBe("Retido até a entrega");
+    expect(payoutLabel({ status: "succeeded", payout_status: "ready" })).toBe("Liberado · transferindo");
+    expect(payoutLabel({ status: "succeeded", payout_status: "none" })).toBe("Na sua conta Stripe");
+    expect(payoutLabel({ status: "refunded", payout_status: "cancelled" })).toBe("Devolvido ao comprador");
+    expect(payoutLabel({ status: "created", payout_status: "none" })).toBe("—");
+    expect(payoutLabel({ status: "succeeded", payout_status: "transferred", transferred_at: "2026-11-13T15:00:00Z" })).toBe(
+      "Transferido em 13/11/2026",
+    );
+  });
+
+  it("conta recebedora (transferências da Zexi) conta como recebimento ativo", () => {
+    const s = accountStatusFromV2({
+      id: "acct_1REC",
+      livemode: false,
+      configuration: {
+        merchant: { capabilities: { card_payments: { status: "active" } } },
+        recipient: { capabilities: { stripe_balance: { payouts: { status: "active" }, stripe_transfers: { status: "active" } } } },
+      },
+      requirements: { entries: [] },
+    });
+    expect(s.charges_enabled).toBe(true);
+    expect(s.payouts_enabled).toBe(true);
+  });
+
+  it("explica quando a venda não pode mais ser devolvida", () => {
+    expect(payErrorMessage("order_not_refundable")).toMatch(/não pode mais ser cancelada/);
   });
 });

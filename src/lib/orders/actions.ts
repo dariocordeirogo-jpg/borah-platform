@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { deliveryErrorMessage, isCarrier, normalizeTrackingCode } from "@/lib/orders/delivery";
+import { processDuePayouts } from "@/lib/pay/payouts";
 import { createClient } from "@/lib/supabase/server";
 
 const uuid = z.uuid();
@@ -34,6 +36,8 @@ export async function confirmDelivery(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.rpc("confirm_delivery", { _order_id: orderId });
   if (error) redirect(withParam(next, "erro", deliveryErrorMessage(error.message)));
+  // Entrega confirmada libera o repasse: transfere para a loja logo depois da resposta (a rotina diária cobre falhas)
+  after(() => processDuePayouts(5).catch(() => undefined));
   revalidatePath("/conta/pedidos");
   redirect(withParam(next, "recebido", "1"));
 }

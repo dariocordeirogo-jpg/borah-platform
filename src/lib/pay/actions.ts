@@ -1,24 +1,16 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { env } from "@/lib/env";
 import { payErrorMessage } from "@/lib/pay/format";
+import { startCartCheckout } from "@/lib/pay/cart";
+import { refundPart } from "@/lib/pay/ingest";
 import { CONNECT_ACCOUNTS_API_VERSION, getStripe } from "@/lib/pay/stripe";
-import { syncStripeObject } from "@/lib/pay/ingest";
 import { createClient } from "@/lib/supabase/server";
 
 const uuid = z.uuid();
-
-type StartPayment = {
-  payment_id: string;
-  session_id: string | null;
-  amount_cents: number;
-  fee_cents: number;
-  destination: string;
-  order_number: number;
-  store_name: string;
-};
 
 async function requireUser(next: string) {
   const supabase = await createClient();
@@ -29,73 +21,54 @@ async function requireUser(next: string) {
   return { supabase, user };
 }
 
-function orderUrl(orderId: string, error?: string) {
-  return `/conta/pedidos/${orderId}${error ? `?erro=${encodeURIComponent(error)}` : ""}`;
+function withError(path: string, error: string) {
+  return `${path}${path.includes("?") ? "&" : "?"}erro=${encodeURIComponent(payErrorMessage(error))}`;
 }
 
 /**
- * Comprador paga um pedido: o banco calcula valor e comissão; o servidor abre o Checkout da Stripe
- * na conta da loja (cobrança direta: a loja é quem vende) e a comissão da Zexi sai como application fee.
+ * Comprador paga um pedido. Usa a cobrança única da Zexi (Compra Garantida): o banco calcula valor e comissão,
+ * o servidor abre o Checkout da Stripe e o dinheiro da loja fica retido até a entrega.
  */
 export async function payOrder(formData: FormData) {
   const orderId = uuid.parse(formData.get("orderId"));
-  const { supabase, user } = await requireUser(orderUrl(orderId));
-  const stripe = await getStripe();
-  if (!stripe || !process.env.STRIPE_WEBHOOK_SECRET) redirect(orderUrl(orderId, payErrorMessage("pay_unavailable")));
+  const back = `/conta/pedidos/${orderId}`;
+  const { supabase, user } = await requireUser(back);
+  const r = await startCartCheckout(supabase, user.email, [orderId], back);
+  if ("error" in r) redirect(withError(back, r.error));
+  redirect("url" in r ? r.url : back);
+}
 
-  const { data, error } = await supabase.rpc("start_order_payment", { _order_id: orderId });
-  if (error || !data) redirect(orderUrl(orderId, payErrorMessage(error?.message)));
-  const p = data as unknown as StartPayment;
+/** Comprador paga vários pedidos (um por loja) de uma vez só. */
+export async function payCart(formData: FormData) {
+  const ids = z.array(uuid).min(1).max(20).safeParse(formData.getAll("orderId"));
+  const back = "/conta/pedidos";
+  const { supabase, user } = await requireUser(back);
+  if (!ids.success) redirect(withError(back, "order_not_found"));
+  const r = await startCartCheckout(supabase, user.email, ids.data, back);
+  if ("error" in r) redirect(withError(back, r.error));
+  redirect("url" in r ? r.url : back);
+}
 
-  let url: string | null = null;
+/**
+ * Loja cancela uma venda paga que ainda não enviou: o banco autoriza e marca; a Stripe devolve só a parte
+ * desta loja ao comprador. O aviso do reembolso cancela o pedido e devolve o estoque.
+ */
+export async function refundStoreOrder(formData: FormData) {
+  const orderId = uuid.parse(formData.get("orderId"));
+  const back = "/seller/pedidos?aba=enviar";
+  const { supabase } = await requireUser(back);
+  const { data, error } = await supabase.rpc("request_order_refund", { _order_id: orderId });
+  if (error || !data) redirect(withError(back, error?.message ?? "unknown"));
+  const r = data as unknown as { payment_id: string; payment_intent: string | null; amount_cents: number };
   try {
-    // Tudo acontece na conta da loja (cobrança direta)
-    const onStore = { stripeAccount: p.destination };
-    if (p.session_id) {
-      const existing = await stripe.checkout.sessions.retrieve(p.session_id, {}, onStore);
-      if (existing.status === "open") url = existing.url;
-      else if (existing.status === "complete") await syncStripeObject("checkout.session.completed", existing, p.destination);
-      else await syncStripeObject("checkout.session.expired", existing, p.destination);
-    } else {
-      const session = await stripe.checkout.sessions.create(
-        {
-          mode: "payment",
-          currency: "brl",
-          locale: "pt-BR",
-          client_reference_id: p.payment_id,
-          customer_email: user.email,
-          metadata: { payment_id: p.payment_id, order_id: orderId },
-          line_items: [
-            {
-              quantity: 1,
-              price_data: {
-                currency: "brl",
-                unit_amount: p.amount_cents,
-                product_data: { name: `Pedido #${p.order_number} · ${p.store_name}` },
-              },
-            },
-          ],
-          payment_intent_data: {
-            // Comissão da Zexi; o restante fica na conta da loja, que paga a taxa da Stripe
-            application_fee_amount: p.fee_cents,
-            metadata: { payment_id: p.payment_id, order_id: orderId },
-            description: `Zexi · Pedido #${p.order_number}`,
-          },
-          // A sessão expira antes do registro no banco (60 min)
-          expires_at: Math.floor(Date.now() / 1000) + 55 * 60,
-          success_url: `${env.NEXT_PUBLIC_SITE_URL}/conta/pedidos/${orderId}?pagamento=retorno&sessao={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${env.NEXT_PUBLIC_SITE_URL}/conta/pedidos/${orderId}?pagamento=cancelado`,
-        },
-        { idempotencyKey: `checkout_${p.payment_id}`, ...onStore },
-      );
-      await supabase.rpc("attach_checkout_session", { _payment_id: p.payment_id, _session_id: session.id });
-      url = session.url;
-    }
+    if (!r.payment_intent) throw new Error("no_intent");
+    await refundPart(r.payment_intent, r.payment_id, r.amount_cents);
   } catch {
-    redirect(orderUrl(orderId, payErrorMessage("stripe_error")));
+    // Fica marcado para devolução no banco (needs_refund) e a equipe conclui manualmente
+    redirect(withError(back, "stripe_error"));
   }
-  // Sessão anterior já fechada: o pedido mostra o novo estado e o comprador tenta de novo se preciso
-  redirect(url ?? orderUrl(orderId));
+  revalidatePath("/", "layout");
+  redirect(`${back}&ok=${encodeURIComponent("Venda cancelada. O valor foi devolvido ao comprador.")}`);
 }
 
 async function requireSellerStore() {
@@ -116,8 +89,8 @@ export async function connectPayoutAccount() {
     const { data: current } = await supabase.from("store_payment_accounts").select("account_id").eq("store_id", store.id).maybeSingle();
     let accountId = current?.account_id;
     if (!accountId) {
-      // Accounts v2: a loja vende na própria conta (merchant), vê o painel Express e a Stripe cuida do risco
-      // (Managed Risk) e cobra a taxa de processamento direto da loja.
+      // Accounts v2 (Compra Garantida): a Zexi cobra o comprador e transfere para a loja depois da entrega.
+      // A loja é recebedora (stripe_transfers), vê o painel Express; a Zexi responde por taxas e perdas.
       const account = await stripe.v2.core.accounts.create(
         {
           contact_email: user.email,
@@ -128,18 +101,29 @@ export async function connectPayoutAccount() {
             currency: "brl",
             locales: ["pt-BR"],
             profile: { business_url: `${env.NEXT_PUBLIC_SITE_URL}/loja/${store.slug}`, doing_business_as: store.name },
-            responsibilities: { fees_collector: "stripe", losses_collector: "stripe" },
+            responsibilities: { fees_collector: "application", losses_collector: "application" },
           },
           configuration: {
-            merchant: { capabilities: { card_payments: { requested: true }, boleto_payments: { requested: true } } },
+            // No Brasil a capacidade de receber transferências exige card_payments junto
+            merchant: { capabilities: { card_payments: { requested: true } } },
+            recipient: { capabilities: { stripe_balance: { stripe_transfers: { requested: true } } } },
           },
           metadata: { store_id: store.id },
         },
-        { idempotencyKey: `acct_v2_${store.id}`, apiVersion: CONNECT_ACCOUNTS_API_VERSION },
+        { idempotencyKey: `acct_v2r_${store.id}`, apiVersion: CONNECT_ACCOUNTS_API_VERSION },
       );
       const { data: registered, error } = await supabase.rpc("register_payout_account", { _account_id: account.id });
       if (error || !registered) throw new Error(error?.message ?? "register_failed");
       accountId = registered;
+    } else {
+      // Conta criada antes da Compra Garantida: pede também a capacidade de receber transferências da Zexi
+      await stripe.v2.core.accounts
+        .update(
+          accountId,
+          { configuration: { recipient: { capabilities: { stripe_balance: { stripe_transfers: { requested: true } } } } } },
+          { apiVersion: CONNECT_ACCOUNTS_API_VERSION },
+        )
+        .catch(() => undefined);
     }
     const link = await stripe.v2.core.accountLinks.create(
       {

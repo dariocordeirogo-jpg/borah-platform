@@ -19,6 +19,26 @@ export const paymentStatusLabel = {
 
 export type PaymentStatus = keyof typeof paymentStatusLabel;
 
+export type PayoutStatus = "none" | "held" | "ready" | "processing" | "transferred" | "cancelled";
+
+/** Situação do repasse para a loja (Compra Garantida). "none" = cobrança direta antiga, já caiu na loja. */
+export function payoutLabel(p: { status: PaymentStatus; payout_status: PayoutStatus; transferred_at?: string | null }): string {
+  if (p.status !== "succeeded" && p.status !== "refunded") return "—";
+  switch (p.payout_status) {
+    case "none":
+      return "Na sua conta Stripe";
+    case "held":
+      return "Retido até a entrega";
+    case "ready":
+    case "processing":
+      return "Liberado · transferindo";
+    case "transferred":
+      return `Transferido${p.transferred_at ? ` em ${new Date(p.transferred_at).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}` : ""}`;
+    case "cancelled":
+      return "Devolvido ao comprador";
+  }
+}
+
 /** 1000 → "10%"; 1250 → "12,5%" */
 export function bpsToPercent(bps: number): string {
   const v = bps / 100;
@@ -50,6 +70,11 @@ export type V2AccountSnapshot = {
         stripe_balance?: { payouts?: { status?: string } | null } | null;
       } | null;
     } | null;
+    recipient?: {
+      capabilities?: {
+        stripe_balance?: { payouts?: { status?: string } | null; stripe_transfers?: { status?: string } | null } | null;
+      } | null;
+    } | null;
   } | null;
   requirements?: {
     entries?: Array<{ awaiting_action_from?: string; description?: string; minimum_deadline?: { status?: string } | null }> | null;
@@ -58,11 +83,12 @@ export type V2AccountSnapshot = {
 
 /**
  * Converte a conta v2 para o formato que o banco recebe no aviso account.updated.
- * Situação pela capacidade v2: vender = card_payments ativo; receber = payouts ativo.
+ * Situação pela capacidade v2: vender = card_payments ativo; receber = payouts ativo (na conta ou como recebedora).
  * Pendências = o que a loja precisa enviar agora (vencido ou a vencer).
  */
 export function accountStatusFromV2(a: V2AccountSnapshot) {
   const caps = a.configuration?.merchant?.capabilities;
+  const rec = a.configuration?.recipient?.capabilities?.stripe_balance;
   const due = (a.requirements?.entries ?? [])
     .filter((e) => e.awaiting_action_from === "user" && ["currently_due", "past_due"].includes(e.minimum_deadline?.status ?? ""))
     .map((e) => e.description ?? "")
@@ -73,7 +99,8 @@ export function accountStatusFromV2(a: V2AccountSnapshot) {
     livemode: a.livemode,
     metadata: a.metadata ?? {},
     charges_enabled: caps?.card_payments?.status === "active",
-    payouts_enabled: caps?.stripe_balance?.payouts?.status === "active",
+    // Recebe por saque da conta (merchant) ou por transferência da Zexi (recipient)
+    payouts_enabled: caps?.stripe_balance?.payouts?.status === "active" || rec?.payouts?.status === "active",
     details_submitted: due.length === 0,
     requirements: { currently_due: due },
   };
@@ -108,6 +135,8 @@ export function payErrorMessage(message: string | undefined): string {
       return "Já existe um pagamento em processamento (Pix ou boleto). Aguarde a confirmação.";
     case "order_not_found":
       return "Pedido não encontrado.";
+    case "order_not_refundable":
+      return "Esta venda não pode mais ser cancelada com devolução (já enviada ou já repassada).";
     case "store_required":
       return "Crie sua loja antes de conectar os recebimentos.";
     case "not_authenticated":

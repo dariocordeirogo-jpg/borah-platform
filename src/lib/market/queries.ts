@@ -212,7 +212,7 @@ export async function getMyAddresses() {
 }
 
 const ORDER_SELECT =
-  "id, number, status, subtotal_cents, shipping_cents, shipping_service, shipping_days, discount_cents, coupon_code, total_cents, shipping_address, cancelled_reason, created_at, buyer_id, store_id, carrier, tracking_code, shipped_at, delivered_at, delivery_confirmed_by, stores(name, slug, owner_id), order_items(id, title, unit_price_cents, quantity, product_id, products(product_images(path, position))), order_events(kind, detail, created_at)" as const;
+  "id, number, status, subtotal_cents, shipping_cents, shipping_service, shipping_days, discount_cents, coupon_code, total_cents, shipping_address, cancelled_reason, created_at, buyer_id, store_id, carrier, tracking_code, shipped_at, delivered_at, delivery_confirmed_by, stores(name, slug, owner_id), order_items(id, title, unit_price_cents, quantity, product_id, products(product_images(path, position))), order_events(kind, detail, created_at), payments(status, payout_status, amount_cents, net_cents, fee_cents, checkout_payment_id, transferred_at)" as const;
 
 /** Primeira foto de cada item do pedido (para as listas de compras e vendas). */
 export function itemImage(item: { products?: { product_images?: { path: string; position: number }[] } | null }): string | null {

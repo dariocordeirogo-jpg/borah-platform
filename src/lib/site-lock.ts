@@ -10,12 +10,13 @@ export function siteLocked(): boolean {
   return Boolean(process.env.SITE_ACCESS_PASSWORD);
 }
 
-/** Caminhos que continuam abertos com o site fechado (página da senha, saúde, webhooks e arquivos da marca). */
+/** Caminhos que continuam abertos com o site fechado (página da senha, saúde, webhooks, rotinas agendadas e arquivos da marca). */
 export function isOpenPath(pathname: string): boolean {
   return (
     pathname === "/em-construcao" ||
     pathname === "/api/health" ||
     pathname.startsWith("/api/webhooks/") ||
+    pathname.startsWith("/api/jobs/") ||
     pathname === "/robots.txt" ||
     pathname === "/manifest.webmanifest" ||
     pathname === "/icon.svg" ||

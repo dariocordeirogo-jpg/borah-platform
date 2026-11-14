@@ -12,7 +12,7 @@ export async function getOrderPayments(orderId: string) {
   const supabase = await db();
   const { data } = await supabase
     .from("payments")
-    .select("id, status, amount_cents, created_at, paid_at, refunded_at, needs_refund")
+    .select("id, status, amount_cents, created_at, paid_at, refunded_at, needs_refund, checkout_payment_id")
     .eq("order_id", orderId)
     .order("created_at", { ascending: false });
   return data ?? [];
@@ -44,7 +44,7 @@ export async function getStorePayments(storeId: string) {
   const supabase = await db();
   const { data } = await supabase
     .from("payments")
-    .select("id, order_id, status, amount_cents, fee_cents, net_cents, created_at, paid_at, refunded_at, needs_refund, orders(number)")
+    .select("id, order_id, status, amount_cents, fee_cents, net_cents, created_at, paid_at, refunded_at, needs_refund, payout_status, transferred_at, orders(number)")
     .eq("store_id", storeId)
     .in("status", ["processing", "succeeded", "refunded", "failed"])
     .order("created_at", { ascending: false })

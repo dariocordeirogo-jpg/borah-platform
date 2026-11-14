@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isReferralCode, REF_COOKIE } from "@/lib/affiliates/format";
 import { marketErrorMessage } from "@/lib/market/format";
 import { addressSchema } from "@/lib/market/schemas";
+import { startCartCheckout } from "@/lib/pay/cart";
 
 export type FormState = { error?: string; fieldErrors?: Record<string, string[] | undefined>; message?: string };
 
@@ -92,7 +93,7 @@ export async function saveAddress(_prev: FormState, formData: FormData): Promise
 export async function placeOrder(_prev: FormState, formData: FormData): Promise<FormState> {
   const addressId = uuid.safeParse(formData.get("addressId"));
   if (!addressId.success) return { error: "Escolha um endereço de entrega." };
-  const { supabase } = await requireUser("/checkout");
+  const { supabase, user } = await requireUser("/checkout");
   // Indicação (cookie do link /r/<código>): o banco decide se gera comissão
   const ref = (await cookies()).get(REF_COOKIE)?.value;
   const coupon = normalizeCouponCode(String(formData.get("coupon") ?? ""));
@@ -105,7 +106,11 @@ export async function placeOrder(_prev: FormState, formData: FormData): Promise<
   });
   if (error || !data?.length) return { error: marketErrorMessage(error?.message) };
   revalidatePath("/", "layout");
-  redirect(data.length === 1 ? `/conta/pedidos/${data[0]}?novo=1` : "/conta/pedidos?novo=1");
+  const back = data.length === 1 ? `/conta/pedidos/${data[0]}?novo=1` : "/conta/pedidos?novo=1";
+  // Pagamento único: todos os pedidos (um por loja) vão para um Checkout só. Sem pagamento online
+  // (em configuração ou loja ainda ativando), o comprador cai na página do pedido como antes.
+  const pay = await startCartCheckout(supabase, user.email, data, back);
+  redirect("url" in pay ? pay.url : back);
 }
 
 export async function cancelMyOrder(formData: FormData) {

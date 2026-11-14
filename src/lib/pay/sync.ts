@@ -11,15 +11,22 @@ export async function syncCheckoutReturn(sessionId: string) {
   if (!/^cs_(test|live)_[A-Za-z0-9]+$/.test(sessionId)) return;
   const stripe = await getStripe();
   if (!stripe) return;
-  // A sessão existe na conta da loja: a conta vem do pagamento que o próprio comprador pode ler
   const supabase = await createClient();
-  const { data: payment } = await supabase
-    .from("payments")
-    .select("destination_account")
-    .eq("checkout_session_id", sessionId)
-    .maybeSingle();
-  if (!payment) return;
   try {
+    // Cobrança única (conta da Zexi): o comprador lê a própria cobrança
+    const { data: cart } = await supabase.from("checkout_payments").select("id").eq("checkout_session_id", sessionId).maybeSingle();
+    if (cart) {
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (session.status === "complete") await syncStripeObject("checkout.session.completed", session, null);
+      return;
+    }
+    // Cobrança direta antiga: a sessão existe na conta da loja
+    const { data: payment } = await supabase
+      .from("payments")
+      .select("destination_account")
+      .eq("checkout_session_id", sessionId)
+      .maybeSingle();
+    if (!payment) return;
     const session = await stripe.checkout.sessions.retrieve(sessionId, {}, { stripeAccount: payment.destination_account });
     if (session.status === "complete") await syncStripeObject("checkout.session.completed", session, payment.destination_account);
   } catch {
@@ -37,7 +44,7 @@ export async function syncPayoutAccount(storeId: string) {
   try {
     const account = await stripe.v2.core.accounts.retrieve(
       acct.account_id,
-      { include: ["configuration.merchant", "requirements"] },
+      { include: ["configuration.merchant", "configuration.recipient", "requirements"] },
       { apiVersion: CONNECT_ACCOUNTS_API_VERSION },
     );
     await syncStripeObject("account.updated", accountStatusFromV2(account), acct.account_id);
