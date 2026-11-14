@@ -45,6 +45,11 @@ const nextConfig: NextConfig = {
           { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
         ],
       },
+      {
+        // Estúdio da live: a loja pode transmitir pela câmera e microfone do navegador (só aqui, só o próprio site)
+        source: "/seller/lives/:id",
+        headers: [{ key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=()" }],
+      },
     ];
   },
 };
