@@ -713,6 +713,7 @@ export type Database = {
         Returns: {
           disabled_at: string
           playback_id: string
+          provider: "mux" | "cloudflare"
           stream_id: string
         }[]
       }
@@ -755,6 +756,10 @@ export type Database = {
       affiliate_program: { Args: Record<string, never>; Returns: Json };
       attach_live_stream: {
         Args: { _live_id: string; _playback_id: string; _stream_id: string }
+        Returns: undefined
+      }
+      attach_browser_stream: {
+        Args: { _live_id: string; _input_uid: string; _play_url: string }
         Returns: undefined
       }
       become_affiliate: { Args: Record<string, never>; Returns: string };

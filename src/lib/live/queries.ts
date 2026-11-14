@@ -1,6 +1,7 @@
 import "server-only";
 import { hiddenStoreIds, notInList } from "@/lib/test-stores";
 import { connection } from "next/server";
+import { cloudflareConfigured, getCfInput, publishUrl } from "@/lib/live/cloudflare";
 import { getMuxStream, MUX_RTMP_URL, muxConfigured, type MuxStreamStatus } from "@/lib/live/mux";
 import { productImageUrl } from "@/lib/market/images";
 import { createClient } from "@/lib/supabase/server";
@@ -100,15 +101,29 @@ export type StudioStream =
   | { kind: "unconfigured" }
   | { kind: "none" }
   | { kind: "ready"; serverUrl: string; streamKey: string; status: MuxStreamStatus }
+  | { kind: "browser"; publishUrl: string }
   | { kind: "unreachable" };
 
-/** Estúdio (só o dono da loja): transmissão do Mux desta live, com a chave buscada na hora (nunca gravada no banco). */
+/**
+ * Estúdio (só o dono da loja): transmissão desta live. A chave do Mux e o endereço de envio da Cloudflare
+ * são buscados na hora (nunca gravados no banco) e só chegam ao dono.
+ */
 export async function getStudioStream(liveId: string): Promise<StudioStream> {
-  if (!muxConfigured()) return { kind: "unconfigured" };
+  if (!muxConfigured() && !cloudflareConfigured()) return { kind: "unconfigured" };
   const supabase = await db();
   const { data, error } = await supabase.rpc("live_stream_ref", { _live_id: liveId });
   const ref = data?.[0];
   if (error || !ref) return { kind: "none" };
+  if (ref.provider === "cloudflare") {
+    if (!cloudflareConfigured()) return { kind: "unreachable" };
+    try {
+      const url = publishUrl(await getCfInput(ref.stream_id));
+      return url ? { kind: "browser", publishUrl: url } : { kind: "unreachable" };
+    } catch {
+      return { kind: "unreachable" };
+    }
+  }
+  if (!muxConfigured()) return { kind: "unreachable" };
   try {
     const stream = await getMuxStream(ref.stream_id);
     return { kind: "ready", serverUrl: MUX_RTMP_URL, streamKey: stream.stream_key, status: stream.status };
