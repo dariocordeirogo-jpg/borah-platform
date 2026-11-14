@@ -32,3 +32,19 @@ describe("frete", () => {
     expect(shippingErrorMessage("cart_empty")).toBeNull();
   });
 });
+
+describe("previsão de entrega no checkout", () => {
+  it("conta só dias úteis", async () => {
+    const { addBusinessDays } = await import("@/lib/shipping/format");
+    // sexta 13/11/2026 + 1 dia útil = segunda 16/11
+    expect(addBusinessDays(new Date(2026, 10, 13, 12), 1).getDate()).toBe(16);
+    // quarta 11/11 + 3 dias úteis = segunda 16/11
+    expect(addBusinessDays(new Date(2026, 10, 11, 12), 3).getDate()).toBe(16);
+    expect(addBusinessDays(new Date(2026, 10, 11, 12), 0).getDate()).toBe(11);
+  });
+
+  it("monta o texto \"Chega até\"", async () => {
+    const { arrivalLabel } = await import("@/lib/shipping/format");
+    expect(arrivalLabel(2, new Date(2026, 10, 11, 12))).toMatch(/^Chega até seg\.?, 16 de nov/);
+  });
+});

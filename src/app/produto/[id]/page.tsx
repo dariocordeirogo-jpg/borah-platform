@@ -12,16 +12,24 @@ import { getCurrentUser } from "@/lib/auth";
 import { addToCart } from "@/lib/market/actions";
 import { conditionLabel } from "@/lib/market/format";
 import { getProduct } from "@/lib/market/queries";
+import { formatBRL } from "@/lib/format";
+import { JsonLd } from "@/components/seo/json-ld";
+import { site } from "@/lib/site";
 
 export async function generateMetadata({ params }: PageProps<"/produto/[id]">): Promise<Metadata> {
   const { id } = await params;
   const p = await getProduct(id);
   if (!p) return { title: "Produto não encontrado" };
+  const description = (p.description?.replace(/\s+/g, " ").trim().slice(0, 155) || `${p.title} por ${formatBRL(p.price_cents)} na Zexi.`);
+  const images = p.images[0] ? [{ url: p.images[0].url, alt: p.title }] : undefined;
   return {
     title: p.title,
-    description: p.description?.slice(0, 160) ?? `${p.title} na Zexi.`,
+    description,
     alternates: { canonical: `/produto/${p.id}` },
-    openGraph: { title: p.title, images: p.images[0] ? [p.images[0].url] : undefined },
+    // Produto pausado ou sem estoque não deve ser indexado
+    robots: p.status === "active" ? undefined : { index: false, follow: true },
+    openGraph: { type: "website", title: p.title, description, url: `/produto/${p.id}`, images },
+    twitter: { card: "summary_large_image", title: p.title, description, images: images?.map((i) => i.url) },
   };
 }
 
@@ -35,6 +43,26 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
 
   return (
     <div className="grid grid-cols-1 gap-8 [&>*]:min-w-0 md:grid-cols-[1.1fr_1fr]">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: p.title,
+          description: p.description ?? undefined,
+          image: p.images.map((i) => i.url),
+          sku: p.id,
+          category: p.categories?.name,
+          itemCondition: `https://schema.org/${p.condition === "new" ? "NewCondition" : p.condition === "refurbished" ? "RefurbishedCondition" : "UsedCondition"}`,
+          offers: {
+            "@type": "Offer",
+            url: `${site.url}/produto/${p.id}`,
+            priceCurrency: "BRL",
+            price: (p.price_cents / 100).toFixed(2),
+            availability: available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            seller: p.stores ? { "@type": "Organization", name: p.stores.name, url: `${site.url}/loja/${p.stores.slug}` } : undefined,
+          },
+        }}
+      />
       <div className="space-y-4">
         <Gallery images={p.images} title={p.title} />
         <ProductVideo url={p.video_url} title={p.title} />

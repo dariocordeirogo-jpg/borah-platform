@@ -118,7 +118,7 @@ test.describe("Indique e ganhe: venda indicada gera comissão", () => {
     await page.getByRole("button", { name: "Comprar agora" }).click();
     await expect(page).toHaveURL(/\/carrinho$/);
     await page.getByRole("link", { name: "Finalizar compra" }).click();
-    await expect(page.getByRole("heading", { name: "Seu pedido" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Resumo da compra" })).toBeVisible();
     if (await page.getByLabel("Quem vai receber").isVisible()) {
       await page.getByLabel("Quem vai receber").fill("Compradora Teste");
       await page.getByLabel("CEP").fill("01001-000");

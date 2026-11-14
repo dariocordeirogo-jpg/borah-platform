@@ -3,6 +3,7 @@ import { Inter, Sora } from "next/font/google";
 import { BottomNav } from "@/components/bottom-nav";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { JsonLd } from "@/components/seo/json-ld";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -17,7 +18,8 @@ export const metadata: Metadata = {
   },
   description: site.description,
   applicationName: site.name,
-  alternates: { canonical: "/" },
+  keywords: ["marketplace", "leilão online", "vendas ao vivo", "live commerce", "comprar online", "vender online", "Zexi"],
+  formatDetection: { telephone: false },
   openGraph: {
     type: "website",
     locale: "pt_BR",
@@ -41,6 +43,23 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#conteudo" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">
           Pular para o conteúdo
         </a>
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@graph": [
+              { "@type": "Organization", "@id": `${site.url}/#org`, name: site.name, url: site.url, logo: `${site.url}/brand/icon-512.png`, slogan: site.slogan },
+              {
+                "@type": "WebSite",
+                "@id": `${site.url}/#site`,
+                name: site.name,
+                url: site.url,
+                inLanguage: "pt-BR",
+                publisher: { "@id": `${site.url}/#org` },
+                potentialAction: { "@type": "SearchAction", target: `${site.url}/market?q={search_term_string}`, "query-input": "required name=search_term_string" },
+              },
+            ],
+          }}
+        />
         <Header />
         <main id="conteudo" className="flex-1">
           {children}
