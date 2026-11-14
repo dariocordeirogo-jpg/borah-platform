@@ -38,6 +38,11 @@ no navegador). Links HLS de outros serviços continuam no hls.js.
 - IDs do Mux validados (`^[A-Za-z0-9]{10,100}$`) antes de virar URL.
 - Teste: `supabase/tests/live_mux.sql` e `tests/unit/mux.test.ts`.
 
+## Quem está assistindo
+
+- Contador "N assistindo" na live e no estúdio, pela presença do Supabase Realtime (canal `live-presence-<id>`).
+- Só quem assiste entra na contagem; o estúdio observa. Número aproximado, só para exibição (nada de dinheiro depende dele).
+
 ## Pendências
 
 - Suspensão de loja cancela as lives no banco, mas não desliga as transmissões no Mux (só o encerramento de uma

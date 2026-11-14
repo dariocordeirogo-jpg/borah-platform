@@ -108,6 +108,9 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     await expect(highlight).toContainText(bag);
     await expect(highlight.getByRole("button", { name: "Comprar agora" })).toBeVisible();
     await expect(viewer.getByText("AO VIVO", { exact: true })).toBeVisible();
+    // Quem assiste entra na contagem; o estúdio da loja só observa
+    await expect(studio.getByTestId("espectadores")).toHaveText(/\b1 assistindo/, { timeout: 15_000 });
+    await expect(viewer.getByTestId("espectadores")).toHaveText(/\b1 assistindo/);
 
     // Espera os dois chats conectarem ao tempo real antes de conversar
     await expect(viewer.getByRole("region", { name: "Chat da live" })).toHaveAttribute("data-realtime", "on");

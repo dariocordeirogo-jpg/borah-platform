@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import Image from "next/image";
 import { ExternalLink, Gavel, Pin, PinOff, ShoppingBag } from "lucide-react";
 import { LiveChat } from "@/components/live/chat";
+import { ViewerCount } from "@/components/live/viewer-count";
 import { LiveRefresh } from "@/components/live/live-refresh";
 import { Notice } from "@/components/market";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
             {liveStatusLabel[live.status]}
           </p>
           <h1 className="font-display text-2xl font-bold tracking-tight text-navy">{live.title}</h1>
+          {isLive && <ViewerCount liveId={live.id} className="mr-3" />}
           <Link href={`/live/${live.id}`} className="inline-flex items-center gap-1 text-sm text-brand hover:underline">
             Ver como público <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
           </Link>
