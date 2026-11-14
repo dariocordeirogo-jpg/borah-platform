@@ -98,7 +98,7 @@ test.describe("ZEXI MARKET: do anúncio ao pedido", () => {
 
     await page.getByRole("link", { name: "Finalizar compra" }).click();
     await expect(page).toHaveURL(/\/checkout$/);
-    await expect(page.getByRole("heading", { name: "Seu pedido" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Resumo da compra" })).toBeVisible();
     if (await page.getByLabel("Quem vai receber").isVisible()) {
       await page.getByLabel("Quem vai receber").fill("Comprador Teste");
       await page.getByLabel("CEP").fill("01001-000");

@@ -60,3 +60,22 @@ export function shippingErrorMessage(message: string | undefined): string | null
       return null;
   }
 }
+
+/** Soma dias úteis (seg–sex) a uma data. Só para exibir a previsão; o prazo que vale é o da loja. */
+export function addBusinessDays(from: Date, days: number): Date {
+  const d = new Date(from);
+  let left = Math.max(0, Math.ceil(days));
+  while (left > 0) {
+    d.setDate(d.getDate() + 1);
+    const wd = d.getDay();
+    if (wd !== 0 && wd !== 6) left--;
+  }
+  return d;
+}
+
+/** "Chega até sex., 22 de nov." a partir de hoje + prazo em dias úteis (fuso de São Paulo). */
+export function arrivalLabel(days: number, from: Date = new Date()): string {
+  const date = addBusinessDays(from, days + 1); // +1 dia útil para postagem
+  const txt = date.toLocaleDateString("pt-BR", { weekday: "short", day: "numeric", month: "short", timeZone: "America/Sao_Paulo" });
+  return `Chega até ${txt}`;
+}

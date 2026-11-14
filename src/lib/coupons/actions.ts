@@ -57,12 +57,18 @@ export async function toggleCoupon(formData: FormData) {
 }
 
 /** Checkout: prévia do cupom digitado (o desconto final é decidido pelo banco ao fechar o pedido). */
-export async function previewCoupon(code: string): Promise<{ ok?: string; error?: string }> {
+export async function previewCoupon(
+  code: string,
+): Promise<{ ok?: string; error?: string; discountCents?: number; storeName?: string }> {
   const c = normalizeCouponCode(code);
   if (!isCouponCode(c)) return { error: fail("coupon_invalid") };
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("check_coupon", { _code: c });
   if (error || !data) return { error: couponErrorMessage(error?.message) ?? "Não foi possível conferir o cupom agora." };
   const d = data as { store_name: string; discount_cents: number };
-  return { ok: `Cupom ${c}: ${formatBRL(d.discount_cents)} de desconto nos produtos de ${d.store_name}.` };
+  return {
+    ok: `Cupom ${c}: ${formatBRL(d.discount_cents)} de desconto nos produtos de ${d.store_name}.`,
+    discountCents: d.discount_cents,
+    storeName: d.store_name,
+  };
 }

@@ -84,7 +84,7 @@ test.describe("Cupons: loja cria, compradora usa", () => {
   test("compradora aplica o cupom e o pedido sai com desconto", async ({ browser }) => {
     await buyer.c.from("cart_items").insert({ user_id: buyer.id, product_id: productId, quantity: 1 });
     const page = await browserAs(browser, BUYER, "/checkout");
-    await expect(page.getByRole("heading", { name: "Seu pedido" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Resumo da compra" })).toBeVisible();
     if (await page.getByLabel("Quem vai receber").isVisible()) {
       await page.getByLabel("Quem vai receber").fill("Compradora Teste");
       await page.getByLabel("CEP").fill("01001-000");
