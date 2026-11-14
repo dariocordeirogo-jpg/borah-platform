@@ -66,6 +66,11 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
       <LiveRefresh liveId={live.id} />
       <div className="space-y-4">
         <LivePlayer src={live.playback_url} status={live.status} title={live.title} />
+        {live.status === "live" && live.stream_signal === "idle" && (
+          <p role="status" data-testid="sinal-caiu" className="rounded-lg bg-navy-soft px-3 py-2 text-sm text-navy">
+            O sinal da loja caiu. Fique por aqui: o vídeo volta sozinho assim que a transmissão retornar.
+          </p>
+        )}
         <div>
           <p className="text-xs font-semibold text-muted">
             {liveStatusLabel[live.status]} ·{" "}
