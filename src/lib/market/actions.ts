@@ -29,6 +29,9 @@ export async function addToCart(formData: FormData) {
   const productId = uuid.parse(formData.get("productId"));
   const quantity = Math.min(99, Math.max(1, Number(formData.get("quantity")) || 1));
   const buyNow = formData.get("buyNow") === "1";
+  // Compra feita de dentro de uma live: o banco só aceita a marca se o produto estiver na live
+  const liveParsed = uuid.safeParse(formData.get("liveId"));
+  const liveId = liveParsed.success ? liveParsed.data : null;
   const { supabase, user } = await requireUser(`/produto/${productId}`);
 
   const { data: existing } = await supabase
@@ -41,11 +44,14 @@ export async function addToCart(formData: FormData) {
   if (existing) {
     await supabase
       .from("cart_items")
-      .update({ quantity: Math.min(99, buyNow ? Math.max(existing.quantity, quantity) : existing.quantity + quantity) })
+      .update({
+        quantity: Math.min(99, buyNow ? Math.max(existing.quantity, quantity) : existing.quantity + quantity),
+        ...(liveId ? { live_id: liveId } : {}),
+      })
       .eq("user_id", user.id)
       .eq("product_id", productId);
   } else {
-    await supabase.from("cart_items").insert({ user_id: user.id, product_id: productId, quantity });
+    await supabase.from("cart_items").insert({ user_id: user.id, product_id: productId, quantity, live_id: liveId });
   }
   revalidatePath("/", "layout");
   redirect(buyNow ? "/carrinho" : `/produto/${productId}?adicionado=1`);

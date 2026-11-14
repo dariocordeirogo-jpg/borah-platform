@@ -38,6 +38,14 @@ no navegador). Links HLS de outros serviços continuam no hls.js.
 - IDs do Mux validados (`^[A-Za-z0-9]{10,100}$`) antes de virar URL.
 - Teste: `supabase/tests/live_mux.sql` e `tests/unit/mux.test.ts`.
 
+## Vendas por live
+
+- O botão de compra dentro da live manda `liveId` junto; o item entra no carrinho com `cart_items.live_id`.
+- O banco só aceita a marca se o produto estiver na live (programada ou no ar); senão grava sem marca.
+- No checkout o pedido herda a live (`orders.live_id`) — mesmo preço, estoque e pagamento de sempre.
+- O estúdio mostra "Vendas desta live" (pedidos pagos e aguardando pagamento).
+- Teste: `supabase/tests/live_atribuicao.sql` e o passo de compra em `tests/e2e/live.spec.ts`.
+
 ## Pendências
 
 - Suspensão de loja cancela as lives no banco, mas não desliga as transmissões no Mux (só o encerramento de uma

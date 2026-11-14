@@ -18,7 +18,7 @@ import { addToCart } from "@/lib/market/actions";
 
 export const metadata: Metadata = { title: "Live" };
 
-function ProductRow({ p, highlight }: { p: LiveProduct; highlight?: boolean }) {
+function ProductRow({ p, highlight, liveId }: { p: LiveProduct; highlight?: boolean; liveId: string }) {
   return (
     <div className={highlight ? "flex items-center gap-3 rounded-xl border-2 border-brand bg-white p-3" : "flex items-center gap-3 p-3"}>
       <Link href={`/produto/${p.id}`} className="flex min-w-0 flex-1 items-center gap-3">
@@ -39,6 +39,7 @@ function ProductRow({ p, highlight }: { p: LiveProduct; highlight?: boolean }) {
           <input type="hidden" name="productId" value={p.id} />
           <input type="hidden" name="quantity" value="1" />
           <input type="hidden" name="buyNow" value="1" />
+          <input type="hidden" name="liveId" value={liveId} />
           <Button type="submit" variant={highlight ? "buy" : "outline"} size="sm">
             {highlight ? "Comprar agora" : "Comprar"}
           </Button>
@@ -132,7 +133,7 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
         {pinned && !activeAuction && (
           <section aria-label="Produto em destaque">
             <p className="mb-2 text-xs font-bold tracking-wider text-brand">EM DESTAQUE AGORA</p>
-            <ProductRow p={pinned} highlight />
+            <ProductRow p={pinned} highlight liveId={live.id} />
           </section>
         )}
         <LiveChat
@@ -146,7 +147,7 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
             <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-navy">Produtos da live</h2>
             <div className="divide-y divide-line">
               {products.map((p) => (
-                <ProductRow key={p.id} p={p} />
+                <ProductRow key={p.id} p={p} liveId={live.id} />
               ))}
             </div>
           </section>

@@ -116,3 +116,14 @@ export async function getStudioStream(liveId: string): Promise<StudioStream> {
     return { kind: "unreachable" };
   }
 }
+
+export type LiveSales = { orders: number; paid: number; totalCents: number };
+
+/** Vendas atribuídas à live (pedidos não cancelados). A loja só lê os próprios pedidos (RLS). */
+export async function getLiveSales(liveId: string): Promise<LiveSales> {
+  const supabase = await db();
+  const { data } = await supabase.from("orders").select("status, total_cents").eq("live_id", liveId).neq("status", "cancelled");
+  const rows = data ?? [];
+  const paid = rows.filter((o) => o.status !== "pending_payment");
+  return { orders: rows.length, paid: paid.length, totalCents: paid.reduce((s, o) => s + o.total_cents, 0) };
+}
