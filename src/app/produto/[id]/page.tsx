@@ -16,6 +16,7 @@ import { getProduct, listProducts } from "@/lib/market/queries";
 import { cn } from "@/lib/utils";
 import { formatBRL } from "@/lib/format";
 import { JsonLd } from "@/components/seo/json-ld";
+import { TrackView } from "@/components/home/recently-viewed";
 import { site } from "@/lib/site";
 
 export async function generateMetadata({ params }: PageProps<"/produto/[id]">): Promise<Metadata> {
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: PageProps<"/produto/[id]">): 
     description,
     alternates: { canonical: `/produto/${p.id}` },
     // Produto pausado ou sem estoque não deve ser indexado
-    robots: p.status === "active" ? undefined : { index: false, follow: true },
+    robots: p.status === "active" && !p.is_showcase ? undefined : { index: false, follow: true },
     openGraph: { type: "website", title: p.title, description, url: `/produto/${p.id}`, images },
     twitter: { card: "summary_large_image", title: p.title, description, images: images?.map((i) => i.url) },
   };
@@ -49,7 +50,7 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
 
   const buyBox = (
     <div className="rounded-lg border border-line p-4">
-      <p className="text-sm font-semibold text-ink">{available ? "Estoque disponível" : "Sem estoque"}</p>
+      <p className="text-sm font-semibold text-ink">{available ? "Estoque disponível" : p.is_showcase ? "Em breve" : "Sem estoque"}</p>
       <p className="mt-1 flex items-start gap-2 text-sm text-ink">
         <Truck className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
         <span>
@@ -72,6 +73,12 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
           <Notice>Este produto está em {p.status === "draft" ? "rascunho" : "pausa"} e só você o vê.</Notice>
         ) : own ? (
           <Notice>Este produto é da sua loja.</Notice>
+        ) : p.is_showcase ? (
+          <Notice>
+            <span data-testid="vitrine-aviso">
+              <strong>Demonstração:</strong> produto de vitrine, ainda sem estoque para venda. Em breve na Zexi.
+            </span>
+          </Notice>
         ) : !available ? (
           <Notice tone="error">Esgotado no momento.</Notice>
         ) : (
@@ -126,7 +133,10 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
 
   return (
     <div className="space-y-4">
-      <JsonLd
+      <TrackView
+        product={{ id: p.id, title: p.title, imageUrl: p.images[0]?.url ?? null, priceCents: p.price_cents, compareAtCents: p.compare_at_cents }}
+      />
+      {!p.is_showcase && <JsonLd
         data={{
           "@context": "https://schema.org",
           "@type": "Product",
@@ -145,7 +155,7 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
             seller: p.stores ? { "@type": "Organization", name: p.stores.name, url: `${site.url}/loja/${p.stores.slug}` } : undefined,
           },
         }}
-      />
+      />}
       <nav aria-label="Você está em" className="flex flex-wrap items-center gap-1 text-xs text-muted">
         <Link href="/market" className="text-brand hover:underline">
           Market

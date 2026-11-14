@@ -79,7 +79,8 @@ export function MarketProductCard({ product, priority }: { product: ProductCardD
       compareAtCents={product.compareAtCents}
       store={product.store?.name}
       priority={priority}
-      meta={product.stock > 0 ? conditionLabel[product.condition] : <span className="font-semibold text-danger">Esgotado</span>}
+      demo={product.showcase}
+      meta={product.showcase ? <span className="font-semibold text-navy-2">Em breve</span> : product.stock > 0 ? conditionLabel[product.condition] : <span className="font-semibold text-danger">Esgotado</span>}
       action={product.stock > 0 ? <QuickAdd productId={product.id} title={product.title} /> : undefined}
     />
   );

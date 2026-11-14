@@ -17,10 +17,12 @@ export type ProductCardData = {
   condition: Enums<"product_condition">;
   imageUrl: string | null;
   store: { name: string; slug: string } | null;
+  /** Produto de vitrine (demonstração, sem estoque) */
+  showcase: boolean;
 };
 
 const CARD_SELECT =
-  "id, title, price_cents, compare_at_cents, stock, condition, product_images(path, position), stores(name, slug)" as const;
+  "id, title, price_cents, compare_at_cents, stock, condition, is_showcase, product_images(path, position), stores(name, slug)" as const;
 
 type CardRow = {
   id: string;
@@ -29,6 +31,7 @@ type CardRow = {
   compare_at_cents: number | null;
   stock: number;
   condition: Enums<"product_condition">;
+  is_showcase: boolean;
   product_images: { path: string; position: number }[] | null;
   stores: { name: string; slug: string } | null;
 };
@@ -44,6 +47,7 @@ function toCard(r: CardRow): ProductCardData {
     condition: r.condition,
     imageUrl: first ? productImageUrl(first.path) : null,
     store: r.stores,
+    showcase: r.is_showcase,
   };
 }
 
@@ -91,6 +95,8 @@ export async function listProducts(opts: {
   if (opts.condition) query = query.eq("condition", opts.condition);
   if (opts.q) query = query.textSearch("search", opts.q, { type: "websearch", config: "portuguese" });
 
+  // Anúncios reais vêm antes dos produtos de vitrine
+  query = query.order("is_showcase", { ascending: true });
   if (opts.sort === "menor-preco") query = query.order("price_cents", { ascending: true });
   else if (opts.sort === "maior-preco") query = query.order("price_cents", { ascending: false });
   else query = query.order("created_at", { ascending: false });
@@ -112,7 +118,7 @@ export async function getProduct(id: string) {
   const { data } = await supabase
     .from("products")
     .select(
-      "id, title, description, price_cents, compare_at_cents, stock, condition, status, store_id, video_url, product_images(id, path, position), stores(id, name, slug, owner_id), categories(name, slug)",
+      "id, title, description, price_cents, compare_at_cents, stock, condition, status, is_showcase, store_id, video_url, product_images(id, path, position), stores(id, name, slug, owner_id), categories(name, slug)",
     )
     .eq("id", id)
     .maybeSingle();
