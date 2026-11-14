@@ -64,6 +64,11 @@ Teste: `supabase/tests/live_navegador.sql` e `tests/unit/cloudflare-stream.test.
 - O estúdio mostra "Vendas desta live" (pedidos pagos e aguardando pagamento).
 - Teste: `supabase/tests/live_atribuicao.sql` e o passo de compra em `tests/e2e/live.spec.ts`.
 
+## Quem está assistindo
+
+- Contador "N assistindo" na live e no estúdio, pela presença do Supabase Realtime (canal `live-presence-<id>`).
+- Só quem assiste entra na contagem; o estúdio observa. Número aproximado, só para exibição (nada de dinheiro depende dele).
+
 ## Pendências
 
 - Suspensão de loja cancela as lives no banco, mas não desliga as transmissões no Mux (só o encerramento de uma
