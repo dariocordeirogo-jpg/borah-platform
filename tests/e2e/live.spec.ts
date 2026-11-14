@@ -77,6 +77,10 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     await expect(studio).toHaveURL(/\/seller\/lives\/[0-9a-f-]{36}\?nova=1$/);
     await expect(studio.getByTestId("estado-live")).toHaveText("Programada");
     livePath = `/live/${new URL(studio.url()).pathname.split("/").pop()}`;
+    // Câmera e microfone liberados só no estúdio (transmissão pelo navegador); no resto do site seguem bloqueados
+    const studioHeaders = (await studio.request.get(new URL(studio.url()).pathname)).headers();
+    expect(studioHeaders["permissions-policy"]).toContain("camera=(self)");
+    expect((await studio.request.get(livePath)).headers()["permissions-policy"]).toContain("camera=()");
 
     await page.goto("/ao-vivo");
     await expect(page.getByRole("heading", { name: "Próximas lives" })).toBeVisible();

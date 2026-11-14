@@ -2,10 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Radio } from "lucide-react";
-import { muxPlaybackId } from "@/lib/live/format";
+import { isWhepUrl, muxPlaybackId } from "@/lib/live/format";
+import { play, type WebRtcSession } from "@/lib/live/webrtc";
 
 /**
  * Player da live. Transmissão do Mux: Mux Player (baixa latência, carregado só quando precisa).
+ * Transmissão pelo navegador (Cloudflare Stream): WebRTC/WHEP, menos de 1 s de atraso.
  * Outros serviços: HLS puro — Safari toca .m3u8 nativamente; nos demais navegadores usa hls.js.
  */
 export function LivePlayer({
@@ -19,8 +21,51 @@ export function LivePlayer({
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const muxRef = useRef<HTMLDivElement>(null);
+  const rtcRef = useRef<HTMLVideoElement>(null);
   const [failed, setFailed] = useState(false);
+  const [waiting, setWaiting] = useState(false);
   const playbackId = muxPlaybackId(src);
+  const whep = isWhepUrl(src) ? src : null;
+
+  // WebRTC (WHEP): enquanto a loja não liga a câmera a Cloudflare recusa; tenta de novo a cada 5 s
+  useEffect(() => {
+    const video = rtcRef.current;
+    if (!video || !whep || status !== "live") return;
+    let current: WebRtcSession | null = null;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let stopped = false;
+    const retry = () => {
+      if (!stopped) timer = setTimeout(connect, 5000);
+    };
+    const connect = async () => {
+      try {
+        const s = await play(whep, (media) => {
+          if (video.srcObject !== media) video.srcObject = media;
+          setWaiting(false);
+        });
+        if (stopped) return void s.stop();
+        current = s;
+        s.pc.addEventListener("connectionstatechange", () => {
+          if (s.pc.connectionState === "failed" || s.pc.connectionState === "closed") {
+            void s.stop();
+            if (current === s) current = null;
+            setWaiting(true);
+            retry();
+          }
+        });
+      } catch {
+        setWaiting(true);
+        retry();
+      }
+    };
+    void connect();
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+      void current?.stop();
+      video.srcObject = null;
+    };
+  }, [whep, status]);
 
   // Mux Player: web component criado no navegador (não roda no servidor)
   useEffect(() => {
@@ -52,7 +97,7 @@ export function LivePlayer({
 
   useEffect(() => {
     const video = ref.current;
-    if (!video || !src || playbackId || status !== "live") return;
+    if (!video || !src || playbackId || whep || status !== "live") return;
     let destroy: (() => void) | undefined;
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
@@ -67,7 +112,7 @@ export function LivePlayer({
       });
     }
     return () => destroy?.();
-  }, [src, playbackId, status]);
+  }, [src, playbackId, whep, status]);
 
   const message =
     status === "scheduled"
@@ -78,12 +123,17 @@ export function LivePlayer({
           ? "A loja está preparando a transmissão. Fique por aqui!"
           : failed
             ? "Não foi possível carregar o vídeo agora. Tente recarregar a página."
-            : null;
+            : waiting
+              ? "A loja está ligando a câmera. O vídeo começa sozinho em instantes."
+              : null;
 
   return (
     <div className="relative aspect-[9/16] max-h-[78dvh] w-full overflow-hidden rounded-[var(--radius-card)] bg-navy md:aspect-video">
       {status === "live" && playbackId && !failed && <div ref={muxRef} className="h-full w-full" />}
-      {status === "live" && src && !playbackId && !failed && (
+      {status === "live" && whep && (
+        <video ref={rtcRef} className="h-full w-full object-contain" autoPlay muted playsInline controls data-testid="live-video" />
+      )}
+      {status === "live" && src && !playbackId && !whep && !failed && (
         <video ref={ref} className="h-full w-full object-contain" autoPlay muted playsInline controls data-testid="live-video" />
       )}
       {message && (
