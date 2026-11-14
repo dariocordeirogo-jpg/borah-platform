@@ -28,6 +28,8 @@
   --color-muted: #5A6878;
   --color-line: #E3E6EB;
   --color-surface: #F5F6F8;
+  /* Fundo das páginas: cinza-claro neutro com os blocos em branco por cima */
+  --color-page: #EDEDED;
   --color-surface-2: #EDEFF3;
   --color-danger: #B42318;
   --color-success: #1E7A46;
@@ -47,7 +49,7 @@
     color-scheme: light;
   }
   body {
-    background: var(--color-surface);
+    background: var(--color-page);
     color: var(--color-ink);
     font-family: var(--font-sans);
   }

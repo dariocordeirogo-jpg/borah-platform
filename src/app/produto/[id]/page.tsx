@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Flag, PackageCheck, ShieldCheck, ShoppingCart, Store, Truck } from "lucide-react";
+import { Banknote, ChevronRight, CreditCard, Flag, Lock, PackageCheck, QrCode, ShieldCheck, ShoppingCart, Truck } from "lucide-react";
 import { Gallery } from "@/components/gallery";
 import { ProductVideo } from "@/components/product/product-video";
-import { Notice, Price } from "@/components/market";
+import { BigPrice } from "@/components/listing";
+import { MarketProductCard, Notice } from "@/components/market";
 import { Button } from "@/components/ui/button";
 import { isStaff } from "@/lib/admin/format";
 import { getCurrentUser } from "@/lib/auth";
 import { addToCart } from "@/lib/market/actions";
 import { conditionLabel } from "@/lib/market/format";
-import { getProduct } from "@/lib/market/queries";
+import { getProduct, listProducts } from "@/lib/market/queries";
+import { cn } from "@/lib/utils";
 import { formatBRL } from "@/lib/format";
 import { JsonLd } from "@/components/seo/json-ld";
 import { site } from "@/lib/site";
@@ -41,8 +43,89 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
   const available = p.status === "active" && p.stock > 0;
   const maxQty = Math.min(p.stock, 10);
 
+  // Mais produtos da mesma loja (como "Produtos do vendedor")
+  const more = p.stores ? (await listProducts({ storeId: p.stores.id, limit: 7 })).items.filter((x) => x.id !== p.id).slice(0, 6) : [];
+  const off = p.compare_at_cents && p.compare_at_cents > p.price_cents ? Math.round((1 - p.price_cents / p.compare_at_cents) * 100) : null;
+
+  const buyBox = (
+    <div className="rounded-lg border border-line p-4">
+      <p className="text-sm font-semibold text-ink">{available ? "Estoque disponível" : "Sem estoque"}</p>
+      <p className="mt-1 flex items-start gap-2 text-sm text-ink">
+        <Truck className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+        <span>
+          <span className="font-semibold text-ink">Envio para todo o Brasil</span>
+          <span className="block text-xs text-muted">Frete PAC ou SEDEX calculado pelo seu CEP na finalização da compra.</span>
+        </span>
+      </p>
+      {sp.adicionado && (
+        <div className="mt-3">
+          <Notice tone="success">
+            Adicionado ao carrinho.{" "}
+            <Link href="/carrinho" className="font-semibold underline">
+              Ver carrinho
+            </Link>
+          </Notice>
+        </div>
+      )}
+      <div className="mt-4">
+        {p.status !== "active" ? (
+          <Notice>Este produto está em {p.status === "draft" ? "rascunho" : "pausa"} e só você o vê.</Notice>
+        ) : own ? (
+          <Notice>Este produto é da sua loja.</Notice>
+        ) : !available ? (
+          <Notice tone="error">Esgotado no momento.</Notice>
+        ) : (
+          <form action={addToCart} className="space-y-3">
+            <input type="hidden" name="productId" value={p.id} />
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <label htmlFor="quantity" className="text-ink">
+                Quantidade
+              </label>
+              <select id="quantity" name="quantity" defaultValue="1" className="h-9 rounded-md border border-line bg-white px-2 text-sm font-semibold">
+                {Array.from({ length: maxQty }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1} {i === 0 ? "unidade" : "unidades"}
+                  </option>
+                ))}
+              </select>
+              <span className="text-muted">
+                ({p.stock} {p.stock === 1 ? "disponível" : "disponíveis"})
+              </span>
+            </div>
+            <Button type="submit" name="buyNow" value="1" variant="buy" size="lg" className="w-full">
+              Comprar agora
+            </Button>
+            <Button type="submit" variant="outline" size="lg" className="w-full">
+              <ShoppingCart className="h-5 w-5" aria-hidden="true" /> Adicionar ao carrinho
+            </Button>
+          </form>
+        )}
+      </div>
+      {p.stores && (
+        <p className="mt-4 text-sm text-muted">
+          Vendido por{" "}
+          <Link href={`/loja/${p.stores.slug}`} className="font-semibold text-brand hover:underline">
+            {p.stores.name}
+          </Link>
+        </p>
+      )}
+      <ul className="mt-4 space-y-3 text-sm">
+        <li className="flex gap-2">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-navy-2" aria-hidden="true" />
+          <span className="text-muted">
+            <span className="font-semibold text-brand">Compra Garantida</span>: o valor fica retido e a loja só recebe depois que você confirma a entrega.
+          </span>
+        </li>
+        <li className="flex gap-2">
+          <Lock className="mt-0.5 h-4 w-4 shrink-0 text-navy-2" aria-hidden="true" />
+          <span className="text-muted">Pagamento seguro pelo ZEXI PAY. Um pagamento só, mesmo comprando de várias lojas.</span>
+        </li>
+      </ul>
+    </div>
+  );
+
   return (
-    <div className="grid grid-cols-1 gap-8 [&>*]:min-w-0 md:grid-cols-[1.1fr_1fr]">
+    <div className="space-y-4">
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -63,114 +146,150 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
           },
         }}
       />
-      <div className="space-y-4">
-        <Gallery images={p.images} title={p.title} />
-        <ProductVideo url={p.video_url} title={p.title} />
-      </div>
-      <div>
+      <nav aria-label="Você está em" className="flex flex-wrap items-center gap-1 text-xs text-muted">
+        <Link href="/market" className="text-brand hover:underline">
+          Market
+        </Link>
         {p.categories && (
-          <Link href={`/market?categoria=${p.categories.slug}`} className="text-xs font-semibold text-brand hover:underline">
-            {p.categories.name}
-          </Link>
+          <>
+            <ChevronRight className="h-3 w-3" aria-hidden="true" />
+            <Link href={`/market?categoria=${p.categories.slug}`} className="text-brand hover:underline">
+              {p.categories.name}
+            </Link>
+          </>
         )}
-        <h1 className="mt-1 font-display text-2xl font-bold leading-tight tracking-tight text-navy md:text-3xl">{p.title}</h1>
-        <p className="mt-1 text-sm text-muted">{conditionLabel[p.condition]}</p>
+        {p.stores && (
+          <span className="ml-auto">
+            <Link href={`/loja/${p.stores.slug}`} className="text-brand hover:underline">
+              Ver mais da loja
+            </Link>
+          </span>
+        )}
+      </nav>
 
-        <div className="mt-4">
-          <Price cents={p.price_cents} compareAt={p.compare_at_cents} size="lg" />
+      <div className="rounded-md bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,0.12)] md:p-6">
+        <div className="grid grid-cols-1 gap-6 [&>*]:min-w-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_300px]">
+          <div className="space-y-4">
+            <Gallery images={p.images} title={p.title} />
+          </div>
+
+          <div>
+            <p className="text-xs text-muted">
+              {conditionLabel[p.condition]}
+              {p.categories ? ` | ${p.categories.name}` : ""}
+            </p>
+            <h1 className="mt-1 text-xl font-semibold leading-snug text-ink md:text-[22px]">{p.title}</h1>
+            <div className="mt-4">
+              {p.compare_at_cents && off ? <p className="text-sm text-muted line-through">{formatBRL(p.compare_at_cents)}</p> : null}
+              <p className="flex flex-wrap items-center gap-3">
+                <BigPrice cents={p.price_cents} className="text-[34px] leading-none" />
+                {off ? <span className="text-lg font-semibold text-brand">{off}% OFF</span> : null}
+              </p>
+              <p className="mt-2 text-sm text-ink">
+                Pague com <span className="font-semibold">cartão, Pix ou boleto</span>
+              </p>
+            </div>
+            <p className="mt-4 rounded-md bg-surface px-3 py-2 text-sm text-ink">
+              <span className="font-semibold">Comprando de várias lojas?</span> Você paga tudo de uma vez só, num único checkout.
+            </p>
+            {p.description && (
+              <div className="mt-5 hidden md:block">
+                <h2 className="text-base font-semibold text-ink">O que você precisa saber sobre este produto</h2>
+                <p className="mt-2 line-clamp-6 whitespace-pre-line text-sm leading-relaxed text-muted">{p.description}</p>
+                <a href="#descricao" className="mt-1 inline-block text-sm text-brand hover:underline">
+                  Ver descrição completa
+                </a>
+              </div>
+            )}
+          </div>
+
+          <aside className="space-y-4 md:col-span-2 lg:col-span-1">
+            {buyBox}
+            <PaymentMethods />
+          </aside>
         </div>
 
-        {sp.adicionado && (
-          <div className="mt-4">
-            <Notice tone="success">
-              Adicionado ao carrinho.{" "}
-              <Link href="/carrinho" className="font-semibold underline">
-                Ver carrinho
-              </Link>
-            </Notice>
+        {p.video_url && (
+          <div className="mt-6 max-w-3xl">
+            <ProductVideo url={p.video_url} title={p.title} />
           </div>
         )}
 
-        <div className="mt-6 rounded-[var(--radius-card)] border border-line bg-white p-4 shadow-[var(--shadow-card)]">
-          {p.status !== "active" ? (
-            <Notice>Este produto está em {p.status === "draft" ? "rascunho" : "pausa"} e só você o vê.</Notice>
-          ) : own ? (
-            <Notice>Este produto é da sua loja.</Notice>
-          ) : !available ? (
-            <Notice tone="error">Esgotado no momento.</Notice>
-          ) : (
-            <form action={addToCart} className="space-y-3">
-              <input type="hidden" name="productId" value={p.id} />
-              <div className="flex items-center gap-3">
-                <label htmlFor="quantity" className="text-sm font-medium text-navy">
-                  Quantidade
-                </label>
-                <select id="quantity" name="quantity" defaultValue="1" className="h-10 rounded-lg border border-line bg-white px-3 text-sm">
-                  {Array.from({ length: maxQty }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
-                </select>
-                <span className="text-sm text-muted">
-                  {p.stock} {p.stock === 1 ? "disponível" : "disponíveis"}
-                </span>
-              </div>
-              <Button type="submit" name="buyNow" value="1" variant="buy" size="lg" className="w-full">
-                Comprar agora
-              </Button>
-              <Button type="submit" variant="outline" size="lg" className="w-full">
-                <ShoppingCart className="h-5 w-5" aria-hidden="true" /> Adicionar ao carrinho
-              </Button>
-            </form>
-          )}
-          <ul className="mt-4 space-y-2 border-t border-line pt-4 text-sm text-muted">
-            <li className="flex items-center gap-2">
-              <Truck className="h-4 w-4 text-navy-2" aria-hidden="true" /> Frete calculado na integração com transportadoras (em breve)
-            </li>
-            <li className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-navy-2" aria-hidden="true" /> Pagamento seguro pelo ZEXI PAY
-            </li>
-            <li className="flex items-center gap-2">
-              <Flag className="h-4 w-4 text-navy-2" aria-hidden="true" />
-              <Link href={`/denunciar?tipo=product&id=${p.id}&next=/produto/${p.id}`} className="text-muted hover:text-brand hover:underline">
-                Denunciar este anúncio
+        {more.length > 0 && p.stores && (
+          <section aria-label={`Produtos de ${p.stores.name}`} className="mt-8 border-t border-line pt-6">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-ink">Produtos de {p.stores.name}</h2>
+              <Link href={`/loja/${p.stores.slug}`} className="text-sm text-brand hover:underline">
+                Ver todos
               </Link>
-            </li>
-          </ul>
-        </div>
-
-        {p.stores && (
-          <Link
-            href={`/loja/${p.stores.slug}`}
-            className="mt-4 flex items-center gap-3 rounded-[var(--radius-card)] border border-line bg-white p-4 hover:border-navy-2"
-          >
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-soft text-brand">
-              <Store className="h-5 w-5" aria-hidden="true" />
-            </span>
-            <span>
-              <span className="block text-xs text-muted">Vendido por</span>
-              <span className="block font-semibold text-navy">{p.stores.name}</span>
-            </span>
-          </Link>
-        )}
-
-        {p.description && (
-          <section className="mt-8">
-            <h2 className="flex items-center gap-2 font-display text-lg font-bold text-navy">
-              <PackageCheck className="h-5 w-5 text-brand" aria-hidden="true" /> Descrição
-            </h2>
-            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-ink">{p.description}</p>
+            </div>
+            <ul className="grid grid-cols-2 gap-3 [&>*]:min-w-0 sm:grid-cols-3 lg:grid-cols-6">
+              {more.map((x) => (
+                <li key={x.id}>
+                  <MarketProductCard product={x} />
+                </li>
+              ))}
+            </ul>
           </section>
         )}
+
+        <section id="descricao" className="mt-8 grid grid-cols-1 gap-8 border-t border-line pt-6 [&>*]:min-w-0 lg:grid-cols-[1fr_300px]">
+          <div>
+            <h2 className="text-lg font-semibold text-ink">Características do produto</h2>
+            <dl className="mt-3 overflow-hidden rounded-md border border-line text-sm">
+              {[
+                ["Condição", conditionLabel[p.condition]],
+                ["Categoria", p.categories?.name ?? "—"],
+                ["Vendido por", p.stores?.name ?? "—"],
+                ["Estoque", available ? `${p.stock} ${p.stock === 1 ? "unidade" : "unidades"}` : "Esgotado"],
+              ].map(([k, v], i) => (
+                <div key={k} className={cn("grid grid-cols-[140px_1fr] gap-3 px-3 py-2", i % 2 === 0 && "bg-surface")}>
+                  <dt className="font-semibold text-ink">{k}</dt>
+                  <dd className="text-ink">{v}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <h2 className="mt-8 flex items-center gap-2 text-lg font-semibold text-ink">
+              <PackageCheck className="h-5 w-5 text-brand" aria-hidden="true" /> Descrição
+            </h2>
+            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted">{p.description || "A loja ainda não escreveu a descrição deste produto."}</p>
+            <Link
+              href={`/denunciar?tipo=product&id=${p.id}&next=/produto/${p.id}`}
+              className="mt-6 inline-flex items-center gap-1.5 text-xs text-muted hover:text-brand hover:underline"
+            >
+              <Flag className="h-3.5 w-3.5" aria-hidden="true" /> Denunciar este anúncio
+            </Link>
+          </div>
+        </section>
       </div>
     </div>
   );
 }
 
+function PaymentMethods() {
+  return (
+    <section aria-label="Meios de pagamento" className="rounded-lg border border-line p-4">
+      <h2 className="text-base font-semibold text-ink">Meios de pagamento</h2>
+      <ul className="mt-3 space-y-3 text-sm">
+        <li className="flex items-center gap-2">
+          <CreditCard className="h-5 w-5 text-navy-2" aria-hidden="true" /> Cartão de crédito
+        </li>
+        <li className="flex items-center gap-2">
+          <QrCode className="h-5 w-5 text-navy-2" aria-hidden="true" /> Pix
+        </li>
+        <li className="flex items-center gap-2">
+          <Banknote className="h-5 w-5 text-navy-2" aria-hidden="true" /> Boleto bancário
+        </li>
+      </ul>
+      <p className="mt-3 text-xs text-muted">As opções disponíveis aparecem na página segura do ZEXI PAY (Stripe).</p>
+    </section>
+  );
+}
+
 export default function Page({ params, searchParams }: PageProps<"/produto/[id]">) {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 md:py-10">
+    <div className="mx-auto max-w-[1200px] px-2 py-4 sm:px-4 md:py-6">
       <Suspense fallback={<div className="h-[32rem] animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
         <Product params={params} searchParams={searchParams as Promise<{ adicionado?: string }>} />
       </Suspense>

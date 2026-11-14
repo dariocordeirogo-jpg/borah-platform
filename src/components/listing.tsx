@@ -40,8 +40,11 @@ export function BigPrice({ cents, className }: { cents: number; className?: stri
   const [reais, centavos] = formatBRL(cents).replace(/\s/g, " ").split(",");
   return (
     <span className={cn("inline-flex items-start font-normal tracking-tight text-ink tabular-nums", className)}>
-      <span>{reais}</span>
-      <span className="ml-0.5 mt-[0.15em] text-[0.55em] leading-none">{centavos}</span>
+      <span className="sr-only">{formatBRL(cents)}</span>
+      <span aria-hidden="true">{reais}</span>
+      <span aria-hidden="true" className="ml-0.5 mt-[0.15em] text-[0.55em] leading-none">
+        {centavos}
+      </span>
     </span>
   );
 }
@@ -113,11 +116,11 @@ export function ListingCard({
   return (
     <article
       className={cn(
-        "group relative flex h-full flex-col overflow-hidden rounded-lg border border-line bg-white transition-shadow duration-200 hover:shadow-[0_6px_20px_rgba(15,17,21,0.12)]",
+        "group relative flex h-full flex-col overflow-hidden rounded-md bg-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] transition-shadow duration-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.16)]",
         className,
       )}
     >
-      <div className="relative border-b border-line/70">
+      <div className="relative border-b border-black/[0.06]">
         <ListingImage src={imageUrl} alt={title} priority={priority} />
         {badge && <Badge kind={badge} className="absolute left-2 top-2" />}
         {demo && <DemoMark className="absolute bottom-2 left-2" />}
@@ -172,7 +175,7 @@ export function LiveCard({
   auction?: boolean;
 }) {
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-line bg-white transition-shadow duration-200 hover:shadow-[0_6px_20px_rgba(15,17,21,0.12)]">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-md bg-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] transition-shadow duration-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.16)]">
       <div className="relative aspect-video overflow-hidden bg-navy">
         {imageUrl ? (
           <Image
