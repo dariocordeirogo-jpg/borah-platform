@@ -91,13 +91,13 @@ insert into r select 'aviso repetido não reprocessa',
   (pg_temp.send('evt_acc1', 'account.updated', '{}'))->>'duplicate' = 'true';
 insert into r select 'anônimo não lê pagamentos', pg_temp.err('select count(*) from public.payments') like '%permission denied%'
   or (select count(*) from public.payments) = 0;
-insert into r select 'comissão pública 10%', public.platform_fee_bps() = 1000;
+insert into r select 'comissão pública 5%', public.platform_fee_bps() = 500;
 
 -- Comprador inicia o pagamento
 set local role authenticated;
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b4');
 insert into ids select 'pay1', public.start_order_payment((select v::uuid from ids where k='o1'))->>'payment_id';
-insert into r select 'valor e comissão calculados no banco', amount_cents = 20000 and fee_cents = 2000 and net_cents = 18000
+insert into r select 'valor e comissão calculados no banco', amount_cents = 20000 and fee_cents = 1000 and net_cents = 19000
   and destination_account = 'acct_1TESTLOJA4' and status = 'created' from public.payments where id = (select v::uuid from ids where k='pay1');
 insert into r select 'repetir reaproveita o mesmo pagamento',
   public.start_order_payment((select v::uuid from ids where k='o1'))->>'payment_id' = (select v from ids where k='pay1');

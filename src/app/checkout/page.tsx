@@ -5,6 +5,7 @@ import { Info } from "lucide-react";
 import { AddressForm, PlaceOrderForm } from "@/components/checkout-forms";
 import { formatBRL } from "@/lib/format";
 import { getCart, getMyAddresses } from "@/lib/market/queries";
+import { payTestMode } from "@/lib/pay/stripe";
 
 export const metadata: Metadata = { title: "Finalizar compra", robots: { index: false } };
 
@@ -41,6 +42,11 @@ async function Checkout() {
           <span>Produtos</span>
           <span>{formatBRL(cart.totalCents)}</span>
         </div>
+        {payTestMode() && (
+          <p className="mb-3 rounded-lg bg-navy-soft px-3 py-2 text-xs text-navy" data-testid="pay-teste">
+            Pagamentos em fase de testes: nenhuma cobrança real é feita.
+          </p>
+        )}
         <p className="mb-4 text-xs text-muted">Frete calculado pelo endereço escolhido. Cupom de desconto aplicado ao finalizar.</p>
         <PlaceOrderForm addresses={addresses} productsCents={cart.totalCents} />
       </aside>

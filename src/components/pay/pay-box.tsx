@@ -5,7 +5,7 @@ import { formatBRL } from "@/lib/format";
 import { payOrder } from "@/lib/pay/actions";
 import { paymentStatusLabel } from "@/lib/pay/format";
 import { getOrderPayments, storeAcceptsPayments } from "@/lib/pay/queries";
-import { payAvailable } from "@/lib/pay/stripe";
+import { payAvailable, payTestMode } from "@/lib/pay/stripe";
 import type { Enums } from "@/lib/supabase/database.types";
 
 type Props = { orderId: string; storeId: string; status: Enums<"order_status">; totalCents: number };
@@ -48,6 +48,12 @@ export async function PayBox({ orderId, storeId, status, totalCents }: Props) {
         <Notice>Esta loja ainda está ativando os recebimentos. Você pode pagar assim que ela concluir.</Notice>
       ) : (
         <>
+          {payTestMode() && (
+            <Notice>
+              ZEXI PAY em fase de testes: nenhuma cobrança real é feita e cartões reais são recusados. Em breve os pagamentos
+              reais serão liberados.
+            </Notice>
+          )}
           <p className="text-muted">
             Você será levado à página segura da Stripe. Cartão, Pix e boleto aparecem conforme disponíveis. Compra Garantida: o
             valor só é repassado à loja depois que você confirmar a entrega.

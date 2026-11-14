@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { ArrowRight, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Tag, UserRound, Video } from "lucide-react";
@@ -11,6 +12,8 @@ import { listAuctions } from "@/lib/auctions/queries";
 import { listLives } from "@/lib/live/queries";
 import { listProducts } from "@/lib/market/queries";
 import { categories, demoLives, endingSoon, liveAuctions, offers, stores, upcoming } from "@/lib/demo-data";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 const eyebrow = (Icon: typeof Radio, text: string) => (
   <span className="mb-0.5 inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-brand">

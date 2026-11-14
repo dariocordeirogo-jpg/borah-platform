@@ -6,6 +6,7 @@ import { CheckCircle2, Clock, PackageCheck, PackageOpen, ShoppingBag, Truck, XCi
 import { cancelStoreOrder } from "@/app/seller/actions";
 import { refundStoreOrder } from "@/lib/pay/actions";
 import { payoutLabel } from "@/lib/pay/format";
+import { payTestMode } from "@/lib/pay/stripe";
 import { EmptyState, Notice } from "@/components/market";
 import { ShipForm } from "@/components/orders/ship-form";
 import { TrackingInfo } from "@/components/orders/timeline";
@@ -54,6 +55,12 @@ async function Sales({ searchParams }: { searchParams: Promise<SP> }) {
 
   return (
     <div className="space-y-4">
+      {payTestMode() && (
+        <Notice>
+          ZEXI PAY em fase de testes: vendas pagas agora não envolvem dinheiro real. Não envie produtos até os pagamentos reais
+          serem liberados.
+        </Notice>
+      )}
       {sp.ok && <Notice tone="success">{sp.ok}</Notice>}
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
 

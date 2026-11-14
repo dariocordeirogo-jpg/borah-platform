@@ -39,3 +39,11 @@ export async function getStripe(): Promise<Stripe | null> {
 export async function payAvailable(): Promise<boolean> {
   return (await getStripe()) !== null && Boolean(process.env.STRIPE_WEBHOOK_SECRET);
 }
+
+/**
+ * Site público com chave de teste da Stripe: nenhum dinheiro real circula. As telas avisam o comprador
+ * e a loja (para ninguém enviar produto de uma venda paga em teste).
+ */
+export function payTestMode(): boolean {
+  return stripeKeyMode(process.env.STRIPE_SECRET_KEY) === "test";
+}

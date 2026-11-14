@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
   const isProduction = site.production && !siteLocked();
   return {
     rules: isProduction
-      ? [{ userAgent: "*", allow: "/", disallow: ["/conta", "/auth/", "/carrinho", "/busca"] }]
+      ? [{ userAgent: "*", allow: "/", disallow: ["/conta", "/auth/", "/carrinho", "/checkout", "/seller", "/admin", "/api/", "/entrar", "/cadastro", "/em-construcao", "/r/"] }]
       : [{ userAgent: "*", disallow: "/" }],
     sitemap: `${site.url}/sitemap.xml`,
     host: site.url,
