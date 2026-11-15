@@ -705,6 +705,25 @@ export type Database = {
         Update: Record<string, never>;
         Relationships: [];
       };
+      product_questions: {
+        Row: {
+          id: number;
+          product_id: string;
+          store_id: string;
+          asker_id: string;
+          asker_alias: string;
+          body: string;
+          answer: string | null;
+          answered_at: string | null;
+          hidden: boolean;
+          created_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [
+          { foreignKeyName: "product_questions_product_id_fkey"; columns: ["product_id"]; isOneToOne: false; referencedRelation: "products"; referencedColumns: ["id"] },
+        ];
+      };
       reports: {
         Row: {
           id: string;
@@ -728,6 +747,9 @@ export type Database = {
     Views: { [_ in never]: never };
     Functions: {
       submit_verification: { Args: { _cpf: string; _phone: string }; Returns: undefined };
+      ask_question: { Args: { _product_id: string; _body: string }; Returns: number };
+      answer_question: { Args: { _question_id: number; _answer: string }; Returns: undefined };
+      hide_question: { Args: { _question_id: number }; Returns: undefined };
       create_auction: {
         Args: {
           _product_id: string;

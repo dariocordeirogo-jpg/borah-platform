@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { Banknote, ChevronRight, CreditCard, Flag, Lock, PackageCheck, QrCode, ShieldCheck, ShoppingCart, Truck } from "lucide-react";
 import { Gallery } from "@/components/gallery";
 import { ProductVideo } from "@/components/product/product-video";
+import { ProductQuestions } from "@/components/questions/product-questions";
 import { BigPrice } from "@/components/listing";
 import { MarketProductCard, Notice } from "@/components/market";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { addToCart } from "@/lib/market/actions";
 import { conditionLabel } from "@/lib/market/format";
 import { getProduct, listProducts } from "@/lib/market/queries";
+import { getProductQuestions } from "@/lib/questions/queries";
 import { cn } from "@/lib/utils";
 import { formatBRL } from "@/lib/format";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -45,6 +47,7 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
   const maxQty = Math.min(p.stock, 10);
 
   // Mais produtos da mesma loja (como "Produtos do vendedor")
+  const { questions } = p.status === "active" && !p.is_showcase ? await getProductQuestions(p.id) : { questions: [] };
   const more = p.stores ? (await listProducts({ storeId: p.stores.id, limit: 7 })).items.filter((x) => x.id !== p.id).slice(0, 6) : [];
   const off = p.compare_at_cents && p.compare_at_cents > p.price_cents ? Math.round((1 - p.price_cents / p.compare_at_cents) * 100) : null;
 
@@ -272,6 +275,10 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
             </Link>
           </div>
         </section>
+
+        {p.status === "active" && !p.is_showcase && (
+          <ProductQuestions productId={p.id} questions={questions} canAsk={!own} loggedIn={!!user} />
+        )}
       </div>
     </div>
   );

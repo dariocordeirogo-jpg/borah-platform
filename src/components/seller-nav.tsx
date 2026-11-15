@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
-import { Clapperboard, Gavel, LayoutDashboard, Link2, Package, PlusCircle, Radio, Receipt, Settings, TicketPercent, Wallet } from "lucide-react";
+import { Clapperboard, Gavel, LayoutDashboard, Link2, MessageCircleQuestion, Package, PlusCircle, Radio, Receipt, Settings, TicketPercent, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/seller", label: "Visão geral", icon: LayoutDashboard },
   { href: "/seller/pedidos", label: "Vendas", icon: Receipt },
   { href: "/seller/produtos", label: "Anúncios", icon: Package },
+  { href: "/seller/perguntas", label: "Perguntas", icon: MessageCircleQuestion },
   { href: "/seller/produtos/importar", label: "Importar anúncios", icon: Link2 },
   { href: "/seller/leiloes", label: "Leilões", icon: Gavel },
   { href: "/seller/videos", label: "Vídeos", icon: Clapperboard },

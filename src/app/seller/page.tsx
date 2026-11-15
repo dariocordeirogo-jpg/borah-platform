@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { AlertTriangle, ExternalLink, Package, Plus, Receipt, Wallet } from "lucide-react";
+import { AlertTriangle, ExternalLink, MessageCircleQuestion, Package, Plus, Receipt, Wallet } from "lucide-react";
 import { Notice } from "@/components/market";
 import { ButtonLink } from "@/components/ui/button";
 import { formatBRL } from "@/lib/format";
@@ -8,16 +8,18 @@ import { getSellerStats } from "@/lib/market/queries";
 import { requireStore } from "@/lib/market/seller-guard";
 import { payoutState, payoutStateLabel } from "@/lib/pay/format";
 import { getMyPayoutAccount } from "@/lib/pay/queries";
+import { countOpenQuestions } from "@/lib/questions/queries";
 
 async function Dashboard({ searchParams }: { searchParams: Promise<{ bemvindo?: string }> }) {
   const [store, sp] = await Promise.all([requireStore("/seller"), searchParams]);
-  const [s, account] = await Promise.all([getSellerStats(store.id), getMyPayoutAccount(store.id)]);
+  const [s, account, openQuestions] = await Promise.all([getSellerStats(store.id), getMyPayoutAccount(store.id), countOpenQuestions(store.id)]);
   const payout = payoutState(account);
   const cards = [
     { icon: Package, label: "Produtos ativos", value: `${s.activeProducts} de ${s.totalProducts}`, href: "/seller/produtos" },
     { icon: Receipt, label: "Pedidos", value: String(s.orders), hint: `${s.pendingOrders} aguardando pagamento`, href: "/seller/pedidos" },
     { icon: Wallet, label: "Vendas registradas", value: formatBRL(s.gmvCents), hint: "Pedidos registrados (pagos ou não)", href: "/seller/pedidos" },
     { icon: AlertTriangle, label: "Estoque baixo (≤ 2)", value: String(s.lowStock), href: "/seller/produtos" },
+    { icon: MessageCircleQuestion, label: "Perguntas sem resposta", value: String(openQuestions), hint: "Responder rápido melhora sua reputação", href: "/seller/perguntas" },
   ];
   return (
     <div className="space-y-6">
@@ -51,7 +53,7 @@ async function Dashboard({ searchParams }: { searchParams: Promise<{ bemvindo?: 
           <Plus className="h-4 w-4" aria-hidden="true" /> Novo produto
         </ButtonLink>
       </div>
-      <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {cards.map((c) => (
           <li key={c.label}>
             <Link href={c.href} className="block rounded-[var(--radius-card)] border border-line bg-white p-4 shadow-[var(--shadow-card)] hover:border-navy-2">
