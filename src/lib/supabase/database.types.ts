@@ -459,6 +459,22 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
         Relationships: [];
       };
+      store_banners: {
+        Row: { id: number; store_id: string; image_path: string; title: string | null; product_id: string | null; position: number; created_at: string };
+        Insert: { store_id: string; image_path: string; title?: string | null; product_id?: string | null; position?: number };
+        Update: { title?: string | null; product_id?: string | null; position?: number };
+        Relationships: [
+          { foreignKeyName: "store_banners_store_id_fkey"; columns: ["store_id"]; isOneToOne: false; referencedRelation: "stores"; referencedColumns: ["id"] },
+        ];
+      };
+      store_featured: {
+        Row: { id: number; store_id: string; product_id: string; position: number };
+        Insert: { store_id: string; product_id: string; position?: number };
+        Update: { position?: number };
+        Relationships: [
+          { foreignKeyName: "store_featured_product_id_fkey"; columns: ["product_id"]; isOneToOne: false; referencedRelation: "products"; referencedColumns: ["id"] },
+        ];
+      };
       stores: {
         Row: {
           created_at: string;
@@ -471,8 +487,16 @@ export type Database = {
           owner_id: string;
           slug: string;
           updated_at: string;
+          logo_path: string | null;
+          cover_path: string | null;
+          theme: string;
+          tagline: string | null;
         };
         Insert: {
+          logo_path?: string | null;
+          cover_path?: string | null;
+          theme?: string;
+          tagline?: string | null;
           origin_cep?: string | null;
           created_at?: string;
           description?: string | null;

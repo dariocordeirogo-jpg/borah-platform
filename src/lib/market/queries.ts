@@ -135,7 +135,7 @@ export async function getProduct(id: string) {
 
 export async function getStoreBySlug(slug: string) {
   const supabase = await db();
-  const { data } = await supabase.from("stores").select("id, name, slug, description, created_at").eq("slug", slug).maybeSingle();
+  const { data } = await supabase.from("stores").select("id, name, slug, description, created_at, logo_path, cover_path, theme, tagline").eq("slug", slug).maybeSingle();
   return data;
 }
 
@@ -257,7 +257,7 @@ export async function getMyStore() {
   if (!user) return null;
   const { data } = await supabase
     .from("stores")
-    .select("id, name, slug, description, origin_cep, is_active, created_at")
+    .select("id, name, slug, description, origin_cep, is_active, created_at, logo_path, cover_path, theme, tagline")
     .eq("owner_id", user.id)
     .maybeSingle();
   return data;
