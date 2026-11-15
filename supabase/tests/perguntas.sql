@@ -31,14 +31,10 @@ insert into r select 'loja não pergunta no próprio produto',
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000e2');
 insert into r select 'pergunta curta demais recusada',
   pg_temp.err(format('select public.ask_question(%L, %L)', (select v from ids where k='p'), 'oi')) = 'invalid_question';
-insert into r select 'e-mail na pergunta recusado',
-  pg_temp.err(format('select public.ask_question(%L, %L)', (select v from ids where k='p'), 'me chama em ana@gmail.com')) = 'contact_not_allowed';
-insert into r select 'telefone com separadores recusado',
-  pg_temp.err(format('select public.ask_question(%L, %L)', (select v from ids where k='p'), 'liga (62) 9 9999-8888 por favor')) = 'contact_not_allowed';
-insert into r select 'WhatsApp recusado',
-  pg_temp.err(format('select public.ask_question(%L, %L)', (select v from ids where k='p'), 'tem whatsapp pra combinar?')) = 'contact_not_allowed';
-insert into r select 'link recusado',
-  pg_temp.err(format('select public.ask_question(%L, %L)', (select v from ids where k='p'), 'vi mais barato em www.outraloja.com')) = 'contact_not_allowed';
+-- Contato não é recusado: a pergunta é gravada com o trecho oculto (ver supabase/tests/regras.sql)
+insert into ids values ('qc', public.ask_question((select v::uuid from ids where k='p'), 'tem whatsapp? liga (62) 9 9999-8888')::text);
+insert into r select 'contato na pergunta fica oculto', body = 'tem [contato oculto]? liga [contato oculto]'
+  from public.product_questions where id = (select v::bigint from ids where k='qc');
 insert into r select 'produto em rascunho não recebe pergunta',
   pg_temp.err(format('select public.ask_question(%L, %L)', (select v from ids where k='draft'), 'Tem outras cores?')) = 'product_not_found';
 insert into ids values ('q1', public.ask_question((select v::uuid from ids where k='p'), '  Serve   na cabeça 58?  ')::text);
@@ -54,17 +50,15 @@ select pg_temp.as_user('00000000-0000-0000-0000-0000000000e3');
 insert into r select 'outra pessoa não responde',
   pg_temp.err(format('select public.answer_question(%L, %L)', (select v from ids where k='q1'), 'Serve sim')) = 'question_not_found';
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1');
-insert into r select 'resposta com telefone recusada',
-  pg_temp.err(format('select public.answer_question(%L, %L)', (select v from ids where k='q1'), 'Me chama no 62999998888')) = 'contact_not_allowed';
 select public.answer_question((select v::bigint from ids where k='q1'), 'Serve sim! Tamanho 58 é o M.');
 insert into r select 'resposta gravada', answer = 'Serve sim! Tamanho 58 é o M.' and answered_at is not null
   from public.product_questions where id = (select v::bigint from ids where k='q1');
-insert into r select 'loja vê as perguntas sem resposta da loja', count(*) = 1 from public.product_questions where store_id = (select v::uuid from ids where k='store') and answer is null;
+insert into r select 'loja vê as perguntas sem resposta da loja', count(*) = 2 from public.product_questions where store_id = (select v::uuid from ids where k='store') and answer is null;
 
 -- Visitante lê as perguntas do produto à venda
 set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
-insert into r select 'visitante lê perguntas do produto', count(*) = 2 from public.product_questions where product_id = (select v::uuid from ids where k='p');
+insert into r select 'visitante lê perguntas do produto', count(*) = 3 from public.product_questions where product_id = (select v::uuid from ids where k='p');
 insert into r select 'visitante não pergunta', pg_temp.err(format('select public.ask_question(%L, %L)', (select v from ids where k='p'), 'Tem nota fiscal?')) like '%permission denied%';
 set local role authenticated;
 

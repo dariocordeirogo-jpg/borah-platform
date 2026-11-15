@@ -119,8 +119,16 @@ select pg_temp.as_user('00000000-0000-0000-0000-0000000000d2');
 select public.resolve_complaint((select v::bigint from ids where k='c1'));
 insert into r select 'comprador encerra a reclamação', status = 'resolved' and resolved_at is not null
   from public.order_complaints where id = (select v::bigint from ids where k='c1');
+insert into r select 'resolvida em até 48 horas não pesa: verde de novo', complaint_rate = 0 and color = 'green'
+  from public.store_reputation(array[(select v::uuid from ids where k='store')]);
 select public.open_complaint((select v::uuid from ids where k='s1_2'), 'not_as_described', null);
-insert into r select '2 reclamações em 10 vendas (20%, mesmo resolvidas): vermelha', complaint_rate = 0.200 and color = 'red'
+select public.open_complaint((select v::uuid from ids where k='s1_4'), 'damaged', null);
+reset role;
+-- Uma delas resolvida só 3 dias depois: continua pesando
+update public.order_complaints set created_at = now() - interval '3 days', status = 'resolved', resolved_at = now()
+  where order_id = (select v::uuid from ids where k='s1_4');
+set local role authenticated;
+insert into r select '2 reclamações em 10 vendas (20%, uma resolvida tarde): vermelha', complaint_rate = 0.200 and color = 'red'
   from public.store_reputation(array[(select v::uuid from ids where k='store')]);
 reset role;
 update public.orders set delivered_at = now() - interval '31 days' where id = (select v::uuid from ids where k='s1_3');
@@ -150,10 +158,10 @@ insert into r select 'pago e não enviado depois do prazo conta como atraso', sa
   from public.store_reputation(array[(select v::uuid from ids where k='store2')]);
 insert into r select 'visitante não lê reclamações', pg_temp.err('select count(*) from public.order_complaints') ~ 'permission denied'
   or (select count(*) from public.order_complaints) = 0;
-insert into r select 'visitante não abre reclamação', pg_temp.err(format('select public.open_complaint(%L, %L, null)', (select v from ids where k='s1_4'), 'damaged')) like '%permission denied%';
+insert into r select 'visitante não abre reclamação', pg_temp.err(format('select public.open_complaint(%L, %L, null)', (select v from ids where k='s1_5'), 'damaged')) like '%permission denied%';
 reset role;
 
-insert into r select 'loja avisada da reclamação por e-mail (fila)', count(*) = 2 from private.outbox where kind = 'complaint.opened' and recipient = 'vend-rg@teste.zexi';
+insert into r select 'loja avisada da reclamação por e-mail (fila)', count(*) = 3 from private.outbox where kind = 'complaint.opened' and recipient = 'vend-rg@teste.zexi';
 
 select count(*) filter (where ok) as ok, count(*) as total, string_agg(test, '; ') filter (where not coalesce(ok, false)) as falhas from r;
 rollback;

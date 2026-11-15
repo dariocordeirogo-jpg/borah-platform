@@ -51,8 +51,6 @@ insert into r select 'pedido de outra pessoa não avalia',
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000f2');
 insert into r select 'nota fora de 1 a 5 recusada',
   pg_temp.err(format('select public.review_product(%L, %L, 6, null)', (select v from ids where k='o_ana'), (select v from ids where k='p'))) = 'invalid_rating';
-insert into r select 'telefone no comentário recusado',
-  pg_temp.err(format('select public.review_product(%L, %L, 5, %L)', (select v from ids where k='o_ana'), (select v from ids where k='p'), 'Ótimo! chama no 62 99999-8888')) = 'contact_not_allowed';
 insert into r select 'prazo de 60 dias depois da entrega',
   pg_temp.err(format('select public.review_product(%L, %L, 5, null)', (select v from ids where k='o_velho'), (select v from ids where k='p'))) = 'review_window_closed';
 select public.review_product((select v::uuid from ids where k='o_ana'), (select v::uuid from ids where k='p'), 4, '  Muito boa,  veste bem ');
@@ -60,7 +58,9 @@ insert into r select 'avaliação gravada com apelido e comentário limpo', rati
   from public.product_reviews where order_id = (select v::uuid from ids where k='o_ana');
 insert into r select 'média do produto calculada', rating_avg = 4.0 and rating_count = 1 and stars = array[0,0,0,1,0]::smallint[]
   from public.product_ratings where product_id = (select v::uuid from ids where k='p');
-select public.review_product((select v::uuid from ids where k='o_ana'), (select v::uuid from ids where k='p'), 5, null);
+select public.review_product((select v::uuid from ids where k='o_ana'), (select v::uuid from ids where k='p'), 5, 'Ótimo! me liga 62 99999-8888');
+insert into r select 'contato no comentário fica oculto', comment = 'Ótimo! [contato oculto] [contato oculto]'
+  from public.product_reviews where order_id = (select v::uuid from ids where k='o_ana');
 insert into r select 'editar a avaliação atualiza a média (sem duplicar)', rating_avg = 5.0 and rating_count = 1
   from public.product_ratings where product_id = (select v::uuid from ids where k='p');
 insert into r select 'ninguém escreve a média direto',
@@ -82,18 +82,14 @@ insert into r select 'visitante lê avaliações', count(*) = 1 from public.prod
 insert into r select 'visitante lê a nota', count(*) = 1 from public.product_ratings where product_id = (select v::uuid from ids where k='p');
 insert into r select 'visitante não avalia', pg_temp.err(format('select public.review_product(%L, %L, 1, null)', (select v from ids where k='o_ana'), (select v from ids where k='p'))) like '%permission denied%';
 
--- Reputação: menos de 5 vendas = loja nova (sem nível). Entregas: a da Ana no prazo, a antiga atrasada
-insert into r select 'loja nova sem nível', sales = 3 and level is null and on_time_rate = 0.50 and rating_avg = 5.0
+-- Reputação (detalhes em supabase/tests/regras.sql): nota média e atendimento aparecem junto com a cor
+insert into r select 'reputação traz nota e vendas', sales = 0 and color is null and rating_avg = 5.0 and rating_count = 1
   from public.store_reputation(array[(select v::uuid from ids where k='store')]);
 reset role;
--- Mais vendas entregues no prazo e uma atrasada; pergunta respondida rápido
-select pg_temp.order_for('00000000-0000-0000-0000-0000000000f3', 'delivered', now() - interval '20 days', now() - interval '18 days') from generate_series(1, 3);
-select pg_temp.order_for('00000000-0000-0000-0000-0000000000f3', 'delivered', now() - interval '40 days', now() - interval '20 days');
 insert into public.product_questions (product_id, store_id, asker_id, asker_alias, body, answer, answered_at, created_at)
 values ((select v::uuid from ids where k='p'), (select v::uuid from ids where k='store'), '00000000-0000-0000-0000-0000000000f3', 'B***a', 'Tem tamanho G?', 'Tem sim', now() - interval '47 hours', now() - interval '48 hours');
 set local role anon;
-insert into r select 'reputação com vendas, entrega no prazo e atendimento',
-  sales = 7 and on_time_rate = 0.67 and answer_rate = 1.00 and level = 5
+insert into r select 'atendimento: pergunta respondida em 24 horas', answer_rate = 1.00
   from public.store_reputation(array[(select v::uuid from ids where k='store')]);
 
 -- Moderação esconde avaliação: sai da média
