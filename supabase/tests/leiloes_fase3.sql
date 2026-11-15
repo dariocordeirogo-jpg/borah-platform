@@ -14,6 +14,24 @@ create function pg_temp.as_user(_id text) returns void language sql as $$
 $$;
 create function pg_temp.err(_sql text) returns text language plpgsql as $$
 begin execute _sql; return null; exception when others then return sqlerrm; end $$;
+-- CPF válido e aleatório a cada execução: os CPFs fixos de exemplo podem já estar cadastrados em outra conta
+create function pg_temp.new_cpf() returns text language plpgsql as $$
+declare
+  d int[] := array[]::int[];
+  s int;
+  i int;
+begin
+  for i in 1..9 loop d := d || floor(random() * 10)::int; end loop;
+  if d = array[d[1],d[1],d[1],d[1],d[1],d[1],d[1],d[1],d[1]] then d[9] := (d[9] + 1) % 10; end if;
+  s := 0; for i in 1..9 loop s := s + d[i] * (11 - i); end loop;
+  d := d || case when s % 11 < 2 then 0 else 11 - s % 11 end;
+  s := 0; for i in 1..10 loop s := s + d[i] * (12 - i); end loop;
+  d := d || case when s % 11 < 2 then 0 else 11 - s % 11 end;
+  return array_to_string(d, '');
+end $$;
+create temp table cpfs(k text primary key, v text) on commit drop;
+insert into cpfs values ('ana', pg_temp.new_cpf()), ('bia', pg_temp.new_cpf());
+grant all on cpfs to authenticated, anon;
 grant execute on function pg_temp.err(text), pg_temp.as_user(text) to authenticated, anon;
 
 -- Vendedor: loja, produto com 1 unidade, leilão de 60 min
@@ -33,14 +51,16 @@ select pg_temp.as_user('00000000-0000-0000-0000-0000000000b3');
 insert into r select 'sem verificação não dá lance',
   pg_temp.err(format('select public.place_bid(%L, 10000, %L)', (select v from ids where k='a'), 'k-ana-0001')) = 'verification_required';
 insert into r select 'CPF inválido recusado', pg_temp.err($q$select public.submit_verification('123.456.789-00', '(11) 98888-7777')$q$) = 'cpf_invalid';
-insert into r select 'telefone inválido recusado', pg_temp.err($q$select public.submit_verification('529.982.247-25', '1234')$q$) = 'phone_invalid';
-select public.submit_verification('529.982.247-25', '(11) 98888-7777');
-insert into r select 'CPF guardado mascarado', cpf_masked = '***.982.247-**' and phone = '+5511988887777' from public.user_verifications;
+insert into r select 'telefone inválido recusado', pg_temp.err(format('select public.submit_verification(%L, %L)', (select v from cpfs where k='ana'), '1234')) = 'phone_invalid';
+select public.submit_verification((select v from cpfs where k='ana'), '(11) 98888-7777');
+insert into r select 'CPF guardado mascarado',
+  cpf_masked = '***.' || substr(c.v, 4, 3) || '.' || substr(c.v, 7, 3) || '-**' and phone = '+5511988887777'
+  from public.user_verifications, cpfs c where c.k = 'ana';
 
 -- Bia tenta usar o CPF da Ana; depois usa o dela
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000c3');
-insert into r select 'CPF de outra conta recusado', pg_temp.err($q$select public.submit_verification('52998224725', '11977776666')$q$) = 'cpf_in_use';
-select public.submit_verification('111.444.777-35', '11977776666');
+insert into r select 'CPF de outra conta recusado', pg_temp.err(format('select public.submit_verification(%L, %L)', (select v from cpfs where k='ana'), '11977776666')) = 'cpf_in_use';
+select public.submit_verification((select v from cpfs where k='bia'), '11977776666');
 
 -- Lances
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b3');
