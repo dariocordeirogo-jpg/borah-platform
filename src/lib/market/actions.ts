@@ -24,6 +24,29 @@ async function requireUser(next: string) {
   return { supabase, user };
 }
 
+type Db = Awaited<ReturnType<typeof createClient>>;
+
+/** Coloca no carrinho (soma à quantidade que já estava; "comprar agora" garante pelo menos a quantidade pedida). */
+async function putInCart(supabase: Db, userId: string, productId: string, quantity: number, buyNow: boolean, liveId: string | null) {
+  const { data: existing } = await supabase
+    .from("cart_items")
+    .select("quantity")
+    .eq("user_id", userId)
+    .eq("product_id", productId)
+    .maybeSingle();
+  if (existing) {
+    return supabase
+      .from("cart_items")
+      .update({
+        quantity: Math.min(99, buyNow ? Math.max(existing.quantity, quantity) : existing.quantity + quantity),
+        ...(liveId ? { live_id: liveId } : {}),
+      })
+      .eq("user_id", userId)
+      .eq("product_id", productId);
+  }
+  return supabase.from("cart_items").insert({ user_id: userId, product_id: productId, quantity, live_id: liveId });
+}
+
 /** Adiciona ao carrinho. Com buyNow, vai direto para o carrinho. */
 export async function addToCart(formData: FormData) {
   const productId = uuid.parse(formData.get("productId"));
@@ -33,28 +56,31 @@ export async function addToCart(formData: FormData) {
   const liveParsed = uuid.safeParse(formData.get("liveId"));
   const liveId = liveParsed.success ? liveParsed.data : null;
   const { supabase, user } = await requireUser(`/produto/${productId}`);
-
-  const { data: existing } = await supabase
-    .from("cart_items")
-    .select("quantity")
-    .eq("user_id", user.id)
-    .eq("product_id", productId)
-    .maybeSingle();
-
-  if (existing) {
-    await supabase
-      .from("cart_items")
-      .update({
-        quantity: Math.min(99, buyNow ? Math.max(existing.quantity, quantity) : existing.quantity + quantity),
-        ...(liveId ? { live_id: liveId } : {}),
-      })
-      .eq("user_id", user.id)
-      .eq("product_id", productId);
-  } else {
-    await supabase.from("cart_items").insert({ user_id: user.id, product_id: productId, quantity, live_id: liveId });
-  }
+  await putInCart(supabase, user.id, productId, quantity, buyNow, liveId);
   revalidatePath("/", "layout");
   redirect(buyNow ? "/carrinho" : `/produto/${productId}?adicionado=1`);
+}
+
+export type QuickCartResult = { ok: true; count: number } | { ok: false; login?: string; error?: string };
+
+/**
+ * Adicionar sem sair da página (botões do produto e dos cards). Quem não entrou recebe o endereço do login.
+ * Preço e estoque continuam sendo conferidos no carrinho e no fechamento do pedido.
+ */
+export async function addToCartQuick(input: { productId: string; quantity?: number; buyNow?: boolean }): Promise<QuickCartResult> {
+  const productId = uuid.safeParse(input?.productId);
+  if (!productId.success) return { ok: false, error: "Produto inválido." };
+  const quantity = Math.min(99, Math.max(1, Math.trunc(Number(input.quantity)) || 1));
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, login: `/entrar?next=${encodeURIComponent(`/produto/${productId.data}`)}` };
+  const { error } = await putInCart(supabase, user.id, productId.data, quantity, Boolean(input.buyNow), null);
+  if (error) return { ok: false, error: "Não foi possível adicionar agora. Tente de novo." };
+  const { data: rows } = await supabase.from("cart_items").select("quantity").eq("user_id", user.id);
+  revalidatePath("/", "layout");
+  return { ok: true, count: (rows ?? []).reduce((n, r) => n + r.quantity, 0) };
 }
 
 export async function updateCartQuantity(formData: FormData) {

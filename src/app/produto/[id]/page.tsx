@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Banknote, ChevronRight, CreditCard, Flag, Lock, PackageCheck, QrCode, ShieldCheck, ShoppingCart, Truck } from "lucide-react";
+import { Banknote, ChevronRight, CreditCard, Flag, Lock, PackageCheck, QrCode, ShieldCheck, Truck } from "lucide-react";
 import { Gallery } from "@/components/gallery";
+import { BuyBox } from "@/components/product/buy-box";
 import { ProductVideo } from "@/components/product/product-video";
 import { ProductQuestions } from "@/components/questions/product-questions";
 import { ProductReviews } from "@/components/reviews/product-reviews";
@@ -11,10 +12,8 @@ import { Stars } from "@/components/reviews/stars";
 import { StoreReputation } from "@/components/reviews/store-reputation";
 import { BigPrice } from "@/components/listing";
 import { MarketProductCard, Notice } from "@/components/market";
-import { Button } from "@/components/ui/button";
 import { isStaff } from "@/lib/admin/format";
 import { getCurrentUser } from "@/lib/auth";
-import { addToCart } from "@/lib/market/actions";
 import { conditionLabel } from "@/lib/market/format";
 import { getProduct, listProducts } from "@/lib/market/queries";
 import { getProductQuestions } from "@/lib/questions/queries";
@@ -49,7 +48,6 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
   if (!p || (p.status !== "active" && p.stores?.owner_id !== user?.id && !isStaff(user?.roles ?? []))) notFound();
   const own = !!user && p.stores?.owner_id === user.id;
   const available = p.status === "active" && p.stock > 0;
-  const maxQty = Math.min(p.stock, 10);
 
   // Tudo o que depende só do produto sai em paralelo (perguntas, opiniões, reputação e mais produtos da loja)
   const [{ questions }, { summary, reviews }, reputations, sameStore] = await Promise.all([
@@ -96,30 +94,7 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
         ) : !available ? (
           <Notice tone="error">Esgotado no momento.</Notice>
         ) : (
-          <form action={addToCart} className="space-y-3">
-            <input type="hidden" name="productId" value={p.id} />
-            <div className="flex flex-wrap items-center gap-2 text-sm">
-              <label htmlFor="quantity" className="text-ink">
-                Quantidade
-              </label>
-              <select id="quantity" name="quantity" defaultValue="1" className="h-9 rounded-md border border-line bg-white px-2 text-sm font-semibold">
-                {Array.from({ length: maxQty }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1} {i === 0 ? "unidade" : "unidades"}
-                  </option>
-                ))}
-              </select>
-              <span className="text-muted">
-                ({p.stock} {p.stock === 1 ? "disponível" : "disponíveis"})
-              </span>
-            </div>
-            <Button type="submit" name="buyNow" value="1" variant="buy" size="lg" className="w-full">
-              Comprar agora
-            </Button>
-            <Button type="submit" variant="outline" size="lg" className="w-full">
-              <ShoppingCart className="h-5 w-5" aria-hidden="true" /> Adicionar ao carrinho
-            </Button>
-          </form>
+          <BuyBox productId={p.id} stock={p.stock} priceCents={p.price_cents} title={p.title} />
         )}
       </div>
       {p.stores && (
@@ -149,7 +124,8 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
   );
 
   return (
-    <div className="space-y-4">
+    // No celular sobra espaço no fim para a barra fixa de compra não cobrir o conteúdo
+    <div className={available && !own && !p.is_showcase ? "space-y-4 pb-20 md:pb-0" : "space-y-4"}>
       <TrackView
         product={{ id: p.id, title: p.title, imageUrl: p.images[0]?.url ?? null, priceCents: p.price_cents, compareAtCents: p.compare_at_cents }}
       />

@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ImageOff, PackageOpen, ShoppingCart } from "lucide-react";
-import { addToCart } from "@/lib/market/actions";
+import { ImageOff, PackageOpen } from "lucide-react";
 import type { ReactNode } from "react";
 import { ListingCard, ListingGrid } from "@/components/listing";
+import { QuickAdd } from "@/components/product/quick-add";
 import { formatBRL } from "@/lib/format";
 import { conditionLabel } from "@/lib/market/format";
 import type { ProductCardData } from "@/lib/market/queries";
@@ -48,23 +48,6 @@ export function Price({ cents, compareAt, size = "md" }: { cents: number; compar
         {discount ? <span className="text-sm font-semibold text-brand">{discount}% OFF</span> : null}
       </p>
     </div>
-  );
-}
-
-/** Botão redondo de carrinho sobre a foto do card (como nos apps de marketplace). */
-function QuickAdd({ productId, title }: { productId: string; title: string }) {
-  return (
-    <form action={addToCart}>
-      <input type="hidden" name="productId" value={productId} />
-      <input type="hidden" name="quantity" value="1" />
-      <button
-        type="submit"
-        aria-label={`Adicionar ${title} ao carrinho`}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white text-brand shadow-[0_1px_4px_rgba(15,17,21,0.15)] transition-colors hover:bg-brand hover:text-white"
-      >
-        <ShoppingCart className="h-4 w-4" aria-hidden="true" />
-      </button>
-    </form>
   );
 }
 

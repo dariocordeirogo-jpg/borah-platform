@@ -78,6 +78,20 @@ test.describe("ZEXI MARKET: do anúncio ao pedido", () => {
     await expect.poll(() => photo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth)).toBeGreaterThan(0);
   });
 
+  test("no celular, a barra de compra fixa aparece quando os botões saem da tela", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(productUrl);
+    const bar = page.getByTestId("barra-compra");
+    await expect(bar).toHaveCSS("opacity", "0");
+    await page.getByRole("button", { name: "Adicionar ao carrinho" }).scrollIntoViewIfNeeded();
+    await page.mouse.wheel(0, 2500);
+    await expect(bar).toHaveCSS("opacity", "1");
+    await expect(bar).toContainText("R$ 123,45");
+    // Visitante sem login: comprar leva ao login e volta para o produto
+    await bar.getByRole("button", { name: "Comprar agora" }).click();
+    await expect(page).toHaveURL(/\/entrar\?next=/);
+  });
+
   test("comprador compra 2 unidades, o estoque baixa, e cancela o pedido", async ({ page }) => {
     await login(page, BUYER);
     // começa com o carrinho vazio (sobras de execuções anteriores)
@@ -90,14 +104,21 @@ test.describe("ZEXI MARKET: do anúncio ao pedido", () => {
       await page.waitForTimeout(400);
     }
     await page.goto(productUrl);
-    await page.getByLabel("Quantidade").selectOption("2");
-    await page.getByRole("button", { name: "Comprar agora" }).click();
-    await expect(page).toHaveURL(/\/carrinho$/);
+    // Adicionar não sai da página: aviso na hora e o carrinho do topo atualiza
+    await page.getByRole("button", { name: "Aumentar quantidade" }).click();
+    await expect(page.getByTestId("quantidade")).toHaveText("2");
+    await page.getByRole("button", { name: "Adicionar ao carrinho" }).click();
+    await expect(page.getByTestId("adicionado")).toContainText("2 unidades adicionadas ao carrinho");
+    await expect(page).toHaveURL(productUrl);
+    await expect(page.getByRole("link", { name: /Carrinho, 2 itens/ })).toBeVisible();
+    await page.goto("/carrinho");
     await expect(page.getByText(title).filter({ visible: true }).first()).toBeVisible();
     await expect(page.getByText("R$ 246,90").filter({ visible: true }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /Carrinho, 2 itens/ })).toBeVisible();
 
-    await page.getByRole("link", { name: "Finalizar compra" }).click();
+    // "Comprar agora" vai direto para a finalização (sem duplicar o que já está no carrinho)
+    await page.goto(productUrl);
+    await page.getByLabel("Quantidade", { exact: true }).selectOption("2");
+    await page.getByRole("button", { name: "Comprar agora" }).first().click();
     await expect(page).toHaveURL(/\/checkout$/);
     await expect(page.getByRole("heading", { name: "Resumo da compra" })).toBeVisible();
     if (await page.getByLabel("Quem vai receber").isVisible()) {
