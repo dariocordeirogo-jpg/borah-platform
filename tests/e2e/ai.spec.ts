@@ -5,6 +5,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
 import type { Database } from "@/lib/supabase/database.types";
+import { runTag } from "./run-tag";
 
 const URL_SB = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://elygbieuroidqxkifgou.supabase.co";
 const KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "sb_publishable_q6ee6uIuN9A8l8ni8wfngQ_NZc5L7Vn";
@@ -13,7 +14,7 @@ test.describe("IA e filtros do Market", () => {
   test.describe.configure({ mode: "serial" });
   test.beforeEach(({}, info) => test.skip(info.project.name !== "desktop", "roda uma vez (desktop)"));
 
-  const run = Date.now();
+  const run = runTag();
   const word = `Garrafa${run}`;
   let seller: SupabaseClient<Database>;
   const ids: string[] = [];

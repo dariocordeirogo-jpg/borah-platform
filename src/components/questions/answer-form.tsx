@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
+import { ContactWarning } from "@/components/contact-warning";
 import { answerQuestion, type AskState } from "@/lib/questions/actions";
 
 export function AnswerForm({ questionId, initial }: { questionId: number; initial?: string | null }) {
@@ -38,6 +39,7 @@ export function AnswerForm({ questionId, initial }: { questionId: number; initia
           </p>
         )}
       </div>
+      {state.contactHidden && <ContactWarning />}
     </form>
   );
 }

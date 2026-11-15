@@ -1,16 +1,16 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import type { Database } from "@/lib/supabase/database.types";
+import { runTag } from "./run-tag";
 
-/** Perguntas e respostas: comprador pergunta (contato fora da Zexi é recusado), a loja responde e todos veem. */
+/** Perguntas e respostas: comprador pergunta (contato fora da Zexi é ocultado com aviso), a loja responde e todos veem. */
 const URL_SB = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://elygbieuroidqxkifgou.supabase.co";
 const KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "sb_publishable_q6ee6uIuN9A8l8ni8wfngQ_NZc5L7Vn";
 const PASSWORD = "Teste12345";
 const SELLER = "e2e-vendedor@livelance.test";
 const BUYER = process.env.E2E_EMAIL ?? "e2e@livelance.test";
-const run = Date.now();
-// Identificador só com letras: um número longo seria barrado como telefone pelo filtro de contato
-const tag = String(run).replace(/\d/g, (d) => "abcdefghij"[Number(d)]);
+const run = runTag();
+const tag = run.toLowerCase();
 const title = `Capacete Perguntas ${run}`;
 
 async function browserAs(browser: Browser, email: string, next: string): Promise<Page> {
@@ -55,12 +55,15 @@ test.describe("Perguntas e respostas", () => {
     await expect(section.getByRole("link", { name: "Entre na sua conta" })).toBeVisible();
   });
 
-  test("comprador pergunta; telefone é recusado; a pergunta fica visível só para ele até a resposta", async ({ browser }) => {
+  test("comprador pergunta; telefone é ocultado com aviso; a pergunta fica visível só para ele até a resposta", async ({ browser }) => {
     const buyer = await browserAs(browser, BUYER, `/produto/${productId}`);
     const section = buyer.getByRole("region", { name: "Perguntas e respostas" });
-    await section.getByLabel("Pergunte ao vendedor").fill("Me chama no (62) 99999-8888");
+    await section.getByLabel("Pergunte ao vendedor").fill(`Tem desconto ${tag}? liga (62) 99999-8888 ou no whatsapp`);
     await section.getByRole("button", { name: "Perguntar" }).click();
-    await expect(section.getByRole("alert")).toContainText("não é permitido trocar telefone");
+    await expect(section.getByTestId("aviso-contato")).toContainText("proibido compartilhar telefone");
+    const masked = section.getByTestId("lista-perguntas");
+    await expect(masked).toContainText(`Tem desconto ${tag}? liga [contato oculto] ou no [contato oculto]`);
+    await expect(masked).not.toContainText("99999");
 
     await section.getByLabel("Pergunte ao vendedor").fill(`Serve na cabeça 58? ${tag}`);
     await section.getByRole("button", { name: "Perguntar" }).click();
@@ -96,9 +99,19 @@ test.describe("Avaliações e reputação", () => {
     await expect(page).toHaveURL(/\/produto\/[0-9a-f-]{36}/);
     const reviews = page.getByRole("region", { name: "Opiniões do produto" });
     await expect(reviews).toBeVisible();
-    await expect(page.getByTestId("reputacao-loja").first()).toContainText(/Loja nova|reputação/);
+    await expect(page.getByTestId("reputacao-loja").first()).toContainText(/Loja nova|Reputação (verde|amarela|vermelha)/);
     await page.getByRole("link", { name: "Ver mais da loja" }).click();
     await expect(page).toHaveURL(/\/loja\//);
     await expect(page.getByTestId("reputacao-loja")).toContainText(/vendas|Ainda sem vendas/);
+  });
+
+  test("vendedor vê a cor da reputação (ou loja nova) e as regras no painel", async ({ browser }) => {
+    const studio = await browserAs(browser, SELLER, "/seller");
+    const box = studio.getByRole("region", { name: "Sua reputação" });
+    await expect(box.getByTestId("reputacao-loja")).toHaveAttribute("data-cor", /^(nova|green|yellow|red)$/);
+    await expect(box).toContainText("5 primeiras vendas");
+    await expect(box).toContainText("10%");
+    await expect(box).toContainText("48 horas");
+    await studio.context().close();
   });
 });

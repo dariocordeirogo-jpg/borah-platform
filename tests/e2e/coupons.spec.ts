@@ -5,6 +5,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import type { Database } from "@/lib/supabase/database.types";
+import { runTag } from "./run-tag";
 
 const URL_SB = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://elygbieuroidqxkifgou.supabase.co";
 const KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "sb_publishable_q6ee6uIuN9A8l8ni8wfngQ_NZc5L7Vn";
@@ -34,7 +35,7 @@ test.describe("Cupons: loja cria, compradora usa", () => {
   test.describe.configure({ mode: "serial" });
   test.beforeEach(({}, info) => test.skip(info.project.name !== "desktop", "roda uma vez (desktop)"));
 
-  const run = Date.now();
+  const run = runTag();
   const title = `Mochila Cupom ${run}`;
   const code = `E2E${String(run).slice(-8)}`;
   let seller: { c: SupabaseClient<Database>; id: string };

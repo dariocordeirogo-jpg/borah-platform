@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { normalizeCep } from "@/lib/shipping/format";
 import { createClient } from "@/lib/supabase/server";
+import { hasContact } from "@/lib/contact/server";
 import { marketErrorMessage } from "@/lib/market/format";
 import { extensionFor, sniffImageType } from "@/lib/market/image-check";
 import { MAX_IMAGE_BYTES, MAX_IMAGES_PER_PRODUCT, PRODUCT_IMAGE_BUCKET } from "@/lib/market/images";
@@ -59,7 +60,7 @@ export async function updateStore(_prev: FormState, formData: FormData): Promise
     .eq("id", store.id);
   if (error) return { error: "Não foi possível salvar." };
   revalidatePath("/", "layout");
-  return { message: "Loja atualizada." };
+  return { message: "Loja atualizada.", contactHidden: await hasContact(supabase, parsed.data.name, parsed.data.description) };
 }
 
 /** Cria (sem id) ou atualiza (com id) um produto da própria loja. */
@@ -87,7 +88,7 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
     const { error } = await supabase.from("products").update(values).eq("id", productId).eq("store_id", store.id);
     if (error) return { error: "Não foi possível salvar o produto." };
     revalidatePath("/", "layout");
-    return { message: "Produto salvo." };
+    return { message: "Produto salvo.", contactHidden: await hasContact(supabase, d.title, d.description) };
   }
 
   const { data, error } = await supabase
@@ -97,7 +98,8 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
     .single();
   if (error || !data) return { error: "Não foi possível criar o produto." };
   revalidatePath("/", "layout");
-  redirect(`/seller/produtos/${data.id}?criado=1`);
+  const hidden = await hasContact(supabase, d.title, d.description);
+  redirect(`/seller/produtos/${data.id}?criado=1${hidden ? "&contato=1" : ""}`);
 }
 
 export async function uploadProductImages(_prev: FormState, formData: FormData): Promise<FormState> {

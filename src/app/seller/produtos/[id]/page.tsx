@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ContactWarning } from "@/components/contact-warning";
 import Link from "next/link";
 import { aiConfigured } from "@/lib/ai/claude";
 import { notFound } from "next/navigation";
@@ -14,7 +15,7 @@ import { requireStore } from "@/lib/market/seller-guard";
 
 export const metadata: Metadata = { title: "Editar produto" };
 
-type SP = { criado?: string; importado?: string; fotos_falharam?: string };
+type SP = { criado?: string; importado?: string; fotos_falharam?: string; contato?: string };
 
 async function Edit({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<SP> }) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
@@ -24,6 +25,7 @@ async function Edit({ params, searchParams }: { params: Promise<{ id: string }>;
   return (
     <div className="space-y-6">
       {sp.criado && <Notice tone="success">Produto criado. Agora envie as fotos.</Notice>}
+      {sp.contato && <ContactWarning />}
       {sp.importado !== undefined && (
         <Notice tone="success">
           Anúncio importado como rascunho

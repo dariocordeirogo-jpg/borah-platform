@@ -6,8 +6,6 @@ export function questionErrorMessage(message?: string): string {
       return "Escreva a pergunta com 5 a 500 caracteres.";
     case "invalid_answer":
       return "Escreva a resposta com 2 a 1000 caracteres.";
-    case "contact_not_allowed":
-      return "Por segurança, não é permitido trocar telefone, e-mail, links ou redes sociais. Converse e compre pela Zexi para ter a Compra Garantida.";
     case "own_product":
       return "Este produto é da sua loja.";
     case "too_many_questions":

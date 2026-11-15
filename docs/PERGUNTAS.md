@@ -5,9 +5,8 @@ Na página do produto, quem está logado pergunta à loja; só a loja dona do pr
 
 - **Visível para todos:** perguntas já respondidas de produtos à venda. Pergunta sem resposta só quem perguntou
   (e a loja) veem.
-- **Contato fora da Zexi é recusado** nas perguntas e nas respostas (`private.has_contact`): e-mail, links,
-  WhatsApp/Telegram, @perfil e telefone (DDD + 8/9 dígitos, com ou sem separadores). Números de modelo, ano e
-  medida continuam permitidos. Motivo: a compra combinada fora da plataforma perde a Compra Garantida.
+- **Contato fora da Zexi é ocultado** nas perguntas e nas respostas: o banco troca o trecho por
+  "[contato oculto]" e o site avisa da proibição. Regra completa em `docs/REGRAS.md`.
 - **Limites:** 5 a 500 caracteres na pergunta, 2 a 1000 na resposta; 10 perguntas por hora por pessoa; a loja
   não pergunta no próprio produto.
 - **Moderação:** a loja (ou a moderação da Zexi) esconde perguntas ofensivas ou fora de contexto (`hide_question`).

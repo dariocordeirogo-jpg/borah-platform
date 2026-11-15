@@ -2,8 +2,7 @@ import { describe, expect, it } from "vitest";
 import { questionErrorMessage, timeAgo } from "@/lib/questions/format";
 
 describe("Perguntas e respostas: textos", () => {
-  it("explica por que contato fora da Zexi é recusado", () => {
-    expect(questionErrorMessage("contact_not_allowed")).toContain("Compra Garantida");
+  it("explica os erros (contato não é recusado: o banco oculta e o site avisa)", () => {
     expect(questionErrorMessage("invalid_question")).toContain("5 a 500");
     expect(questionErrorMessage("qualquer")).toBe("Não foi possível enviar agora. Tente de novo.");
   });

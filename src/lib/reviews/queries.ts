@@ -24,6 +24,8 @@ export async function getProductReviews(productId: string, limit = 10) {
   return { summary, reviews: (reviews ?? []) as ProductReview[] };
 }
 
+const num = (v: number | string | null) => (v === null ? null : Number(v));
+
 /** Reputação de várias lojas de uma vez (números agregados calculados pelo banco). */
 export async function getStoreReputations(storeIds: string[]): Promise<Map<string, Reputation>> {
   const ids = [...new Set(storeIds)].slice(0, 50);
@@ -35,11 +37,13 @@ export async function getStoreReputations(storeIds: string[]): Promise<Map<strin
   for (const r of data ?? []) {
     out.set(r.store_id, {
       sales: r.sales,
-      onTimeRate: r.on_time_rate === null ? null : Number(r.on_time_rate),
-      answerRate: r.answer_rate === null ? null : Number(r.answer_rate),
-      ratingAvg: r.rating_avg === null ? null : Number(r.rating_avg),
+      complaintRate: num(r.complaint_rate),
+      cancelRate: num(r.cancel_rate),
+      delayRate: num(r.delay_rate),
+      answerRate: num(r.answer_rate),
+      ratingAvg: num(r.rating_avg),
       ratingCount: r.rating_count,
-      level: r.level,
+      color: r.color === "green" || r.color === "yellow" || r.color === "red" ? r.color : null,
     });
   }
   return out;

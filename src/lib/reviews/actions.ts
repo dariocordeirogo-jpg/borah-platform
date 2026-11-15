@@ -4,8 +4,9 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { reviewErrorMessage } from "@/lib/reviews/format";
 import { createClient } from "@/lib/supabase/server";
+import { hasContact } from "@/lib/contact/server";
 
-export type ReviewState = { error?: string; ok?: boolean };
+export type ReviewState = { error?: string; ok?: boolean; contactHidden?: boolean };
 const uuid = z.uuid();
 
 export async function reviewProduct(_prev: ReviewState, formData: FormData): Promise<ReviewState> {
@@ -25,5 +26,5 @@ export async function reviewProduct(_prev: ReviewState, formData: FormData): Pro
   if (error) return { error: reviewErrorMessage(error.message) };
   revalidatePath(`/conta/pedidos/${orderId.data}`);
   revalidatePath(`/produto/${productId.data}`);
-  return { ok: true };
+  return { ok: true, contactHidden: await hasContact(supabase, comment) };
 }
