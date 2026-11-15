@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { runTag } from "./run-tag";
 
 const SELLER = { email: "e2e-vendedor@livelance.test", password: "Teste12345" };
 
@@ -17,7 +18,7 @@ test.describe("Vídeo do produto por link", () => {
   test("loja cola link do YouTube; a página do produto mostra o player oficial", async ({ page }) => {
     // Produto próprio do teste (não depende da ordem dos outros testes)
     await login(page, "/seller/produtos/novo");
-    await page.getByLabel("Título").fill(`Caixa de som com vídeo E2E ${Date.now()}`);
+    await page.getByLabel("Título").fill(`Caixa de som com vídeo E2E ${runTag()}`);
     await page.getByLabel("Categoria").selectOption({ index: 1 });
     await page.getByLabel("Preço (R$)").fill("199,90");
     await page.getByRole("button", { name: "Criar produto" }).click();

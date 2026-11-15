@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ContactWarning } from "@/components/contact-warning";
 import { reviewProduct, type ReviewState } from "@/lib/reviews/actions";
 import { cn } from "@/lib/utils";
 
@@ -75,6 +76,7 @@ export function ReviewForm({
           </p>
         )}
       </div>
+      {state.contactHidden && <ContactWarning />}
     </form>
   );
 }

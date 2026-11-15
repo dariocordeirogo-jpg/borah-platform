@@ -3,6 +3,8 @@
 import { useActionState, useEffect, useRef } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ContactWarning } from "@/components/contact-warning";
+import { CONTACT_HINT } from "@/lib/contact/rule";
 import { askQuestion, type AskState } from "@/lib/questions/actions";
 
 /** Caixa de pergunta no produto. A loja recebe o aviso e a resposta aparece aqui para todos. */
@@ -43,7 +45,8 @@ export function AskForm({ productId }: { productId: string }) {
           Pergunta enviada! Avisamos a loja e a resposta aparece aqui.
         </p>
       )}
-      <p className="text-xs text-muted">Não compartilhe telefone, e-mail ou links: negocie e pague pela Zexi para ter a Compra Garantida.</p>
+      {state.contactHidden && <ContactWarning />}
+      <p className="text-xs text-muted">{CONTACT_HINT} Negocie e pague pela Zexi para ter a Compra Garantida.</p>
     </form>
   );
 }

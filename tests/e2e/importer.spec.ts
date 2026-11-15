@@ -3,6 +3,7 @@ import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { runTag } from "./run-tag";
 
 /**
  * Importador de anúncios. Um servidor de exemplo em 127.0.0.1 faz o papel da "outra loja"
@@ -10,7 +11,7 @@ import { expect, test, type Page } from "@playwright/test";
  */
 const SELLER = { email: "e2e-vendedor@livelance.test", password: "Teste12345" };
 const photo = readFileSync(path.join(__dirname, "fixtures", "produto.jpg"));
-const run = Date.now();
+const run = runTag();
 const title = `Luminária Importada E2E ${run}`;
 
 let server: Server;

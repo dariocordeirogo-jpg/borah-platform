@@ -1,5 +1,6 @@
 "use client";
 
+import { CONTACT_WARNING } from "@/lib/contact/rule";
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { EyeOff, Send } from "lucide-react";
@@ -103,11 +104,12 @@ export function LiveChat({
                 const res = await sendMessage(liveId, body);
                 if (res.error) setError(res.error);
                 else {
-                  setError(null);
+                  setError(res.contactHidden ? CONTACT_WARNING : null);
                   setText("");
-                  // Mostra a própria mensagem na hora; o tempo real só confirma (sem duplicar pelo id)
+                  // Mostra a própria mensagem na hora (como o banco gravou); o tempo real só confirma (sem duplicar pelo id)
                   const id = res.id;
-                  if (id) setMessages((prev) => (prev.some((x) => x.id === id) ? prev : [...prev, { id, alias: "Você", body, hidden: false }]));
+                  const saved = res.body ?? body;
+                  if (id) setMessages((prev) => (prev.some((x) => x.id === id) ? prev : [...prev, { id, alias: "Você", body: saved, hidden: false }]));
                 }
               });
             }}

@@ -12,6 +12,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { reviewWindowOpen } from "@/lib/reviews/format";
 import { getMyOrderReviews } from "@/lib/reviews/queries";
 import { ReviewForm } from "@/components/reviews/review-form";
+import { OrderComplaint } from "@/components/complaints/order-complaint";
+import { complaintWindowOpen } from "@/lib/complaints/format";
+import { getOrderComplaint } from "@/lib/complaints/queries";
 import { formatBRL } from "@/lib/format";
 import { formatDays, shippingServiceLabel } from "@/lib/shipping/format";
 import { cancelMyOrder } from "@/lib/market/actions";
@@ -20,7 +23,7 @@ import { syncCheckoutReturn } from "@/lib/pay/sync";
 
 export const metadata: Metadata = { title: "Pedido", robots: { index: false } };
 
-type SP = { novo?: string; erro?: string; pagamento?: string; sessao?: string; recebido?: string };
+type SP = { novo?: string; erro?: string; pagamento?: string; sessao?: string; recebido?: string; resolvida?: string };
 type Addr = { recipient: string; street: string; number: string; complement: string | null; district: string; city: string; state: string; cep: string };
 
 async function Order({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<SP> }) {
@@ -34,7 +37,11 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
   const a = o.shipping_address as unknown as Addr;
   // Avaliar: pedido entregue, até 60 dias depois da entrega (o banco confere de novo)
   const canReview = o.status === "delivered" && reviewWindowOpen(o.delivered_at ?? o.created_at);
-  const myReviews = canReview ? await getMyOrderReviews(o.id) : new Map();
+  const canComplain = complaintWindowOpen(o.status, o.delivered_at);
+  const [myReviews, complaint] = await Promise.all([
+    canReview ? getMyOrderReviews(o.id) : Promise.resolve(new Map()),
+    canComplain || o.status === "delivered" ? getOrderComplaint(o.id) : Promise.resolve(null),
+  ]);
 
   return (
     <div className="space-y-4">
@@ -46,6 +53,7 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
       {sp.pagamento === "cancelado" && <Notice>Pagamento não concluído. Você pode tentar de novo quando quiser.</Notice>}
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
       {sp.recebido && <Notice tone="success">Obrigado por confirmar! Esperamos que goste da compra.</Notice>}
+      {sp.resolvida && <Notice tone="success">Que bom que deu certo! Reclamação encerrada.</Notice>}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold tracking-tight text-navy">Pedido #{o.number}</h1>
         <OrderStatus status={o.status} />
@@ -122,6 +130,8 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
           ))}
         </section>
       )}
+
+      <OrderComplaint orderId={o.id} complaint={complaint} canOpen={canComplain} />
 
       <section className="rounded-[var(--radius-card)] border border-line bg-white p-4 text-sm">
         <h2 className="font-semibold text-navy">Entrega</h2>

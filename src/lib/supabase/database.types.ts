@@ -264,6 +264,24 @@ export type Database = {
           },
         ];
       };
+      order_complaints: {
+        Row: {
+          id: number;
+          order_id: string;
+          store_id: string;
+          buyer_id: string;
+          reason: "not_received" | "not_as_described" | "damaged" | "other";
+          details: string | null;
+          status: "open" | "resolved";
+          created_at: string;
+          resolved_at: string | null;
+        };
+        Insert: { [k: string]: never };
+        Update: { [k: string]: never };
+        Relationships: [
+          { foreignKeyName: "order_complaints_order_id_fkey"; columns: ["order_id"]; isOneToOne: true; referencedRelation: "orders"; referencedColumns: ["id"] },
+        ];
+      };
       order_events: {
         Row: { id: number; order_id: string; kind: string; detail: Json; created_at: string };
         Insert: { order_id: string; kind: string; detail?: Json; created_at?: string };
@@ -783,13 +801,18 @@ export type Database = {
         Returns: {
           store_id: string;
           sales: number;
-          on_time_rate: number | null;
+          complaint_rate: number | null;
+          cancel_rate: number | null;
+          delay_rate: number | null;
           answer_rate: number | null;
           rating_avg: number | null;
           rating_count: number;
-          level: number | null;
+          color: "green" | "yellow" | "red" | null;
         }[];
       };
+      contact_hidden: { Args: { _text: string }; Returns: boolean };
+      open_complaint: { Args: { _order_id: string; _reason: string; _details: string | null }; Returns: number };
+      resolve_complaint: { Args: { _complaint_id: number }; Returns: undefined };
       create_auction: {
         Args: {
           _product_id: string;

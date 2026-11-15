@@ -9,10 +9,18 @@ import { requireStore } from "@/lib/market/seller-guard";
 import { payoutState, payoutStateLabel } from "@/lib/pay/format";
 import { getMyPayoutAccount } from "@/lib/pay/queries";
 import { countOpenQuestions } from "@/lib/questions/queries";
+import { StoreReputation } from "@/components/reviews/store-reputation";
+import { percent, REPUTATION_RULES } from "@/lib/reviews/format";
+import { getStoreReputations } from "@/lib/reviews/queries";
 
 async function Dashboard({ searchParams }: { searchParams: Promise<{ bemvindo?: string }> }) {
   const [store, sp] = await Promise.all([requireStore("/seller"), searchParams]);
-  const [s, account, openQuestions] = await Promise.all([getSellerStats(store.id), getMyPayoutAccount(store.id), countOpenQuestions(store.id)]);
+  const [s, account, openQuestions, reputations] = await Promise.all([
+    getSellerStats(store.id),
+    getMyPayoutAccount(store.id),
+    countOpenQuestions(store.id),
+    getStoreReputations([store.id]),
+  ]);
   const payout = payoutState(account);
   const cards = [
     { icon: Package, label: "Produtos ativos", value: `${s.activeProducts} de ${s.totalProducts}`, href: "/seller/produtos" },
@@ -53,6 +61,16 @@ async function Dashboard({ searchParams }: { searchParams: Promise<{ bemvindo?: 
           <Plus className="h-4 w-4" aria-hidden="true" /> Novo produto
         </ButtonLink>
       </div>
+      <section aria-label="Sua reputação" className="space-y-3 rounded-[var(--radius-card)] border border-line bg-white p-4 shadow-[var(--shadow-card)]">
+        <h2 className="font-semibold text-navy">Sua reputação</h2>
+        <StoreReputation reputation={reputations.get(store.id)} />
+        <p className="text-xs text-muted">
+          A cor aparece depois das {REPUTATION_RULES.minSales} primeiras vendas. Vermelha acima de {percent(REPUTATION_RULES.complaintLimit)} de
+          reclamações, {percent(REPUTATION_RULES.cancelLimit)} de cancelamentos pela loja ou {percent(REPUTATION_RULES.delayLimit)} de envios
+          atrasados (mais de {REPUTATION_RULES.handlingDays} dias após o pagamento); amarela a partir da metade desses limites. Reclamação resolvida
+          em até 48 horas não pesa. Conta o último ano (ou os últimos 60 dias, para quem vendeu 101 ou mais nesse período).
+        </p>
+      </section>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {cards.map((c) => (
           <li key={c.label}>

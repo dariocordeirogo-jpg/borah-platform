@@ -1,5 +1,6 @@
 "use client";
 
+import { ContactWarning } from "@/components/contact-warning";
 import { useActionState, useState, startTransition } from "react";
 import { Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ function Alerts({ state }: { state: FormState }) {
           {state.message}
         </p>
       )}
+      {state.contactHidden && <ContactWarning />}
     </>
   );
 }

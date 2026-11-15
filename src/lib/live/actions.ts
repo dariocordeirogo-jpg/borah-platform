@@ -10,6 +10,7 @@ import { createMuxStream, disableMuxStream, muxConfigured, publicPlaybackId } fr
 import { retireLiveStream } from "@/lib/live/stream";
 import { parseBRLToCents } from "@/lib/market/format";
 import { createClient } from "@/lib/supabase/server";
+import { hasContact } from "@/lib/contact/server";
 
 const uuid = z.uuid();
 export type LiveFormState = { error?: string };
@@ -157,11 +158,18 @@ export async function startLiveAuction(formData: FormData) {
   redirect(studio(liveId, error ? liveErrorMessage(error.message) : undefined));
 }
 
-export async function sendMessage(liveId: string, body: string): Promise<{ error?: string; id?: number }> {
+export async function sendMessage(
+  liveId: string,
+  body: string,
+): Promise<{ error?: string; id?: number; body?: string; contactHidden?: boolean }> {
   if (!uuid.safeParse(liveId).success) return { error: liveErrorMessage() };
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("send_live_message", { _live_id: liveId, _body: body.slice(0, 400) });
-  return error ? { error: liveErrorMessage(error.message) } : { id: data ?? undefined };
+  if (error) return { error: liveErrorMessage(error.message) };
+  if (!(await hasContact(supabase, body))) return { id: data ?? undefined, body };
+  // O banco gravou com o contato oculto: devolve o texto como ficou
+  const { data: saved } = data ? await supabase.from("live_messages").select("body").eq("id", data).maybeSingle() : { data: null };
+  return { id: data ?? undefined, body: saved?.body ?? body, contactHidden: true };
 }
 
 export async function hideMessage(messageId: number): Promise<{ error?: string }> {
