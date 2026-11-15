@@ -16,8 +16,8 @@ async function Cart() {
   if (!cart) redirect("/entrar?next=/carrinho");
   if (!cart.items.length) {
     return (
-      <EmptyState title="Seu carrinho está vazio" action={<ButtonLink href="/market">Explorar o Market</ButtonLink>}>
-        Encontre produtos no ZEXI MARKET.
+      <EmptyState title="Seu carrinho está vazio" action={<ButtonLink href="/market">Ver produtos</ButtonLink>}>
+        Encontre produtos na Zexi Compras.
       </EmptyState>
     );
   }

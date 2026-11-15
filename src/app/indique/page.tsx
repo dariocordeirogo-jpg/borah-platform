@@ -30,7 +30,7 @@ async function Program({ searchParams }: { searchParams: Promise<{ erro?: string
     <div className="space-y-8">
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
       <section className="rounded-[var(--radius-card)] bg-navy p-6 text-white md:p-10">
-        <p className="text-sm font-bold tracking-wider text-white/70">INDIQUE E GANHE</p>
+        <p className="text-sm font-bold tracking-wider text-white/70">Indique e ganhe</p>
         <h1 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">Ganhe {rate} em cada venda que você indicar</h1>
         <p className="mt-3 max-w-2xl text-white/80">
           Divulgue produtos e leilões da Zexi no WhatsApp, Instagram ou onde quiser. Sem custo e sem precisar ter loja.

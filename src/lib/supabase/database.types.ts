@@ -264,6 +264,26 @@ export type Database = {
           },
         ];
       };
+      flash_deals: {
+        Row: {
+          id: number;
+          product_id: string;
+          store_id: string;
+          deal_price_cents: number;
+          starts_at: string;
+          ends_at: string;
+          status: "scheduled" | "active" | "ended" | "cancelled";
+          original_price_cents: number | null;
+          original_compare_cents: number | null;
+          created_at: string;
+        };
+        Insert: { [k: string]: never };
+        Update: { [k: string]: never };
+        Relationships: [
+          { foreignKeyName: "flash_deals_product_id_fkey"; columns: ["product_id"]; isOneToOne: false; referencedRelation: "products"; referencedColumns: ["id"] },
+          { foreignKeyName: "flash_deals_store_id_fkey"; columns: ["store_id"]; isOneToOne: false; referencedRelation: "stores"; referencedColumns: ["id"] },
+        ];
+      };
       order_complaints: {
         Row: {
           id: number;
@@ -366,6 +386,7 @@ export type Database = {
           condition: Database["public"]["Enums"]["product_condition"];
           created_at: string;
           description: string | null;
+          discount_pct: number | null;
           id: string;
           imported_from: string | null;
           is_showcase: boolean;
@@ -835,6 +856,8 @@ export type Database = {
         }[];
       };
       contact_hidden: { Args: { _text: string }; Returns: boolean };
+      create_flash_deal: { Args: { _product_id: string; _deal_price_cents: number; _starts_at: string | null; _hours: number }; Returns: number };
+      cancel_flash_deal: { Args: { _deal_id: number }; Returns: undefined };
       open_complaint: { Args: { _order_id: string; _reason: string; _details: string | null }; Returns: number };
       resolve_complaint: { Args: { _complaint_id: number }; Returns: undefined };
       create_auction: {

@@ -22,7 +22,7 @@ type Slide = {
 const slides: Slide[] = [
   {
     id: "ao-vivo",
-    eyebrow: "MARKET · LIVE · LEILÕES",
+    eyebrow: "Compras · Ao vivo · Leilões",
     title: (
       <>
         Tudo acontece <span className="text-brand-bright">ao vivo.</span>
@@ -31,16 +31,16 @@ const slides: Slide[] = [
     text: "Compre, assista e dê seu lance em um só lugar.",
     cta: { href: "/market", label: "Explorar ofertas" },
     image: "/images/home/hero.webp",
-    alt: "Vendedora sorridente mostra um tênis para o celular durante uma live de vendas",
+    alt: "Vendedora sorridente mostra um tênis para o celular durante uma transmissão de vendas",
     bg: "bg-navy",
     ctaClass: "bg-brand text-white hover:bg-brand-dark",
   },
   {
     id: "lives",
-    eyebrow: "ZEXI LIVE",
-    title: "Viu na live, comprou na hora.",
+    eyebrow: "Zexi Ao Vivo",
+    title: "Viu na transmissão, comprou na hora.",
     text: "Lojas apresentam produtos ao vivo. Pergunte no chat e compre sem sair da transmissão.",
-    cta: { href: "/ao-vivo", label: "Ver lives" },
+    cta: { href: "/ao-vivo", label: "Ver transmissões" },
     image: "/images/home/live.webp",
     alt: "Vendedor mostra uma bolsa para o celular durante uma transmissão ao vivo",
     bg: "bg-brand",
@@ -48,7 +48,7 @@ const slides: Slide[] = [
   },
   {
     id: "leiloes",
-    eyebrow: "ZEXI LEILÕES",
+    eyebrow: "Zexi Leilões",
     title: "Cada lance conta.",
     text: "Lances em tempo real e cronômetro oficial. Quem der o maior lance arremata.",
     cta: { href: "/leiloes", label: "Ver leilões" },
@@ -59,7 +59,7 @@ const slides: Slide[] = [
   },
   {
     id: "cupons",
-    eyebrow: "CUPONS DAS LOJAS",
+    eyebrow: "Cupons das lojas",
     title: "Tem cupom? Tem desconto.",
     text: "Lojas criam cupons exclusivos. É só digitar o código ao finalizar a compra.",
     cta: { href: "/market", label: "Ver ofertas" },

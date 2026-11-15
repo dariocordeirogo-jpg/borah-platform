@@ -18,9 +18,13 @@
   `docs/BRAND_MIGRATION.md`, nos e-mails/loja das contas de teste (`@livelance.test`, "Loja E2E LIVELANCE") e no
   tempero interno do hash de CPF (não pode mudar).
 - Logo: só os arquivos de `public/brand/` (vetorizados da arte original); nunca redesenhar nem digitar o logo como texto.
-- Cores: grafite `#0F1115` + branco; laranja Zexi `#FF4D2D` em botões, links, ponto AO VIVO e selos.
+- Cores: grafite `#0F1115` + branco; laranja Zexi `#FF4D2D` no cabeçalho (como a faixa do Mercado Livre, com o logo
+  sobre placa branca), em botões, links, ponto "Ao vivo" e selos.
   Dourado só em botões de comprar/dar lance; verde só em status.
-- Módulos: ZEXI MARKET (`/market`), ZEXI LIVE (`/ao-vivo`), ZEXI LEILÕES (`/leiloes`), ZEXI SELLER (`/vender`), ZEXI PAY.
+- Módulos (nomes em português, sem caixa alta): Zexi Compras (`/market`), Zexi Ao Vivo (`/ao-vivo`), Zexi Leilões
+  (`/leiloes`), Zexi Vendedor (`/vender`), Pagamento Zexi. Ofertas em `/ofertas` (inclui ofertas relâmpago).
+- Texto da tela sempre em português do Brasil: nada de palavras em inglês ("live" → "transmissão") nem frases em
+  caixa alta. Códigos digitados (cupom, rastreio) podem ficar em maiúsculas.
 
 ## Next.js 16
 

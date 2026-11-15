@@ -8,7 +8,7 @@ test("home Zexi: slogan, três modalidades e aviso de demonstração", async ({ 
     await expect(page.getByRole("link", { name }).first()).toBeVisible();
   }
   await expect(page.getByText(/“Demonstração” não são reais/).first()).toBeVisible();
-  for (const h of ["Transmissões ao vivo", "Leilões terminando", "Ofertas do Market", "Próximos leilões"]) {
+  for (const h of ["Transmissões ao vivo", "Leilões terminando", "Ofertas da Zexi", "Próximos leilões"]) {
     await expect(page.getByRole("heading", { name: h })).toBeVisible();
   }
 });
@@ -88,7 +88,7 @@ test("sem rolagem horizontal nas páginas principais", async ({ page }) => {
 
 test("vitrine no padrão marketplace: card inteiro clicável, foto, preço e marca de demonstração", async ({ page }) => {
   await page.goto("/");
-  const ofertas = page.getByRole("list", { name: "Ofertas do Market" });
+  const ofertas = page.getByRole("list", { name: "Ofertas da Zexi" });
   await expect(ofertas.getByRole("listitem").first()).toBeVisible();
   // Os cards trazem foto (no celular só os 4 primeiros ficam visíveis; os itens de teste locais não têm foto)
   expect(await ofertas.locator("article img").count()).toBeGreaterThan(0);

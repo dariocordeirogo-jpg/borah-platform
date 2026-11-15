@@ -27,7 +27,7 @@ export default function Page() {
             guarda apenas identificadores e o status do pagamento.
           </li>
           <li>Lojas: dados da loja e da conta de recebimento cadastrada no provedor de pagamento.</li>
-          <li>Conteúdo que você publica: produtos, fotos, vídeos, lives, mensagens no chat das lives e denúncias.</li>
+          <li>Conteúdo que você publica: produtos, fotos, vídeos, transmissões, mensagens no chat das transmissões e denúncias.</li>
           <li>Indicações (afiliados): cliques em links de indicação e comissões geradas.</li>
           <li>Registros técnicos e de auditoria: ações administrativas, eventos de pagamento e registros de acesso.</li>
         </ul>
@@ -60,7 +60,7 @@ export default function Page() {
             Anthropic (Claude) — só quando um recurso de IA é usado: o texto do anúncio, as fotos do produto, o pedido de
             busca ou o conteúdo denunciado são enviados para gerar a resposta. Não enviamos CPF, telefone nem endereço.
           </li>
-          <li>Provedor de transmissão das lives (a definir).</li>
+          <li>Provedor de transmissão das transmissões (a definir).</li>
           <li>Lojas vendedoras recebem nome e endereço de entrega dos seus pedidos, só para entregar.</li>
         </ul>
 

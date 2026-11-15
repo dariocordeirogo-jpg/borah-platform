@@ -7,7 +7,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { getLiveProductsForSeller } from "@/lib/live/queries";
 import { requireStore } from "@/lib/market/seller-guard";
 
-export const metadata: Metadata = { title: "Programar live" };
+export const metadata: Metadata = { title: "Programar transmissão" };
 
 /** Próxima hora cheia no horário de Brasília, no formato do campo datetime-local. */
 function nextHourBrasilia(): string {
@@ -37,7 +37,7 @@ async function NewLive() {
 export default function Page() {
   return (
     <div className="space-y-4">
-      <h1 className="font-display text-2xl font-bold tracking-tight text-navy">Programar live</h1>
+      <h1 className="font-display text-2xl font-bold tracking-tight text-navy">Programar transmissão</h1>
       <Suspense fallback={<div className="h-64 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
         <NewLive />
       </Suspense>

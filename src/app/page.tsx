@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Countdown } from "@/components/offers/countdown";
+import { listFlashDeals, listOffers } from "@/lib/offers/queries";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ArrowRight, Flame, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Tag, UserRound, Video } from "lucide-react";
+import { ArrowRight, Flame, Gavel, Info, Radio, ShieldCheck, ShoppingBag, Store as StoreIcon, Tag, UserRound, Video, Zap } from "lucide-react";
 import { HeroCarousel } from "@/components/home/hero-carousel";
 import { DepartmentCards } from "@/components/home/department-cards";
 import { PromoBanners } from "@/components/home/promo-banners";
@@ -49,7 +51,7 @@ async function LivesShelf() {
   const { live, upcoming: next } = await listLives();
   const real = [...live.map((l) => ({ l, on: true })), ...next.map((l) => ({ l, on: false }))].slice(0, 8);
   return (
-    <Shelf title="Transmissões ao vivo" eyebrow={eyebrow(Radio, "ZEXI LIVE")} href="/ao-vivo" cta="Ver lives" size="live">
+    <Shelf title="Transmissões ao vivo" eyebrow={eyebrow(Radio, "Zexi Ao Vivo")} href="/ao-vivo" cta="Ver transmissões" size="live">
       {real.map(({ l, on }) => (
         <li key={l.id}>
           <LiveCard href={`/live/${l.id}`} title={l.title} store={l.stores?.name} live={on} when={on ? undefined : whenBR(l.scheduled_at)} auction={(l.auctions ?? []).some((a) => a.status === "active")} />
@@ -68,7 +70,7 @@ async function LivesShelf() {
 async function AuctionsShelf() {
   const { items, serverNow } = await listAuctions("andamento", 10);
   return (
-    <Shelf title="Leilões terminando" eyebrow={eyebrow(Gavel, "ZEXI LEILÕES")} href="/leiloes" cta="Ver leilões">
+    <Shelf title="Leilões terminando" eyebrow={eyebrow(Gavel, "Zexi Leilões")} href="/leiloes" cta="Ver leilões">
       {items.map((a) => (
         <li key={a.id}>
           <AuctionCardLive a={a} serverNow={serverNow} />
@@ -105,7 +107,7 @@ async function ScheduledShelf() {
 async function ProductsShelf() {
   const { items } = await listProducts({ limit: 12 });
   return (
-    <Shelf title="Ofertas do Market" eyebrow={eyebrow(ShoppingBag, "ZEXI MARKET")} href="/market" cta="Ver todas">
+    <Shelf title="Ofertas da Zexi" eyebrow={eyebrow(ShoppingBag, "Zexi Compras")} href="/market" cta="Ver todas">
       {items.map((p) => (
         <li key={p.id}>
           <MarketProductCard product={p} />
@@ -120,16 +122,26 @@ async function ProductsShelf() {
   );
 }
 
-/** Ofertas do dia: produtos com preço "de/por" (maior desconto primeiro). */
+/** Ofertas relâmpago no ar (com contagem regressiva); sem nenhuma, as ofertas do dia (maior desconto primeiro). */
 async function DealsShelf() {
-  const { items } = await listProducts({ limit: 48 });
-  const deals = items
-    .filter((p) => p.compareAtCents && p.compareAtCents > p.priceCents)
-    .sort((a, b) => b.compareAtCents! / b.priceCents - a.compareAtCents! / a.priceCents)
-    .slice(0, 12);
+  const flash = await listFlashDeals(12);
+  if (flash.length) {
+    return (
+      <Shelf title="Ofertas relâmpago" eyebrow={eyebrow(Zap, "Por tempo limitado")} href="/ofertas?aba=relampago" cta="Ver todas">
+        {flash.map((p) => (
+          <li key={p.id} className="space-y-1">
+            <Countdown endsAt={p.endsAt} />
+            <MarketProductCard product={p} />
+          </li>
+        ))}
+      </Shelf>
+    );
+  }
+  const { items } = await listOffers({ tab: "todas" });
+  const deals = items.slice(0, 12);
   if (deals.length < 3) return null;
   return (
-    <Shelf title="Ofertas do dia" eyebrow={eyebrow(Flame, "DESCONTOS")} href="/market" cta="Ver todas">
+    <Shelf title="Ofertas do dia" eyebrow={eyebrow(Flame, "Descontos")} href="/ofertas" cta="Ver todas">
       {deals.map((p) => (
         <li key={p.id}>
           <MarketProductCard product={p} />
@@ -247,9 +259,9 @@ export default function HomePage() {
           className="overflow-hidden rounded-xl bg-white shadow-[0_1px_2px_rgba(15,17,21,0.08)] md:grid md:grid-cols-[1.3fr_1fr]"
         >
           <div className="p-5 md:p-10">
-            <p className="text-xs font-bold tracking-wider text-brand">ZEXI SELLER</p>
+            <p className="text-xs font-bold tracking-wider text-brand">Zexi Vendedor</p>
             <h2 id="vendedores" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-navy md:text-3xl">
-              Venda do seu jeito: vitrine, live ou leilão.
+              Venda do seu jeito: vitrine, transmissão ao vivo ou leilão.
             </h2>
             <p className="mt-3 max-w-lg text-muted">
               Cadastre seus produtos uma vez e escolha como vender: preço fixo no Market, apresentação ao vivo ou lote em
@@ -262,7 +274,7 @@ export default function HomePage() {
           <ul className="grid gap-px border-t border-line bg-line md:border-l md:border-t-0">
             {[
               { icon: StoreIcon, title: "Sua loja", text: "Produtos, estoque e pedidos em um painel." },
-              { icon: Video, title: "Suas lives", text: "Transmita, fixe produtos e converse com quem assiste." },
+              { icon: Video, title: "Suas transmissões", text: "Transmita, fixe produtos e converse com quem assiste." },
               { icon: ShieldCheck, title: "Leilões com regra clara", text: "Lance validado pelo servidor e histórico público." },
             ].map((f) => (
               <li key={f.title} className="flex items-start gap-3 bg-surface p-5">

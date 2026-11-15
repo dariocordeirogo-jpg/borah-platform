@@ -38,7 +38,7 @@ async function Reports({ searchParams }: { searchParams: Promise<SP> }) {
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
       {sp.ok && <Notice tone="success">Denúncia tratada.</Notice>}
       {!reports.length ? (
-        <EmptyState title="Nenhuma denúncia aberta">Quando alguém denunciar um produto, vídeo, live, loja ou mensagem, aparece aqui.</EmptyState>
+        <EmptyState title="Nenhuma denúncia aberta">Quando alguém denunciar um produto, vídeo, transmissão, loja ou mensagem, aparece aqui.</EmptyState>
       ) : (
         <ul className="space-y-3">
           {reports.map((r) => {

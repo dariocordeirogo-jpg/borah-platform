@@ -28,7 +28,7 @@ async function Coupons({ searchParams }: { searchParams: Promise<SP> }) {
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
       <CouponForm />
       {!coupons.length ? (
-        <EmptyState title="Nenhum cupom ainda">Crie um cupom para atrair clientes nas suas lives e vídeos.</EmptyState>
+        <EmptyState title="Nenhum cupom ainda">Crie um cupom para atrair clientes nas suas transmissões e vídeos.</EmptyState>
       ) : (
         <ul className="divide-y divide-line rounded-[var(--radius-card)] border border-line bg-white" aria-label="Seus cupons">
           {coupons.map((c) => (

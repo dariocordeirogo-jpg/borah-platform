@@ -7,7 +7,7 @@ export function PromoBanners() {
     {
       href: "/market",
       icon: ShieldCheck,
-      eyebrow: "COMPRA GARANTIDA",
+      eyebrow: "Compra Garantida",
       title: "Seu dinheiro protegido até a entrega",
       text: "A loja só recebe depois que você confirma que o pedido chegou.",
       cls: "bg-navy text-white",
@@ -16,7 +16,7 @@ export function PromoBanners() {
     {
       href: "/market",
       icon: Ticket,
-      eyebrow: "CUPONS DAS LOJAS",
+      eyebrow: "Cupons das lojas",
       title: "Tem cupom? Tem desconto.",
       text: "Digite o código da loja ao finalizar a compra e veja o desconto na hora.",
       cls: "bg-gradient-to-br from-brand to-brand-dark text-white",

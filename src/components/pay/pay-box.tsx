@@ -25,7 +25,7 @@ export async function PayBox({ orderId, storeId, status, totalCents }: Props) {
     return (
       <section className="rounded-[var(--radius-card)] border border-line bg-white p-4 text-sm" aria-label="Pagamento">
         <h2 className="flex items-center gap-2 font-semibold text-navy">
-          <Lock className="h-4 w-4" aria-hidden="true" /> ZEXI PAY
+          <Lock className="h-4 w-4" aria-hidden="true" /> Pagamento Zexi
         </h2>
         <p className="mt-1 text-muted" data-testid="pagamento-status">
           {paymentStatusLabel[paid.status]} · {formatBRL(paid.amount_cents)}
@@ -38,19 +38,19 @@ export async function PayBox({ orderId, storeId, status, totalCents }: Props) {
   return (
     <section className="space-y-3 rounded-[var(--radius-card)] border border-line bg-white p-4 text-sm shadow-[var(--shadow-card)]" aria-label="Pagamento">
       <h2 className="flex items-center gap-2 font-semibold text-navy">
-        <Lock className="h-4 w-4" aria-hidden="true" /> Pagamento seguro · ZEXI PAY
+        <Lock className="h-4 w-4" aria-hidden="true" /> Pagamento seguro · Pagamento Zexi
       </h2>
       {last?.status === "processing" ? (
         <Notice>Recebemos seu pedido de pagamento por Pix ou boleto. Assim que o banco confirmar, o pedido muda para “Pago”.</Notice>
       ) : !available ? (
-        <Notice>O ZEXI PAY está em configuração. O pagamento online será liberado em breve.</Notice>
+        <Notice>O Pagamento Zexi está em configuração. O pagamento online será liberado em breve.</Notice>
       ) : !accepts ? (
         <Notice>Esta loja ainda está ativando os recebimentos. Você pode pagar assim que ela concluir.</Notice>
       ) : (
         <>
           {payTestMode() && (
             <Notice>
-              ZEXI PAY em fase de testes: nenhuma cobrança real é feita e cartões reais são recusados. Em breve os pagamentos
+              Pagamento Zexi em fase de testes: nenhuma cobrança real é feita e cartões reais são recusados. Em breve os pagamentos
               reais serão liberados.
             </Notice>
           )}

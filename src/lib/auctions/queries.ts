@@ -52,7 +52,7 @@ function toCard(r: CardRow) {
     leaderAlias: r.leader_alias,
     imageUrl: img ? productImageUrl(img.path) : null,
     store: r.stores,
-    /** Leilão aberto dentro de uma transmissão (ZEXI LIVE) */
+    /** Leilão aberto dentro de uma transmissão (Zexi Ao Vivo) */
     liveId: r.live_id,
   };
 }

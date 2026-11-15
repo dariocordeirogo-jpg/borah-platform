@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
-import { Clapperboard, Gavel, LayoutDashboard, Link2, MessageCircleQuestion, Package, PlusCircle, Radio, Receipt, Settings, TicketPercent, Wallet } from "lucide-react";
+import { Clapperboard, Gavel, LayoutDashboard, Link2, MessageCircleQuestion, Package, PlusCircle, Radio, Receipt, Settings, TicketPercent, Wallet, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
@@ -14,7 +14,8 @@ const items = [
   { href: "/seller/produtos/importar", label: "Importar anúncios", icon: Link2 },
   { href: "/seller/leiloes", label: "Leilões", icon: Gavel },
   { href: "/seller/videos", label: "Vídeos", icon: Clapperboard },
-  { href: "/seller/lives", label: "Lives", icon: Radio },
+  { href: "/seller/lives", label: "Ao vivo", icon: Radio },
+  { href: "/seller/ofertas", label: "Ofertas relâmpago", icon: Zap },
   { href: "/seller/cupons", label: "Cupons", icon: TicketPercent },
   { href: "/seller/pagamentos", label: "Pagamentos", icon: Wallet },
   { href: "/seller/loja", label: "Loja", icon: Settings },
@@ -40,7 +41,7 @@ function SellerNavView({ pathname }: { pathname: string }) {
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
   return (
     <nav aria-label="Painel do vendedor" className="rounded-xl border border-line bg-white p-2 md:p-3">
-      <p className="hidden px-3 pb-2 pt-1 text-[11px] font-bold tracking-wider text-brand md:block">ZEXI SELLER</p>
+      <p className="hidden px-3 pb-2 pt-1 text-[11px] font-bold tracking-wider text-brand md:block">Zexi Vendedor</p>
       <Link
         href="/seller/produtos/novo"
         className="mb-2 hidden items-center justify-center gap-2 rounded-full bg-brand px-3 py-2.5 text-sm font-bold text-white hover:bg-brand-dark md:flex"

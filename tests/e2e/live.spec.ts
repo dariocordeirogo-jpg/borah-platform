@@ -69,12 +69,12 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     if (productIds.length) await seller.c.from("products").update({ status: "paused" }).in("id", productIds);
   });
 
-  test("loja programa a live e ela aparece nas próximas", async ({ browser, page }) => {
+  test("loja programa a transmissão e ela aparece nas próximas", async ({ browser, page }) => {
     studio = await browserAs(browser, SELLER, "/seller/lives/nova");
     await studio.getByLabel("Título").fill(liveTitle);
     await studio.getByLabel(bag).check();
     await studio.getByLabel(wallet).check();
-    await studio.getByRole("button", { name: "Programar live" }).click();
+    await studio.getByRole("button", { name: "Programar transmissão" }).click();
     await expect(studio).toHaveURL(/\/seller\/lives\/[0-9a-f-]{36}\?nova=1$/);
     await expect(studio.getByTestId("estado-live")).toHaveText("Programada");
     livePath = `/live/${new URL(studio.url()).pathname.split("/").pop()}`;
@@ -84,14 +84,14 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     expect((await studio.request.get(livePath)).headers()["permissions-policy"]).toContain("camera=()");
 
     await page.goto("/ao-vivo");
-    await expect(page.getByRole("heading", { name: "Próximas lives" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Próximas transmissões" })).toBeVisible();
     await page.getByRole("link", { name: new RegExp(liveTitle) }).click();
     await expect(page.getByTestId("live-player-status")).toHaveText("A transmissão ainda não começou.");
-    await expect(page.getByText("O chat abre quando a live estiver no ar.")).toBeVisible();
+    await expect(page.getByText("O chat abre quando a transmissão estiver no ar.")).toBeVisible();
   });
 
   test("começa, destaca produto e recebe o link do vídeo", async () => {
-    await studio.getByRole("button", { name: "Começar live" }).click();
+    await studio.getByRole("button", { name: "Começar transmissão" }).click();
     await expect(studio.getByTestId("estado-live")).toHaveText("Ao vivo");
     await studio.getByRole("button", { name: `Destacar ${bag}` }).click();
     await expect(studio.getByText("À venda agora")).toBeVisible();
@@ -120,7 +120,7 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     const highlight = viewer.getByRole("region", { name: "Produto em destaque" });
     await expect(highlight).toContainText(bag);
     await expect(highlight.getByRole("button", { name: "Comprar agora" })).toBeVisible();
-    await expect(viewer.getByText("AO VIVO", { exact: true })).toBeVisible();
+    await expect(viewer.getByText("Ao vivo", { exact: true }).first()).toBeVisible();
     // Live ligada ao TikTok: quem assiste vê o espaço dos comentários de lá e como participar
     await expect(viewer.getByTestId("espelho-redes")).toContainText("Ao vivo também no TikTok");
     // Quem assiste entra na contagem; o estúdio da loja só observa
@@ -128,8 +128,8 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     await expect(viewer.getByTestId("espectadores")).toHaveText(/\b1 assistindo/);
 
     // Espera os dois chats conectarem ao tempo real antes de conversar
-    await expect(viewer.getByRole("region", { name: "Chat da live" })).toHaveAttribute("data-realtime", "on");
-    await expect(studio.getByRole("region", { name: "Chat da live" })).toHaveAttribute("data-realtime", "on");
+    await expect(viewer.getByRole("region", { name: "Chat da transmissão" })).toHaveAttribute("data-realtime", "on");
+    await expect(studio.getByRole("region", { name: "Chat da transmissão" })).toHaveAttribute("data-realtime", "on");
     const text = `Tem em azul? ${run}`;
     await viewer.getByLabel("Mensagem para o chat").fill(text);
     await viewer.getByRole("button", { name: "Enviar mensagem" }).click();
@@ -140,7 +140,7 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     await expect(viewer.getByTestId("chat-mensagens")).not.toContainText(text);
   });
 
-  test("compra pelo destaque da live leva ao carrinho com a origem da live", async ({ browser }) => {
+  test("compra pelo destaque da transmissão leva ao carrinho com a origem da transmissão", async ({ browser }) => {
     const buyer = await browserAs(browser, BUYER, livePath);
     const highlight = buyer.getByRole("region", { name: "Produto em destaque" });
     await highlight.getByRole("button", { name: "Comprar agora" }).click();
@@ -151,11 +151,11 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     const { data: line } = await me.c.from("cart_items").select("live_id").eq("product_id", productIds[0]).single();
     expect(line?.live_id).toBe(livePath.split("/").pop());
     await me.c.from("cart_items").delete().eq("product_id", productIds[0]);
-    await expect(studio.getByTestId("vendas-live")).toContainText("Vendas desta live");
+    await expect(studio.getByTestId("vendas-live")).toContainText("Vendas desta transmissão");
     await buyer.context().close();
   });
 
-  test("vendedor escolhe leiloar ao vivo e quem assiste dá lance sem sair da live", async () => {
+  test("vendedor escolhe leiloar ao vivo e quem assiste dá lance sem sair da transmissão", async () => {
     const item = studio.getByRole("listitem").filter({ hasText: wallet });
     await expect(item.getByRole("button", { name: `Destacar ${wallet}` })).toContainText("Vender a preço fixo");
     await item.getByText("Leiloar ao vivo").click();
@@ -186,10 +186,10 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
   });
 
   test("loja encerra e a sala fecha para o público", async () => {
-    await studio.getByRole("button", { name: "Encerrar live" }).click();
+    await studio.getByRole("button", { name: "Encerrar transmissão" }).click();
     await expect(studio.getByTestId("estado-live")).toHaveText("Encerrada");
-    await expect(viewer.getByTestId("live-player-status")).toHaveText("Esta live terminou.", { timeout: 15_000 });
-    await expect(viewer.getByText("O chat abre quando a live estiver no ar.")).toBeVisible();
+    await expect(viewer.getByTestId("live-player-status")).toHaveText("Esta transmissão terminou.", { timeout: 15_000 });
+    await expect(viewer.getByText("O chat abre quando a transmissão estiver no ar.")).toBeVisible();
     await expect(viewer.getByTestId("espelho-redes")).toHaveCount(0);
   });
 });

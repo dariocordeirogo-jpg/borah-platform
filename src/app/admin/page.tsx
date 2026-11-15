@@ -21,7 +21,7 @@ async function Overview() {
     { label: "Lojas ativas / suspensas", value: `${o.stores_active} / ${o.stores_suspended}`, href: "/admin/lojas" },
     { label: "Produtos à venda / bloqueados", value: `${o.products_active} / ${o.products_blocked}`, href: "/admin/moderacao" },
     { label: "Leilões em andamento", value: String(o.auctions_active) },
-    { label: "Lives no ar", value: String(o.lives_now), href: "/admin/moderacao" },
+    { label: "Transmissões no ar", value: String(o.lives_now), href: "/admin/moderacao" },
     { label: "Vídeos publicados", value: String(o.videos_published), href: "/admin/moderacao" },
   ];
   return (

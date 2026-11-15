@@ -7,7 +7,7 @@ import { listLives } from "@/lib/live/queries";
 
 export const metadata: Metadata = {
   title: "Vendas ao vivo",
-  description: "ZEXI LIVE: transmissões de venda com chat, produtos em destaque e leilões relâmpago.",
+  description: "Zexi Ao Vivo: transmissões de venda com chat, produtos em destaque e leilões relâmpago.",
   alternates: { canonical: "/ao-vivo" },
 };
 
@@ -34,8 +34,8 @@ async function Lives() {
   const { live, upcoming } = await listLives();
   if (!live.length && !upcoming.length) {
     return (
-      <EmptyState title="Nenhuma live agora" action={<ButtonLink href="/vender">Venda na Zexi</ButtonLink>}>
-        As transmissões das lojas aparecem aqui. Tem loja? Programe sua live no painel do vendedor.
+      <EmptyState title="Nenhuma transmissão agora" action={<ButtonLink href="/vender">Venda na Zexi</ButtonLink>}>
+        As transmissões das lojas aparecem aqui. Tem loja? Programe sua transmissão no painel do vendedor.
       </EmptyState>
     );
   }
@@ -53,7 +53,7 @@ async function Lives() {
       )}
       {upcoming.length > 0 && (
         <section>
-          <h2 className="mb-3 font-display text-lg font-bold text-navy">Próximas lives</h2>
+          <h2 className="mb-3 font-display text-lg font-bold text-navy">Próximas transmissões</h2>
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {upcoming.map((l) => (
               <Item key={l.id} l={l} live={false} />
@@ -69,7 +69,7 @@ export default function Page() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
       <div>
-        <p className="text-sm font-bold tracking-wider text-brand">ZEXI LIVE</p>
+        <p className="text-sm font-bold tracking-wider text-brand">Zexi Ao Vivo</p>
         <h1 className="font-display text-3xl font-bold tracking-tight text-navy">Vendas ao vivo</h1>
         <p className="mt-1 text-muted">Assista, pergunte no chat, compre o produto em destaque e dispute leilões relâmpago.</p>
       </div>
