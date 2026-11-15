@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SignInForm } from "@/components/auth-forms";
+import { googleLoginEnabled } from "@/lib/auth-providers";
 import { safeNextPath } from "@/lib/validation";
 
 export const metadata: Metadata = { title: "Entrar" };
 
 async function Form({ searchParams }: { searchParams: Promise<{ next?: string | string[] }> }) {
-  const { next } = await searchParams;
-  return <SignInForm next={safeNextPath(Array.isArray(next) ? next[0] : next)} />;
+  const [{ next }, google] = await Promise.all([searchParams, googleLoginEnabled()]);
+  return <SignInForm next={safeNextPath(Array.isArray(next) ? next[0] : next)} google={google} />;
 }
 
 export default function Page({ searchParams }: PageProps<"/entrar">) {

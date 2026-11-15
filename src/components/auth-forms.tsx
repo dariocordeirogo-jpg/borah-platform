@@ -108,12 +108,16 @@ function Alert({ state }: { state: AuthState }) {
   return null;
 }
 
-export function SignInForm({ next }: { next: string }) {
+export function SignInForm({ next, google = false }: { next: string; google?: boolean }) {
   const [state, action, pending] = useActionState(signIn, {});
   return (
     <>
-      <GoogleButton next={next} />
-      <Divider />
+      {google && (
+        <>
+          <GoogleButton next={next} />
+          <Divider />
+        </>
+      )}
       <form action={action} className="space-y-4" noValidate>
         <input type="hidden" name="next" value={next} />
         <Alert state={state} />
@@ -152,7 +156,7 @@ export function SignInForm({ next }: { next: string }) {
   );
 }
 
-export function SignUpForm() {
+export function SignUpForm({ google = false }: { google?: boolean }) {
   const [state, action, pending] = useActionState(signUp, {});
   if (state.message) {
     return (
@@ -166,8 +170,12 @@ export function SignUpForm() {
   }
   return (
     <>
-      <GoogleButton next="/conta" />
-      <Divider />
+      {google && (
+        <>
+          <GoogleButton next="/conta" />
+          <Divider />
+        </>
+      )}
       <form action={action} className="space-y-4" noValidate>
         <Alert state={state} />
         <div>

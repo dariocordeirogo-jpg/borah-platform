@@ -48,13 +48,36 @@ test("login, conta, sair — e ignora redirecionamento externo", async ({ page }
   await expect(page).toHaveURL(/\/entrar/);
 });
 
-test("botão do Google leva ao login do Google via Supabase", async ({ page }) => {
+test("botão do Google só aparece com o Google ligado no Supabase e leva ao login dele", async ({ page, request }) => {
+  const settings = await request.get(`${process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://elygbieuroidqxkifgou.supabase.co"}/auth/v1/settings`, {
+    headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "sb_publishable_q6ee6uIuN9A8l8ni8wfngQ_NZc5L7Vn" },
+  });
+  const google = (await settings.json()).external?.google === true;
   await page.goto("/entrar");
+  const button = page.getByRole("button", { name: "Continuar com Google" });
+  if (!google) {
+    // Desligado no Supabase: nada de botão que leva a erro
+    await expect(page.getByLabel("E-mail")).toBeVisible();
+    await expect(button).toHaveCount(0);
+    return;
+  }
   const req = page.waitForRequest((r) => r.url().includes("/auth/v1/authorize") && r.url().includes("provider=google"));
-  await page.getByRole("button", { name: "Continuar com Google" }).click();
+  await button.click();
   const r = await req;
   expect(r.url()).toContain("elygbieuroidqxkifgou.supabase.co");
   expect(r.url()).toContain(encodeURIComponent("/auth/callback"));
+});
+
+test("link de e-mail expirado explica o que fazer; confirmação tem página própria", async ({ page }) => {
+  await page.goto("/auth/callback?error=access_denied&error_code=otp_expired");
+  await expect(page).toHaveURL(/\/auth\/erro\?motivo=expirado/);
+  await expect(page.getByRole("heading", { name: "Este link expirou" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Esqueci minha senha" })).toBeVisible();
+  await page.goto("/auth/callback?token_hash=invalido&type=signup");
+  await expect(page).toHaveURL(/\/auth\/erro/);
+  await page.goto("/auth/confirmado");
+  await expect(page.getByTestId("email-confirmado")).toContainText("E-mail confirmado");
+  await expect(page.getByRole("link", { name: "Entrar na Zexi" })).toBeVisible();
 });
 
 test("recuperação de senha responde igual exista ou não a conta", async ({ page }) => {

@@ -74,7 +74,7 @@ export async function signInWithGoogle(formData: FormData) {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: `${await siteOrigin()}/auth/callback?next=${encodeURIComponent(next)}` },
+    options: { redirectTo: `${await siteOrigin()}/auth/callback?origem=google&next=${encodeURIComponent(next)}` },
   });
   if (error || !data.url) redirect("/auth/erro?motivo=google");
   redirect(data.url);
