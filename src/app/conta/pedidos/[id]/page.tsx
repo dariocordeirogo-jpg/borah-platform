@@ -24,7 +24,7 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const user = await getCurrentUser();
   if (!user) redirect(`/entrar?next=/conta/pedidos/${id}`);
-  // Volta do Checkout da Stripe: confere a sessão antes de mostrar o pedido
+  // Volta do pagamento (Pix, boleto, cartão com 3DS): confere a sessão antes de mostrar o pedido
   if (sp.pagamento === "retorno" && sp.sessao) await syncCheckoutReturn(sp.sessao);
   const o = await getOrder(id);
   if (!o || o.buyer_id !== user.id) notFound();
@@ -35,7 +35,7 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
       {sp.novo && <Notice tone="success">Pedido registrado e estoque reservado. Agora é só pagar.</Notice>}
       {sp.pagamento === "retorno" && o.status === "paid" && <Notice tone="success">Pagamento confirmado! A loja já foi avisada.</Notice>}
       {sp.pagamento === "retorno" && o.status === "pending_payment" && (
-        <Notice>Pagamento recebido pela Stripe. A confirmação pode levar alguns instantes (Pix e boleto dependem do banco).</Notice>
+        <Notice>Pagamento enviado. A confirmação pode levar alguns instantes (Pix e boleto dependem do banco).</Notice>
       )}
       {sp.pagamento === "cancelado" && <Notice>Pagamento não concluído. Você pode tentar de novo quando quiser.</Notice>}
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}

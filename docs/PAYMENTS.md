@@ -16,6 +16,22 @@ Pagamentos com **Stripe Connect**, no modelo em que **a Stripe cuida do risco** 
 - A Zexi **não** pode ser responsável pelos saldos negativos nesta conta Stripe sem a aceitação formal em
   Connect → Platform profile; por isso o modelo anterior (cobrança com destino, conta Express v1) foi trocado.
 
+## Pagamento dentro da Zexi
+
+O comprador não sai do site: depois de "Finalizar compra" (ou "Pagar" no pedido) ele vai para `/pagamento`, uma
+página da Zexi com o formulário da Stripe embutido (Payment Element com a Checkout Sessions API,
+`ui_mode: "elements"`), nas cores da Zexi, com cartão, Pix e boleto conforme os meios ligados no painel da Stripe
+(meios dinâmicos: o código não fixa `payment_method_types`).
+
+- A sessão de Checkout é a mesma de antes (mesmo valor, comissão, `transfer_group` e Compra Garantida); só muda onde
+  ela é mostrada. Sessões antigas abertas na página da Stripe continuam funcionando até expirar.
+- Depois de pagar (ou das instruções do Pix/boleto), a Stripe devolve o comprador para o pedido
+  (`?pagamento=retorno&sessao=…`). **Quem confirma o pagamento continua sendo o aviso assinado da Stripe**
+  (`checkout.session.completed` e `checkout.session.async_payment_succeeded`), nunca a página de retorno.
+- O navegador usa só a chave pública (`NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`); a secreta fica no servidor.
+- Sem chave pública ou sem Stripe configurada, `/pagamento` devolve para o pedido (como antes, sem cobrança online).
+- Teste: `tests/e2e/checkout-interno.spec.ts` (cartão de teste 4242; só roda com chaves `pk_test_`/`sk_test_`).
+
 ## Quem decide o quê
 
 | Etapa | Onde | Detalhe |

@@ -4,8 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { env } from "@/lib/env";
-import { payErrorMessage } from "@/lib/pay/format";
-import { startCartCheckout } from "@/lib/pay/cart";
+import { payErrorMessage, paymentPath } from "@/lib/pay/format";
 import { refundPart } from "@/lib/pay/ingest";
 import { CONNECT_ACCOUNTS_API_VERSION, getStripe } from "@/lib/pay/stripe";
 import { createClient } from "@/lib/supabase/server";
@@ -32,21 +31,17 @@ function withError(path: string, error: string) {
 export async function payOrder(formData: FormData) {
   const orderId = uuid.parse(formData.get("orderId"));
   const back = `/conta/pedidos/${orderId}`;
-  const { supabase, user } = await requireUser(back);
-  const r = await startCartCheckout(supabase, user.email, [orderId], back);
-  if ("error" in r) redirect(withError(back, r.error));
-  redirect("url" in r ? r.url : back);
+  await requireUser(back);
+  redirect(paymentPath([orderId], back));
 }
 
 /** Comprador paga vários pedidos (um por loja) de uma vez só. */
 export async function payCart(formData: FormData) {
   const ids = z.array(uuid).min(1).max(20).safeParse(formData.getAll("orderId"));
   const back = "/conta/pedidos";
-  const { supabase, user } = await requireUser(back);
+  await requireUser(back);
   if (!ids.success) redirect(withError(back, "order_not_found"));
-  const r = await startCartCheckout(supabase, user.email, ids.data, back);
-  if ("error" in r) redirect(withError(back, r.error));
-  redirect("url" in r ? r.url : back);
+  redirect(paymentPath(ids.data, back));
 }
 
 /**

@@ -292,7 +292,7 @@ function PaymentMethods() {
           <Banknote className="h-5 w-5 text-navy-2" aria-hidden="true" /> Boleto bancário
         </li>
       </ul>
-      <p className="mt-3 text-xs text-muted">As opções disponíveis aparecem na página segura do ZEXI PAY (Stripe).</p>
+      <p className="mt-3 text-xs text-muted">Você paga aqui mesmo na Zexi, em ambiente seguro do ZEXI PAY.</p>
     </section>
   );
 }

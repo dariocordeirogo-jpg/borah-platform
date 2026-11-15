@@ -326,7 +326,7 @@ export function CheckoutFlow({
 
           <Section n={4} title="Pagamento" icon={CreditCard}>
             <p className="text-sm text-muted">
-              Um pagamento só para todos os envios. Você escolhe a forma na página segura do ZEXI PAY (Stripe) logo depois.
+              Um pagamento só para todos os envios. Na próxima tela você paga aqui mesmo na Zexi, com cartão, Pix ou boleto.
             </p>
             <ul className="mt-3 grid grid-cols-3 gap-2 text-center text-xs font-semibold text-navy">
               {[
