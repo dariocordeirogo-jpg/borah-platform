@@ -66,7 +66,7 @@ export function LogoStacked({ className }: { className?: string }) {
     <span className={cn("flex flex-col items-center gap-3 text-navy", className)} role="img" aria-label="Zexi — Tudo acontece ao vivo.">
       <LogoMark className="h-14" />
       <Image src="/brand/zexi-palavra.svg" alt="" aria-hidden="true" width={301} height={128} unoptimized className="h-9 w-auto" />
-      <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em]">
+      <span className="flex items-center gap-2 text-[10px] font-bold tracking-[0.2em]">
         <span className="h-0.5 w-5 rounded bg-brand-vivid" aria-hidden="true" />
         Tudo acontece ao vivo.
         <span className="h-0.5 w-5 rounded bg-brand-vivid" aria-hidden="true" />

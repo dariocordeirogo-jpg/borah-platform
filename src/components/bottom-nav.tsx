@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/", label: "Início", icon: Home },
-  { href: "/market", label: "Market", icon: ShoppingBag },
+  { href: "/market", label: "Comprar", icon: ShoppingBag },
   { href: "/ao-vivo", label: "Ao vivo", icon: Radio },
   { href: "/leiloes", label: "Leilões", icon: Gavel },
   { href: "/conta", label: "Conta", icon: UserRound },

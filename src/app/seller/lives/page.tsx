@@ -8,14 +8,14 @@ import { liveStatusLabel } from "@/lib/live/format";
 import { getSellerLives } from "@/lib/live/queries";
 import { requireStore } from "@/lib/market/seller-guard";
 
-export const metadata: Metadata = { title: "Lives" };
+export const metadata: Metadata = { title: "Transmissões ao vivo" };
 
 async function Lives() {
   const store = await requireStore("/seller/lives");
   const lives = await getSellerLives(store.id);
   if (!lives.length) {
     return (
-      <EmptyState title="Nenhuma live programada" action={<ButtonLink href="/seller/lives/nova">Programar live</ButtonLink>}>
+      <EmptyState title="Nenhuma transmissão programada" action={<ButtonLink href="/seller/lives/nova">Programar transmissão</ButtonLink>}>
         Venda ao vivo: mostre os produtos, responda no chat e abra leilões relâmpago.
       </EmptyState>
     );

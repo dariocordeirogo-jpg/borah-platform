@@ -136,7 +136,7 @@ export function BrowserBroadcast({ publishUrl }: { publishUrl: string }) {
           </div>
         )}
         {phase === "on" && (
-          <span className="absolute left-3 top-3 rounded-full bg-brand px-2.5 py-0.5 text-xs font-bold text-white">AO VIVO</span>
+          <span className="absolute left-3 top-3 rounded-full bg-brand px-2.5 py-0.5 text-xs font-bold text-white">Ao vivo</span>
         )}
       </div>
       <p className="text-muted">
@@ -172,7 +172,7 @@ export function BrowserBroadcast({ publishUrl }: { publishUrl: string }) {
       </div>
       <p className="text-xs text-muted">
         Mantenha esta tela aberta durante a live: se fechar ou trocar de aba no celular, o vídeo para. Quando o vídeo
-        estiver indo, toque em “Começar live” para abrir a sala ao público.
+        estiver indo, toque em “Começar transmissão” para abrir a sala ao público.
       </p>
     </div>
   );

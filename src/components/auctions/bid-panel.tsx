@@ -127,7 +127,7 @@ export function BidPanel(props: BidPanelProps) {
       <div className="rounded-[var(--radius-card)] border border-line bg-white p-5 shadow-[var(--shadow-card)]">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-navy-2">
+            <p className="text-xs font-semibold text-navy-2">
               {live.current === null ? "Lance inicial" : "Maior lance"}
             </p>
             <p className="text-4xl font-extrabold tracking-tight text-navy" aria-live="polite" data-testid="maior-lance">

@@ -16,7 +16,7 @@ async function Stores({ searchParams }: { searchParams: Promise<SP> }) {
       <h1 className="font-display text-2xl font-bold tracking-tight text-navy">Lojas</h1>
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
       {sp.ok && <Notice tone="success">Feito. A ação ficou registrada na auditoria.</Notice>}
-      <p className="text-sm text-muted">Suspender tira a loja, os produtos, os vídeos e as lives do ar. Só admin geral e de operações.</p>
+      <p className="text-sm text-muted">Suspender tira a loja, os produtos, os vídeos e as transmissões do ar. Só admin geral e de operações.</p>
       <ul className="divide-y divide-line rounded-[var(--radius-card)] border border-line bg-white">
         {stores.map((s) => (
           <li key={s.id} className="space-y-2 p-4 text-sm" data-testid="loja-admin">

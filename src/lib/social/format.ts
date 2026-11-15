@@ -28,7 +28,7 @@ export const socialResultLabel: Record<string, string> = {
   auction_running: "leilão em andamento: dê lance",
   out_of_stock: "esgotado",
   own_product: "produto da própria loja",
-  invalid_amount: "valor inválido (ex.: LANCE 150)",
+  invalid_amount: "valor inválido (ex.: lance 150)",
   verification_required: "confirme CPF e celular na Zexi",
   bid_too_low: "abaixo do lance mínimo",
   bid_too_high: "acima do limite",
@@ -46,7 +46,7 @@ export function socialErrorMessage(message?: string): string {
     case "too_many_codes":
       return "Muitos códigos hoje. Tente de novo amanhã.";
     case "live_finished":
-      return "Esta live já terminou.";
+      return "Esta transmissão já terminou.";
     case "not_authenticated":
       return "Entre na sua conta para continuar.";
     default:

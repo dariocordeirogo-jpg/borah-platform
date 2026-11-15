@@ -154,7 +154,7 @@ async function Purchases({ searchParams }: { searchParams: Promise<SP> }) {
         </p>
       )}
       {!orders.length ? (
-        <EmptyState title="Você ainda não fez compras" action={<ButtonLink href="/market">Explorar o Market</ButtonLink>} />
+        <EmptyState title="Você ainda não fez compras" action={<ButtonLink href="/market">Ver produtos</ButtonLink>} />
       ) : (
         <>
           <Group title="Próximas entregas" orders={next} />

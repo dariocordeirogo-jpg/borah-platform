@@ -3,6 +3,7 @@ import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { runTag } from "./run-tag";
 
 /**
  * Importar anúncios em massa: planilha (formato Shopify e formato de marketplace com instruções acima do cabeçalho)
@@ -10,7 +11,7 @@ import { expect, test, type Page } from "@playwright/test";
  */
 const SELLER = { email: "e2e-vendedor@livelance.test", password: "Teste12345" };
 const photo = readFileSync(path.join(__dirname, "fixtures", "produto.jpg"));
-const run = Date.now();
+const run = runTag();
 
 let server: Server;
 let base = "";

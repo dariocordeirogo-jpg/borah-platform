@@ -117,7 +117,7 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
         </li>
         <li className="flex gap-2">
           <Lock className="mt-0.5 h-4 w-4 shrink-0 text-navy-2" aria-hidden="true" />
-          <span className="text-muted">Pagamento seguro pelo ZEXI PAY. Um pagamento só, mesmo comprando de várias lojas.</span>
+          <span className="text-muted">Pagamento seguro pelo Pagamento Zexi. Um pagamento só, mesmo comprando de várias lojas.</span>
         </li>
       </ul>
     </div>
@@ -192,7 +192,7 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
               {p.compare_at_cents && off ? <p className="text-sm text-muted line-through">{formatBRL(p.compare_at_cents)}</p> : null}
               <p className="flex flex-wrap items-center gap-3">
                 <BigPrice cents={p.price_cents} className="text-[34px] leading-none" />
-                {off ? <span className="text-lg font-semibold text-brand">{off}% OFF</span> : null}
+                {off ? <span className="text-lg font-semibold text-brand">{off}% de desconto</span> : null}
               </p>
               <p className="mt-2 text-sm text-ink">
                 Pague com <span className="font-semibold">cartão, Pix ou boleto</span>
@@ -298,7 +298,7 @@ function PaymentMethods() {
           <Banknote className="h-5 w-5 text-navy-2" aria-hidden="true" /> Boleto bancário
         </li>
       </ul>
-      <p className="mt-3 text-xs text-muted">Você paga aqui mesmo na Zexi, em ambiente seguro do ZEXI PAY.</p>
+      <p className="mt-3 text-xs text-muted">Você paga aqui mesmo na Zexi, em ambiente seguro do Pagamento Zexi.</p>
     </section>
   );
 }

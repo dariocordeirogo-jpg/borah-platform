@@ -36,7 +36,7 @@ export type ReportKind = keyof typeof reportKindLabel;
 export const reportActionLabel: Record<ReportKind, string> = {
   product: "Bloquear produto",
   video: "Remover vídeo",
-  live: "Encerrar live",
+  live: "Encerrar transmissão",
   store: "Suspender loja",
   message: "Esconder mensagem",
 };

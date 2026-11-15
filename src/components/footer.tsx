@@ -6,15 +6,15 @@ const groups = [
   {
     title: "Comprar",
     links: [
-      { href: "/market", label: "ZEXI MARKET" },
-      { href: "/ao-vivo", label: "ZEXI LIVE" },
-      { href: "/leiloes", label: "ZEXI LEILÕES" },
+      { href: "/market", label: "Zexi Compras" },
+      { href: "/ao-vivo", label: "Zexi Ao Vivo" },
+      { href: "/leiloes", label: "Zexi Leilões" },
     ],
   },
   {
     title: "Vender e indicar",
     links: [
-      { href: "/vender", label: "ZEXI SELLER" },
+      { href: "/vender", label: "Zexi Vendedor" },
       { href: "/indique", label: "Indique e ganhe" },
     ],
   },
@@ -52,7 +52,7 @@ export function Footer() {
         </div>
         {groups.map((g) => (
           <div key={g.title}>
-            <h2 className="text-sm font-bold uppercase tracking-wide text-brand">{g.title}</h2>
+            <h2 className="text-sm font-bold text-brand">{g.title}</h2>
             <ul className="mt-3 space-y-2">
               {g.links.map((l) => (
                 <li key={l.href}>
@@ -70,7 +70,7 @@ export function Footer() {
           © {site.name} · {site.productionDomain}
           {site.production
             ? " — intermediação de compra e venda entre lojas e compradores."
-            : " — versão de testes. Lojas, produtos, leilões e lives podem ser de teste ou demonstração."}
+            : " — versão de testes. Lojas, produtos, leilões e transmissões podem ser de teste ou demonstração."}
         </p>
       </div>
     </footer>

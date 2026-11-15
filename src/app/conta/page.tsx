@@ -73,10 +73,10 @@ async function Account() {
         {[
           { icon: Receipt, title: "Meus pedidos", text: "Acompanhe suas compras", href: "/conta/pedidos" },
           user.roles.includes("seller")
-            ? { icon: Store, title: "Minha loja", text: "Painel ZEXI SELLER", href: "/seller" }
+            ? { icon: Store, title: "Minha loja", text: "Painel Zexi Vendedor", href: "/seller" }
             : { icon: Store, title: "Abrir minha loja", text: "Venda na Zexi", href: "/vender" },
           { icon: Gavel, title: "Meus lances", text: "Leilões em que você participa", href: "/conta/lances" },
-          { icon: Link2, title: "TikTok e Instagram", text: "Dê lance e compre comentando na live", href: "/conta/redes" },
+          { icon: Link2, title: "TikTok e Instagram", text: "Dê lance e compre comentando na transmissão", href: "/conta/redes" },
           ...(isStaff(user.roles) ? [{ icon: ShieldCheck, title: "Painel da equipe", text: "Denúncias, moderação e números", href: "/admin" }] : []),
           { icon: Megaphone, title: "Minhas indicações", text: "Indique e ganhe comissão", href: user.roles.includes("affiliate") ? "/conta/indicacoes" : "/indique" },
         ].map((c) =>

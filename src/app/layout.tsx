@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   description: site.description,
   applicationName: site.name,
-  keywords: ["marketplace", "leilão online", "vendas ao vivo", "live commerce", "comprar online", "vender online", "Zexi"],
+  keywords: ["marketplace", "leilão online", "vendas ao vivo", "transmissão commerce", "comprar online", "vender online", "Zexi"],
   formatDetection: { telephone: false },
   openGraph: {
     type: "website",
