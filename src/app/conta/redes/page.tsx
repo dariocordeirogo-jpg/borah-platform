@@ -25,8 +25,8 @@ async function Links({ searchParams }: { searchParams: Promise<{ erro?: string }
           <Link2 className="h-6 w-6 text-brand" aria-hidden="true" /> Comprar e dar lance pelo TikTok e Instagram
         </h1>
         <p className="mt-1 text-sm text-muted">
-          Quando uma loja da Zexi faz live no TikTok ou no Instagram, você pode comentar <strong>LANCE 150</strong> para dar
-          lance ou <strong>EU QUERO</strong> para colocar o produto em destaque no seu carrinho. Vale só para o @ vinculado à
+          Quando uma loja da Zexi faz transmissão no TikTok ou no Instagram, você pode comentar <strong>lance 150</strong> para dar
+          lance ou <strong>eu quero</strong> para colocar o produto em destaque no seu carrinho. Vale só para o @ vinculado à
           sua conta; o pagamento é sempre aqui na Zexi.
         </p>
       </header>
@@ -60,7 +60,7 @@ async function Links({ searchParams }: { searchParams: Promise<{ erro?: string }
         <h2 className="font-semibold text-navy">Vincular um @</h2>
         <ol className="list-decimal space-y-1 pl-5 text-sm">
           <li>Gere o código abaixo.</li>
-          <li>Entre numa live de loja da Zexi no TikTok ou no Instagram, com o @ que você quer vincular.</li>
+          <li>Entre numa transmissão de loja da Zexi no TikTok ou no Instagram, com o @ que você quer vincular.</li>
           <li>Comente só o código (ex.: ZX123456). Pronto: o @ fica ligado à sua conta.</li>
         </ol>
         <LinkCode />

@@ -60,7 +60,7 @@ async function Sales({ searchParams }: { searchParams: Promise<SP> }) {
     <div className="space-y-4">
       {payTestMode() && (
         <Notice>
-          ZEXI PAY em fase de testes: vendas pagas agora não envolvem dinheiro real. Não envie produtos até os pagamentos reais
+          Pagamento Zexi em fase de testes: vendas pagas agora não envolvem dinheiro real. Não envie produtos até os pagamentos reais
           serem liberados.
         </Notice>
       )}
@@ -103,7 +103,7 @@ async function Sales({ searchParams }: { searchParams: Promise<SP> }) {
               c.strong && counts[c.key] > 0 ? "border-brand" : "border-line",
             )}
           >
-            <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted">
+            <span className="flex items-center gap-1.5 text-xs font-semibold text-muted">
               <c.icon className="h-3.5 w-3.5" aria-hidden="true" /> {c.label}
             </span>
             <span className={cn("mt-1 block font-display text-2xl font-bold", c.strong && counts[c.key] > 0 ? "text-brand" : "text-navy")}>
@@ -198,7 +198,7 @@ async function Sales({ searchParams }: { searchParams: Promise<SP> }) {
 
                   {(tab === "enviar" || tab === "transito") && (
                     <div className="rounded-lg border border-dashed border-line p-3 text-sm">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-muted">Enviar para</p>
+                      <p className="text-xs font-semibold text-muted">Enviar para</p>
                       <p className="mt-0.5 text-ink">
                         {a.recipient} · {a.street}, {a.number}
                         {a.complement ? ` – ${a.complement}` : ""} · {a.district} · {a.city}/{a.state} · CEP {a.cep.replace(/(\d{5})(\d{3})/, "$1-$2")}

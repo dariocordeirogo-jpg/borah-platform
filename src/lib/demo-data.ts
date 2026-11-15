@@ -92,7 +92,7 @@ export const liveAuctions: DemoAuction[] = [
 ];
 
 export const demoLives: { id: string; title: string; store: string; viewers: number; image: string }[] = [
-  { id: "demo-l-1", title: "Bolsas e acessórios com preço de live", store: "Moda Exemplo", viewers: 1284, image: "/images/home/live.webp" },
+  { id: "demo-l-1", title: "Bolsas e acessórios com preço de transmissão", store: "Moda Exemplo", viewers: 1284, image: "/images/home/live.webp" },
   { id: "demo-l-2", title: "Fones e caixas de som: teste ao vivo", store: "Loja Exemplo Som", viewers: 3410, image: "/images/home/hero.webp" },
 ];
 

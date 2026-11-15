@@ -1,4 +1,4 @@
-/** ZEXI LIVE: textos e validações que podem ir ao navegador. */
+/** Zexi Ao Vivo: textos e validações que podem ir ao navegador. */
 
 export const liveStatusLabel = {
   scheduled: "Programada",
@@ -43,11 +43,11 @@ export function liveErrorMessage(message?: string): string {
     case "invalid_url":
       return "Use o link HLS (https, terminando em .m3u8) do serviço de transmissão.";
     case "live_not_scheduled":
-      return "Esta live já começou ou terminou.";
+      return "Esta transmissão já começou ou terminou.";
     case "live_not_live":
-      return "A live não está no ar.";
+      return "A transmissão não está no ar.";
     case "live_finished":
-      return "Esta live já terminou.";
+      return "Esta transmissão já terminou.";
     case "product_not_in_live":
       return "Esse produto não faz parte da live.";
     case "live_auction_running":
@@ -59,7 +59,7 @@ export function liveErrorMessage(message?: string): string {
     case "stream_unavailable":
       return "O serviço de transmissão não respondeu agora. Tente de novo em instantes.";
     case "stream_exists":
-      return "Esta live já tem uma transmissão.";
+      return "Esta transmissão já está com o vídeo ligado.";
     case "invalid_stream":
       return "O serviço de transmissão devolveu dados inválidos. Tente de novo.";
     case "too_fast":

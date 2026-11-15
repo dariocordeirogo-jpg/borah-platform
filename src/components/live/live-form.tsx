@@ -31,7 +31,7 @@ export function LiveForm({ products, defaultStart }: { products: { id: string; t
         <input name="scheduledAt" type="datetime-local" required defaultValue={defaultStart} className={input} />
       </label>
       <fieldset>
-        <legend className="mb-2 text-sm font-medium text-navy">Produtos da live</legend>
+        <legend className="mb-2 text-sm font-medium text-navy">Produtos da transmissão</legend>
         <ul className="max-h-72 space-y-1 overflow-y-auto rounded-xl border border-line p-2">
           {products.map((p) => (
             <li key={p.id}>
@@ -45,7 +45,7 @@ export function LiveForm({ products, defaultStart }: { products: { id: string; t
         </ul>
       </fieldset>
       <Button type="submit" disabled={pending}>
-        {pending ? "Salvando..." : "Programar live"}
+        {pending ? "Salvando..." : "Programar transmissão"}
       </Button>
     </form>
   );

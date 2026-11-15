@@ -45,13 +45,13 @@ export function Price({ cents, compareAt, size = "md" }: { cents: number; compar
         <span className={cn("font-bold tracking-tight text-navy", size === "lg" ? "text-3xl" : "text-xl")}>
           {formatBRL(cents)}
         </span>
-        {discount ? <span className="text-sm font-semibold text-brand">{discount}% OFF</span> : null}
+        {discount ? <span className="text-sm font-semibold text-brand">{discount}% de desconto</span> : null}
       </p>
     </div>
   );
 }
 
-/** Card de produto real do ZEXI MARKET. */
+/** Card de produto real da Zexi Compras. */
 export function MarketProductCard({ product, priority }: { product: ProductCardData; priority?: boolean }) {
   return (
     <ListingCard

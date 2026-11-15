@@ -143,7 +143,7 @@ test.describe("ZEXI PAY: pedido pago pelo aviso assinado", () => {
     const box = page.getByRole("region", { name: "Pagamento" });
     await expect(box).toBeVisible();
     // Sem chave Stripe neste ambiente: nada de botão de pagar, só o aviso
-    await expect(box.getByText("O ZEXI PAY está em configuração")).toBeVisible();
+    await expect(box.getByText("O Pagamento Zexi está em configuração")).toBeVisible();
     await expect(page.getByRole("button", { name: /Pagar R\$/ })).toHaveCount(0);
     await page.context().close();
   });

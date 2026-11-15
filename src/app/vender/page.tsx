@@ -9,7 +9,7 @@ import { getMyStore } from "@/lib/market/queries";
 
 export const metadata: Metadata = {
   title: "Venda na Zexi",
-  description: "ZEXI SELLER: abra sua loja e venda com preço fixo, ao vivo ou em leilão.",
+  description: "Zexi Vendedor: abra sua loja e venda com preço fixo, ao vivo ou em leilão.",
   alternates: { canonical: "/vender" },
 };
 
@@ -35,14 +35,14 @@ export default function Page() {
   return (
     <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 md:grid-cols-[1.1fr_1fr] md:py-14">
       <div>
-        <p className="text-xs font-bold tracking-wider text-brand">ZEXI SELLER</p>
+        <p className="text-xs font-bold tracking-wider text-brand">Zexi Vendedor</p>
         <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-navy md:text-4xl">
           Abra sua loja e venda do seu jeito.
         </h1>
-        <p className="mt-3 text-muted">Cadastre seus produtos uma vez. Hoje você vende no Market; em breve, também ao vivo e em leilão.</p>
+        <p className="mt-3 text-muted">Cadastre seus produtos uma vez. Venda com preço fixo, ao vivo ou em leilão.</p>
         <ul className="mt-6 space-y-3">
           {[
-            { icon: ShoppingBag, t: "Market", d: "Preço fixo, estoque e pedidos — disponível agora." },
+            { icon: ShoppingBag, t: "Preço fixo", d: "Preço fixo, estoque e pedidos — disponível agora." },
             { icon: Radio, t: "Ao vivo", d: "Transmissões com produtos fixados — Fase 7." },
             { icon: Gavel, t: "Leilões", d: "Lotes com lance mínimo e cronômetro oficial — Fase 3." },
           ].map((x) => (

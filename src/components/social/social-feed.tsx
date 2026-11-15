@@ -32,14 +32,14 @@ export function SocialFeed({ liveId, initial, platforms }: { liveId: string; ini
         Ao vivo também no {platforms.map((p) => platformLabel[p]).join(" e ")}
       </h2>
       <p className="px-4 pt-3 text-xs text-muted">
-        Comente <strong>LANCE 150</strong> para dar lance ou <strong>EU QUERO</strong> para levar o produto em destaque.
+        Comente <strong>lance 150</strong> para dar lance ou <strong>eu quero</strong> para levar o produto em destaque.
         Vincule seu @ em <a href="/conta/redes" className="text-brand hover:underline">Minha conta → TikTok e Instagram</a>.
       </p>
       <ol className="max-h-64 space-y-1.5 overflow-y-auto px-4 py-3 text-sm">
         {events.length === 0 && <li className="text-muted">Os comentários das redes aparecem aqui.</li>}
         {events.map((e) => (
           <li key={e.id}>
-            <span className="mr-1 rounded bg-navy-soft px-1.5 py-0.5 text-[10px] font-bold uppercase text-navy">{platformLabel[e.platform]}</span>
+            <span className="mr-1 rounded bg-navy-soft px-1.5 py-0.5 text-[10px] font-bold text-navy">{platformLabel[e.platform]}</span>
             <strong className="text-navy">{e.nickname}</strong> <span>{e.body}</span>
             {e.result && e.kind !== "comment" && <span className="ml-1 text-xs text-muted">({socialResultLabel[e.result] ?? e.result})</span>}
           </li>

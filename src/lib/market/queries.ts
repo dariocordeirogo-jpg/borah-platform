@@ -23,10 +23,10 @@ export type ProductCardData = {
   rating: { avg: number; count: number } | null;
 };
 
-const CARD_SELECT =
+export const CARD_SELECT =
   "id, title, price_cents, compare_at_cents, stock, condition, is_showcase, product_images(path, position), stores(name, slug), product_ratings(rating_avg, rating_count)" as const;
 
-type CardRow = {
+export type CardRow = {
   id: string;
   title: string;
   price_cents: number;
@@ -39,7 +39,7 @@ type CardRow = {
   product_ratings: { rating_avg: number; rating_count: number } | null;
 };
 
-function toCard(r: CardRow): ProductCardData {
+export function toCard(r: CardRow): ProductCardData {
   const first = [...(r.product_images ?? [])].sort((a, b) => a.position - b.position)[0];
   return {
     id: r.id,

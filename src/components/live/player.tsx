@@ -118,7 +118,7 @@ export function LivePlayer({
     status === "scheduled"
       ? "A transmissão ainda não começou."
       : status === "ended" || status === "cancelled"
-        ? "Esta live terminou."
+        ? "Esta transmissão terminou."
         : !src
           ? "A loja está preparando a transmissão. Fique por aqui!"
           : failed
@@ -145,7 +145,7 @@ export function LivePlayer({
         </div>
       )}
       {status === "live" && (
-        <span className="absolute left-3 top-3 rounded-full bg-brand px-2.5 py-0.5 text-xs font-bold text-white">AO VIVO</span>
+        <span className="absolute left-3 top-3 rounded-full bg-brand px-2.5 py-0.5 text-xs font-bold text-white">Ao vivo</span>
       )}
     </div>
   );
