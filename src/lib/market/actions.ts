@@ -11,7 +11,7 @@ import { marketErrorMessage } from "@/lib/market/format";
 import { addressSchema } from "@/lib/market/schemas";
 import { startCartCheckout } from "@/lib/pay/cart";
 
-export type FormState = { error?: string; fieldErrors?: Record<string, string[] | undefined>; message?: string };
+export type FormState = { error?: string; fieldErrors?: Record<string, string[] | undefined>; message?: string; contactHidden?: boolean };
 
 const uuid = z.uuid();
 

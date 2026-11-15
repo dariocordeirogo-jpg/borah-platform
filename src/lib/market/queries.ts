@@ -19,10 +19,12 @@ export type ProductCardData = {
   store: { name: string; slug: string } | null;
   /** Produto de vitrine (demonstração, sem estoque) */
   showcase: boolean;
+  /** Nota média dos compradores (null sem avaliações) */
+  rating: { avg: number; count: number } | null;
 };
 
 const CARD_SELECT =
-  "id, title, price_cents, compare_at_cents, stock, condition, is_showcase, product_images(path, position), stores(name, slug)" as const;
+  "id, title, price_cents, compare_at_cents, stock, condition, is_showcase, product_images(path, position), stores(name, slug), product_ratings(rating_avg, rating_count)" as const;
 
 type CardRow = {
   id: string;
@@ -34,6 +36,7 @@ type CardRow = {
   is_showcase: boolean;
   product_images: { path: string; position: number }[] | null;
   stores: { name: string; slug: string } | null;
+  product_ratings: { rating_avg: number; rating_count: number } | null;
 };
 
 function toCard(r: CardRow): ProductCardData {
@@ -48,6 +51,7 @@ function toCard(r: CardRow): ProductCardData {
     imageUrl: first ? productImageUrl(first.path) : null,
     store: r.stores,
     showcase: r.is_showcase,
+    rating: r.product_ratings ? { avg: Number(r.product_ratings.rating_avg), count: r.product_ratings.rating_count } : null,
   };
 }
 

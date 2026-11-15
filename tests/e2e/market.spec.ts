@@ -1,5 +1,6 @@
 import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { runTag } from "./run-tag";
 
 // Usuários de teste do projeto de desenvolvimento (e-mail confirmado). Não existem em produção.
 const SELLER = { email: "e2e-vendedor@livelance.test", password: "Teste12345" };
@@ -24,7 +25,7 @@ test.describe("ZEXI MARKET: do anúncio ao pedido", () => {
   test.describe.configure({ mode: "serial" });
   test.beforeEach(({}, info) => test.skip(info.project.name !== "desktop", "fluxo completo roda uma vez (desktop)"));
 
-  const title = `Fone E2E ${Date.now()}`;
+  const title = `Fone E2E ${runTag()}`;
   let productUrl = "";
 
   test("vendedor abre a loja (se ainda não tiver), cria produto e envia foto", async ({ page }) => {

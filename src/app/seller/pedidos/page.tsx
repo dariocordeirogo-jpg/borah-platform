@@ -15,6 +15,8 @@ import { formatBRL } from "@/lib/format";
 import { dateBR, dateTimeBR } from "@/lib/orders/delivery";
 import { getSellerOrders, itemImage, type SellerOrderTab } from "@/lib/market/queries";
 import { requireStore } from "@/lib/market/seller-guard";
+import { reasonLabel } from "@/lib/complaints/format";
+import { getStoreComplaints } from "@/lib/complaints/queries";
 import { formatDays, shippingServiceLabel } from "@/lib/shipping/format";
 import { cn } from "@/lib/utils";
 
@@ -48,7 +50,8 @@ const headline: Record<SellerOrderTab, { text: string; tone: string }> = {
 async function Sales({ searchParams }: { searchParams: Promise<SP> }) {
   const [store, sp] = await Promise.all([requireStore("/seller/pedidos"), searchParams]);
   const tab: SellerOrderTab = isTab(sp.aba) ? sp.aba : "enviar";
-  const { orders, counts } = await getSellerOrders(store.id, tab);
+  const [{ orders, counts }, complaints] = await Promise.all([getSellerOrders(store.id, tab), getStoreComplaints(store.id)]);
+  const openComplaints = complaints.filter((c) => c.status === "open");
   const q = (sp.q ?? "").replace(/\D/g, "");
   const list = q ? orders.filter((o) => String(o.number).includes(q)) : orders;
   const here = `/seller/pedidos?aba=${tab}`;
@@ -63,6 +66,26 @@ async function Sales({ searchParams }: { searchParams: Promise<SP> }) {
       )}
       {sp.ok && <Notice tone="success">{sp.ok}</Notice>}
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
+
+      {openComplaints.length > 0 && (
+        <section aria-label="Reclamações abertas" className="space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-3" data-testid="reclamacoes-abertas">
+          <h2 className="text-sm font-semibold text-amber-900">
+            {openComplaints.length === 1 ? "1 reclamação aberta" : `${openComplaints.length} reclamações abertas`}
+          </h2>
+          <p className="text-xs text-amber-900">
+            Resolva com o comprador: reclamação encerrada em até 48 horas não pesa na sua reputação.
+          </p>
+          <ul className="space-y-1 text-sm">
+            {openComplaints.map((c) => (
+              <li key={c.id} className="text-ink">
+                <strong>Pedido #{c.orders?.number}</strong> · {reasonLabel[c.reason]}
+                {c.details ? <span className="text-muted"> · {c.details}</span> : null}
+                <span className="text-xs text-muted"> · {dateTimeBR(c.created_at)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Resumo do dia */}
       <section aria-label="Resumo" className="grid grid-cols-2 gap-2 sm:grid-cols-4">

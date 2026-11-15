@@ -264,6 +264,24 @@ export type Database = {
           },
         ];
       };
+      order_complaints: {
+        Row: {
+          id: number;
+          order_id: string;
+          store_id: string;
+          buyer_id: string;
+          reason: "not_received" | "not_as_described" | "damaged" | "other";
+          details: string | null;
+          status: "open" | "resolved";
+          created_at: string;
+          resolved_at: string | null;
+        };
+        Insert: { [k: string]: never };
+        Update: { [k: string]: never };
+        Relationships: [
+          { foreignKeyName: "order_complaints_order_id_fkey"; columns: ["order_id"]; isOneToOne: true; referencedRelation: "orders"; referencedColumns: ["id"] },
+        ];
+      };
       order_events: {
         Row: { id: number; order_id: string; kind: string; detail: Json; created_at: string };
         Insert: { order_id: string; kind: string; detail?: Json; created_at?: string };
@@ -705,6 +723,51 @@ export type Database = {
         Update: Record<string, never>;
         Relationships: [];
       };
+      product_reviews: {
+        Row: {
+          id: number;
+          product_id: string;
+          store_id: string;
+          order_id: string;
+          buyer_id: string;
+          buyer_alias: string;
+          rating: number;
+          comment: string | null;
+          hidden: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      product_ratings: {
+        Row: { product_id: string; rating_avg: number; rating_count: number; stars: number[] };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [
+          { foreignKeyName: "product_ratings_product_id_fkey"; columns: ["product_id"]; isOneToOne: true; referencedRelation: "products"; referencedColumns: ["id"] },
+        ];
+      };
+      product_questions: {
+        Row: {
+          id: number;
+          product_id: string;
+          store_id: string;
+          asker_id: string;
+          asker_alias: string;
+          body: string;
+          answer: string | null;
+          answered_at: string | null;
+          hidden: boolean;
+          created_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [
+          { foreignKeyName: "product_questions_product_id_fkey"; columns: ["product_id"]; isOneToOne: false; referencedRelation: "products"; referencedColumns: ["id"] },
+        ];
+      };
       reports: {
         Row: {
           id: string;
@@ -728,6 +791,28 @@ export type Database = {
     Views: { [_ in never]: never };
     Functions: {
       submit_verification: { Args: { _cpf: string; _phone: string }; Returns: undefined };
+      ask_question: { Args: { _product_id: string; _body: string }; Returns: number };
+      answer_question: { Args: { _question_id: number; _answer: string }; Returns: undefined };
+      hide_question: { Args: { _question_id: number }; Returns: undefined };
+      review_product: { Args: { _order_id: string; _product_id: string; _rating: number; _comment: string | null }; Returns: undefined };
+      hide_review: { Args: { _review_id: number }; Returns: undefined };
+      store_reputation: {
+        Args: { _store_ids: string[] };
+        Returns: {
+          store_id: string;
+          sales: number;
+          complaint_rate: number | null;
+          cancel_rate: number | null;
+          delay_rate: number | null;
+          answer_rate: number | null;
+          rating_avg: number | null;
+          rating_count: number;
+          color: "green" | "yellow" | "red" | null;
+        }[];
+      };
+      contact_hidden: { Args: { _text: string }; Returns: boolean };
+      open_complaint: { Args: { _order_id: string; _reason: string; _details: string | null }; Returns: number };
+      resolve_complaint: { Args: { _complaint_id: number }; Returns: undefined };
       create_auction: {
         Args: {
           _product_id: string;

@@ -1,4 +1,5 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
+import { runTag } from "./run-tag";
 
 const SELLER = { email: "e2e-vendedor@livelance.test", cpf: "" };
 const ANA = { email: process.env.E2E_EMAIL ?? "e2e@livelance.test", cpf: "529.982.247-25" };
@@ -34,7 +35,7 @@ test.describe("ZEXI LEILÕES: disputa em tempo real", () => {
   test.describe.configure({ mode: "serial" });
   test.beforeEach(({}, info) => test.skip(info.project.name !== "desktop", "roda uma vez (desktop)"));
 
-  const title = `Relógio E2E ${Date.now()}`;
+  const title = `Relógio E2E ${runTag()}`;
   let auctionPath = "";
 
   test("vendedor cadastra o lote e abre o leilão", async ({ browser }) => {
