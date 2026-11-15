@@ -19,8 +19,19 @@ const groups = [
     ],
   },
   {
+    title: "Ajuda",
+    links: [
+      { href: "/ajuda", label: "Central de ajuda" },
+      { href: "/como-comprar", label: "Como comprar" },
+      { href: "/compra-garantida", label: "Compra Garantida" },
+      { href: "/trocas-e-devolucoes", label: "Trocas e devoluções" },
+    ],
+  },
+  {
     title: "Institucional",
     links: [
+      { href: "/sobre", label: "Sobre a Zexi" },
+      { href: "/categorias", label: "Categorias" },
       { href: "/termos", label: "Termos de uso" },
       { href: "/privacidade", label: "Política de privacidade" },
     ],
@@ -33,7 +44,7 @@ export function Footer() {
       <a href="#" className="block bg-navy-2 py-3 text-center text-sm font-semibold text-white hover:bg-navy">
         Voltar ao início
       </a>
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-4">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         <div>
           <Logo />
           <p className="mt-4 font-display text-lg font-bold text-navy">{site.slogan}</p>

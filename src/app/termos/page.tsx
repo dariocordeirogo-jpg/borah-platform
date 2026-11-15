@@ -9,7 +9,7 @@ export default function Page() {
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
       <p className="rounded-xl bg-brand-soft px-4 py-3 text-sm font-semibold text-brand-dark">
-        RASCUNHO — este texto ainda não foi revisado por advogado e não vale como termo definitivo. Ele descreve as regras
+        Rascunho: este texto ainda não foi revisado por advogado e não vale como termo definitivo. Ele descreve as regras
         que o sistema aplica hoje, para servir de base à versão final.
       </p>
       <h1 className="mt-6 font-display text-3xl font-extrabold">Termos de uso da Zexi</h1>

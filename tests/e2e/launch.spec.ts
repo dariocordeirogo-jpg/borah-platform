@@ -25,7 +25,26 @@ test("rodapé avisa que é versão de testes; termos e privacidade são rascunho
   await expect(page.getByRole("contentinfo").getByText(/versão de testes/)).toBeVisible();
   for (const path of ["/termos", "/privacidade"]) {
     await page.goto(path);
-    await expect(page.getByText(/^RASCUNHO/)).toBeVisible();
+    await expect(page.getByText(/^Rascunho:/)).toBeVisible();
   }
   await expect(page.getByRole("heading", { name: /Encarregado/ })).toBeVisible();
+});
+
+test("páginas de ajuda e institucionais existem e estão no rodapé; 404 tem busca e atalhos", async ({ page }) => {
+  for (const [path, heading] of [
+    ["/ajuda", "Central de ajuda"],
+    ["/como-comprar", "Como comprar"],
+    ["/compra-garantida", "Compra Garantida"],
+    ["/trocas-e-devolucoes", "Trocas e devoluções"],
+    ["/sobre", "Sobre a Zexi"],
+    ["/categorias", "Categorias"],
+  ] as const) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
+    await expect(page.getByRole("contentinfo").getByRole("link", { name: heading === "Central de ajuda" ? "Central de ajuda" : heading })).toBeVisible();
+  }
+  const res = await page.goto("/pagina-que-nao-existe");
+  expect(res?.status()).toBe(404);
+  await expect(page.getByTestId("pagina-404").getByRole("searchbox")).toBeVisible();
+  await expect(page.getByTestId("pagina-404").getByRole("link", { name: "Ofertas" })).toBeVisible();
 });

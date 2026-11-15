@@ -22,7 +22,7 @@ export default function Page() {
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
       <p className="rounded-xl bg-brand-soft px-4 py-3 text-sm font-semibold text-brand-dark">
-        RASCUNHO — regras ainda sem revisão jurídica. O enquadramento dos leilões precisa de parecer antes do lançamento.
+        Rascunho: regras ainda sem revisão jurídica. O enquadramento dos leilões precisa de parecer antes do lançamento.
       </p>
       <h1 className="mt-6 font-display text-3xl font-extrabold text-navy">Regras dos leilões</h1>
       <dl className="mt-6 space-y-5">
