@@ -12,11 +12,22 @@ type StartCart = {
   orders: { order_id: string; number: number; store_name: string; amount_cents: number }[];
 };
 
-export type CartCheckout = { url: string } | { done: true } | { error: string };
+/** Pagamento aberto dentro da Zexi (formulário da Stripe embutido na página, sem sair do site). */
+export type EmbeddedCheckout = {
+  clientSecret: string;
+  amountCents: number;
+  orders: StartCart["orders"];
+};
+export type CartCheckout = EmbeddedCheckout | { url: string } | { done: true } | { error: string };
+
+const returnUrl = (backPath: string) =>
+  `${env.NEXT_PUBLIC_SITE_URL}${backPath}${backPath.includes("?") ? "&" : "?"}pagamento=retorno&sessao={CHECKOUT_SESSION_ID}`;
 
 /**
  * Pagamento único (Compra Garantida): uma cobrança na conta da Zexi para todos os pedidos do carrinho.
- * O banco valida os pedidos e calcula valores e comissões; aqui só se abre o Checkout da Stripe.
+ * O banco valida os pedidos e calcula valores e comissões; aqui só se abre a sessão de Checkout da Stripe,
+ * mostrada dentro da própria Zexi (Payment Element, ui_mode "elements"). A confirmação continua pelos avisos
+ * assinados da Stripe (checkout.session.completed / async_payment_succeeded), nunca pela página de retorno.
  * O dinheiro de cada loja fica retido e é transferido depois da entrega (ver payouts.ts).
  */
 export async function startCartCheckout(
@@ -35,6 +46,10 @@ export async function startCartCheckout(
   try {
     if (c.session_id) {
       const existing = await stripe.checkout.sessions.retrieve(c.session_id);
+      if (existing.status === "open" && existing.client_secret && existing.ui_mode === "elements") {
+        return { clientSecret: existing.client_secret, amountCents: c.amount_cents, orders: c.orders };
+      }
+      // Sessão antiga, aberta na página da Stripe (antes do pagamento dentro da Zexi): continua valendo
       if (existing.status === "open" && existing.url) return { url: existing.url };
       await syncStripeObject(existing.status === "complete" ? "checkout.session.completed" : "checkout.session.expired", existing, null);
       return { done: true };
@@ -44,6 +59,7 @@ export async function startCartCheckout(
     const session = await stripe.checkout.sessions.create(
       {
         mode: "payment",
+        ui_mode: "elements",
         currency: "brl",
         locale: "pt-BR",
         client_reference_id: c.checkout_payment_id,
@@ -65,13 +81,15 @@ export async function startCartCheckout(
         },
         // A sessão expira antes do registro no banco (60 min)
         expires_at: Math.floor(Date.now() / 1000) + 55 * 60,
-        success_url: `${env.NEXT_PUBLIC_SITE_URL}${backPath}${backPath.includes("?") ? "&" : "?"}pagamento=retorno&sessao={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${env.NEXT_PUBLIC_SITE_URL}${backPath}${backPath.includes("?") ? "&" : "?"}pagamento=cancelado`,
+        // Pix, boleto e cartão com 3DS voltam para cá; a confirmação do pedido vem pelo aviso assinado
+        return_url: returnUrl(backPath),
       },
       { idempotencyKey: `checkout_${c.checkout_payment_id}` },
     );
     await supabase.rpc("attach_cart_session", { _checkout_payment_id: c.checkout_payment_id, _session_id: session.id });
-    return session.url ? { url: session.url } : { error: "stripe_error" };
+    return session.client_secret
+      ? { clientSecret: session.client_secret, amountCents: c.amount_cents, orders: c.orders }
+      : { error: "stripe_error" };
   } catch {
     return { error: "stripe_error" };
   }

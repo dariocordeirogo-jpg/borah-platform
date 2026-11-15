@@ -130,7 +130,7 @@ function PayAll({ orders }: { orders: Order[] }) {
 async function Purchases({ searchParams }: { searchParams: Promise<SP> }) {
   if (!(await getCurrentUser())) redirect("/entrar?next=/conta/pedidos");
   const sp = await searchParams;
-  // Volta do Checkout da Stripe: confere a cobrança antes de listar
+  // Volta do pagamento: confere a cobrança antes de listar
   if (sp.pagamento === "retorno" && sp.sessao) await syncCheckoutReturn(sp.sessao);
   const [orders, available] = await Promise.all([getMyOrders(), payAvailable()]);
   const next = orders.filter((o) => o.status === "paid" || o.status === "shipped");

@@ -149,3 +149,9 @@ export function payErrorMessage(message: string | undefined): string {
       return "Não foi possível concluir agora. Tente de novo.";
   }
 }
+
+/** Página de pagamento da Zexi para estes pedidos; depois do pagamento volta para `back` (caminho interno). */
+export function paymentPath(orderIds: string[], back: string): string {
+  const q = new URLSearchParams({ pedidos: orderIds.join(","), voltar: back });
+  return `/pagamento?${q.toString()}`;
+}
