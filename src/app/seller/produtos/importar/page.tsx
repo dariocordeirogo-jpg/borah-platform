@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { ImportFlow } from "@/components/importer/import-flow";
 import { getCategories } from "@/lib/market/queries";
@@ -19,7 +20,11 @@ export default function Page() {
         <h1 className="font-display text-2xl font-bold tracking-tight text-navy">Importar anúncio de outro site</h1>
         <p className="mt-1 text-sm text-muted">
           Cole o link de um anúncio seu em outra loja virtual. Puxamos título, preço, fotos e descrição; você revisa e ele entra como
-          rascunho.
+          rascunho. Tem muitos anúncios?{" "}
+          <Link href="/seller/produtos/importar-em-massa" className="text-brand hover:underline">
+            Importe em massa pela planilha
+          </Link>
+          .
         </p>
       </div>
       <Suspense fallback={<div className="h-40 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>

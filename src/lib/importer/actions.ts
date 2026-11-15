@@ -1,17 +1,13 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { importErrorMessage, ImportError, safeFetch } from "@/lib/importer/safe-fetch";
-import { MAX_IMPORT_IMAGES, parseListing, type ImportedListing } from "@/lib/importer/parse";
+import { importErrorMessage, ImportError } from "@/lib/importer/safe-fetch";
+import { readListing, saveImages } from "@/lib/importer/save";
+import { MAX_IMPORT_IMAGES, type ImportedListing } from "@/lib/importer/parse";
 import type { FormState } from "@/lib/market/actions";
-import { extensionFor, sniffImageType } from "@/lib/market/image-check";
-import { MAX_IMAGE_BYTES, PRODUCT_IMAGE_BUCKET } from "@/lib/market/images";
 import { productSchema } from "@/lib/market/schemas";
 import { createClient } from "@/lib/supabase/server";
-
-const MAX_PAGE_BYTES = 3 * 1024 * 1024;
 
 async function requireSeller() {
   const supabase = await createClient();
@@ -24,15 +20,6 @@ async function requireSeller() {
   return { supabase, store };
 }
 
-function decode(body: Uint8Array, contentType: string): string {
-  const charset = contentType.match(/charset=([\w-]+)/i)?.[1]?.toLowerCase();
-  try {
-    return new TextDecoder(charset && charset !== "utf8" ? charset : "utf-8").decode(body);
-  } catch {
-    return new TextDecoder("utf-8").decode(body);
-  }
-}
-
 export type PreviewState = { error?: string; listing?: ImportedListing };
 
 /** Passo 1: lê o link e devolve os dados encontrados para a loja revisar. Nada é gravado aqui. */
@@ -41,12 +28,7 @@ export async function previewImport(_prev: PreviewState, formData: FormData): Pr
   const url = String(formData.get("url") ?? "").trim();
   if (!/^https?:\/\//i.test(url)) return { error: importErrorMessage.invalid_url };
   try {
-    const page = await safeFetch(url, {
-      maxBytes: MAX_PAGE_BYTES,
-      accept: "text/html,application/xhtml+xml;q=0.9,*/*;q=0.5",
-      allowTypes: (t) => t === "" || t.includes("html") || t.includes("xml"),
-    });
-    const listing = parseListing(decode(page.body, page.contentType), page.url.toString());
+    const listing = await readListing(url);
     if (!listing) {
       return {
         error:
@@ -58,19 +40,6 @@ export async function previewImport(_prev: PreviewState, formData: FormData): Pr
     if (e instanceof ImportError) return { error: importErrorMessage[e.code] };
     return { error: "Não foi possível ler esse link agora. Tente de novo." };
   }
-}
-
-/** Baixa uma foto do anúncio de origem (mesma proteção) e confere a assinatura real do arquivo. */
-async function fetchImage(url: string) {
-  const img = await safeFetch(url, {
-    maxBytes: MAX_IMAGE_BYTES,
-    accept: "image/webp,image/jpeg,image/png;q=0.9",
-    timeoutMs: 15_000,
-    allowTypes: (t) => t === "" || t.startsWith("image/") || t === "application/octet-stream",
-  });
-  const type = sniffImageType(img.body);
-  if (!type) throw new ImportError("bad_type");
-  return { bytes: img.body, type };
 }
 
 /**
@@ -109,24 +78,7 @@ export async function confirmImport(_prev: FormState, formData: FormData): Promi
   if (error || !product) return { error: "Não foi possível criar o produto." };
 
   const images = [...new Set(formData.getAll("image").map(String))].filter((u) => /^https?:\/\//i.test(u)).slice(0, MAX_IMPORT_IMAGES);
-  let ok = 0;
-  let failed = 0;
-  for (const url of images) {
-    try {
-      const { bytes, type } = await fetchImage(url);
-      const path = `${store.id}/${product.id}/${randomUUID()}.${extensionFor[type]}`;
-      const { error: upErr } = await supabase.storage.from(PRODUCT_IMAGE_BUCKET).upload(path, bytes, { contentType: type, upsert: false });
-      if (upErr) throw upErr;
-      const { error: dbErr } = await supabase.from("product_images").insert({ product_id: product.id, path, position: ok });
-      if (dbErr) {
-        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
-        throw dbErr;
-      }
-      ok++;
-    } catch {
-      failed++;
-    }
-  }
+  const { ok, failed } = await saveImages(supabase, store.id, product.id, images);
   revalidatePath("/seller/produtos");
   redirect(`/seller/produtos/${product.id}?importado=${ok}${failed ? `&fotos_falharam=${failed}` : ""}`);
 }

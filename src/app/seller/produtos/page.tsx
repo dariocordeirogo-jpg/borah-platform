@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { Plus, Link2 } from "lucide-react";
+import { FileSpreadsheet, Link2, Plus } from "lucide-react";
 import { EmptyState, ProductImage } from "@/components/market";
 import { ButtonLink } from "@/components/ui/button";
 import { formatBRL } from "@/lib/format";
@@ -58,6 +58,9 @@ export default function Page() {
         <div className="flex flex-wrap gap-2">
           <ButtonLink href="/seller/produtos/importar" variant="outline">
             <Link2 className="h-4 w-4" aria-hidden="true" /> Importar de outro site
+          </ButtonLink>
+          <ButtonLink href="/seller/produtos/importar-em-massa" variant="outline">
+            <FileSpreadsheet className="h-4 w-4" aria-hidden="true" /> Importar em massa
           </ButtonLink>
           <ButtonLink href="/seller/produtos/novo">
             <Plus className="h-4 w-4" aria-hidden="true" /> Novo produto
