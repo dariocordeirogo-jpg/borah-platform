@@ -69,10 +69,10 @@ test.describe("Frete: CEP da loja, PAC/SEDEX no checkout", () => {
     const page = await browserAs(browser, SELLER, "/seller/loja");
     const cep = page.getByLabel(/CEP de origem/);
     await cep.fill("123");
-    await page.getByRole("button", { name: "Salvar" }).click();
+    await page.getByRole("button", { name: "Salvar", exact: true }).click();
     await expect(page.getByText("CEP inválido. Use 8 números")).toBeVisible();
     await page.getByLabel(/CEP de origem/).fill("01001-000");
-    await page.getByRole("button", { name: "Salvar" }).click();
+    await page.getByRole("button", { name: "Salvar", exact: true }).click();
     await expect(page.getByText("Loja atualizada.")).toBeVisible();
     const { data } = await seller.c.from("stores").select("origin_cep").eq("id", storeId).single();
     expect(data!.origin_cep).toBe("01001000");

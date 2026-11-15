@@ -23,10 +23,10 @@ export type ProductCardData = {
   rating: { avg: number; count: number } | null;
 };
 
-const CARD_SELECT =
+export const CARD_SELECT =
   "id, title, price_cents, compare_at_cents, stock, condition, is_showcase, product_images(path, position), stores(name, slug), product_ratings(rating_avg, rating_count)" as const;
 
-type CardRow = {
+export type CardRow = {
   id: string;
   title: string;
   price_cents: number;
@@ -39,7 +39,7 @@ type CardRow = {
   product_ratings: { rating_avg: number; rating_count: number } | null;
 };
 
-function toCard(r: CardRow): ProductCardData {
+export function toCard(r: CardRow): ProductCardData {
   const first = [...(r.product_images ?? [])].sort((a, b) => a.position - b.position)[0];
   return {
     id: r.id,
@@ -135,7 +135,7 @@ export async function getProduct(id: string) {
 
 export async function getStoreBySlug(slug: string) {
   const supabase = await db();
-  const { data } = await supabase.from("stores").select("id, name, slug, description, created_at").eq("slug", slug).maybeSingle();
+  const { data } = await supabase.from("stores").select("id, name, slug, description, created_at, logo_path, cover_path, theme, tagline").eq("slug", slug).maybeSingle();
   return data;
 }
 
@@ -257,7 +257,7 @@ export async function getMyStore() {
   if (!user) return null;
   const { data } = await supabase
     .from("stores")
-    .select("id, name, slug, description, origin_cep, is_active, created_at")
+    .select("id, name, slug, description, origin_cep, is_active, created_at, logo_path, cover_path, theme, tagline")
     .eq("owner_id", user.id)
     .maybeSingle();
   return data;
