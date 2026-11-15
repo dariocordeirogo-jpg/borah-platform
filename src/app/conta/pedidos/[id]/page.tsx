@@ -9,6 +9,9 @@ import { OrderTimeline, TrackingInfo } from "@/components/orders/timeline";
 import { confirmDelivery } from "@/lib/orders/actions";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth";
+import { reviewWindowOpen } from "@/lib/reviews/format";
+import { getMyOrderReviews } from "@/lib/reviews/queries";
+import { ReviewForm } from "@/components/reviews/review-form";
 import { formatBRL } from "@/lib/format";
 import { formatDays, shippingServiceLabel } from "@/lib/shipping/format";
 import { cancelMyOrder } from "@/lib/market/actions";
@@ -29,6 +32,9 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
   const o = await getOrder(id);
   if (!o || o.buyer_id !== user.id) notFound();
   const a = o.shipping_address as unknown as Addr;
+  // Avaliar: pedido entregue, até 60 dias depois da entrega (o banco confere de novo)
+  const canReview = o.status === "delivered" && reviewWindowOpen(o.delivered_at ?? o.created_at);
+  const myReviews = canReview ? await getMyOrderReviews(o.id) : new Map();
 
   return (
     <div className="space-y-4">
@@ -103,6 +109,19 @@ async function Order({ params, searchParams }: { params: Promise<{ id: string }>
           </div>
         </dl>
       </section>
+
+      {canReview && (
+        <section aria-label="Avalie sua compra" className="space-y-4 rounded-[var(--radius-card)] border border-line bg-white p-4" data-testid="avaliar-compra">
+          <h2 className="font-semibold text-navy">Avalie sua compra</h2>
+          <p className="text-xs text-muted">Sua opinião aparece na página do produto e ajuda outros compradores.</p>
+          {[...new Map(o.order_items.map((i) => [i.product_id, i])).values()].map((i) => (
+            <div key={i.product_id} className="space-y-1 border-t border-line pt-3 first:border-t-0 first:pt-0">
+              <p className="text-sm text-ink">{i.title}</p>
+              <ReviewForm orderId={o.id} productId={i.product_id} title={i.title} initial={myReviews.get(i.product_id)} />
+            </div>
+          ))}
+        </section>
+      )}
 
       <section className="rounded-[var(--radius-card)] border border-line bg-white p-4 text-sm">
         <h2 className="font-semibold text-navy">Entrega</h2>

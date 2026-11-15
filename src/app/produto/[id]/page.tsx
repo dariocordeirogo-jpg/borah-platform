@@ -6,6 +6,9 @@ import { Banknote, ChevronRight, CreditCard, Flag, Lock, PackageCheck, QrCode, S
 import { Gallery } from "@/components/gallery";
 import { ProductVideo } from "@/components/product/product-video";
 import { ProductQuestions } from "@/components/questions/product-questions";
+import { ProductReviews } from "@/components/reviews/product-reviews";
+import { Stars } from "@/components/reviews/stars";
+import { StoreReputation } from "@/components/reviews/store-reputation";
 import { BigPrice } from "@/components/listing";
 import { MarketProductCard, Notice } from "@/components/market";
 import { Button } from "@/components/ui/button";
@@ -15,6 +18,8 @@ import { addToCart } from "@/lib/market/actions";
 import { conditionLabel } from "@/lib/market/format";
 import { getProduct, listProducts } from "@/lib/market/queries";
 import { getProductQuestions } from "@/lib/questions/queries";
+import { ratingText } from "@/lib/reviews/format";
+import { getProductReviews, getStoreReputations } from "@/lib/reviews/queries";
 import { cn } from "@/lib/utils";
 import { formatBRL } from "@/lib/format";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -46,9 +51,15 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
   const available = p.status === "active" && p.stock > 0;
   const maxQty = Math.min(p.stock, 10);
 
-  // Mais produtos da mesma loja (como "Produtos do vendedor")
-  const { questions } = p.status === "active" && !p.is_showcase ? await getProductQuestions(p.id) : { questions: [] };
-  const more = p.stores ? (await listProducts({ storeId: p.stores.id, limit: 7 })).items.filter((x) => x.id !== p.id).slice(0, 6) : [];
+  // Tudo o que depende só do produto sai em paralelo (perguntas, opiniões, reputação e mais produtos da loja)
+  const [{ questions }, { summary, reviews }, reputations, sameStore] = await Promise.all([
+    p.status === "active" && !p.is_showcase ? getProductQuestions(p.id) : { questions: [] },
+    getProductReviews(p.id),
+    getStoreReputations(p.stores ? [p.stores.id] : []),
+    p.stores ? listProducts({ storeId: p.stores.id, limit: 7 }) : null,
+  ]);
+  const reputation = p.stores ? reputations.get(p.stores.id) : undefined;
+  const more = sameStore ? sameStore.items.filter((x) => x.id !== p.id).slice(0, 6) : [];
   const off = p.compare_at_cents && p.compare_at_cents > p.price_cents ? Math.round((1 - p.price_cents / p.compare_at_cents) * 100) : null;
 
   const buyBox = (
@@ -112,12 +123,15 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
         )}
       </div>
       {p.stores && (
-        <p className="mt-4 text-sm text-muted">
-          Vendido por{" "}
-          <Link href={`/loja/${p.stores.slug}`} className="font-semibold text-brand hover:underline">
-            {p.stores.name}
-          </Link>
-        </p>
+        <div className="mt-4 space-y-2">
+          <p className="text-sm text-muted">
+            Vendido por{" "}
+            <Link href={`/loja/${p.stores.slug}`} className="font-semibold text-brand hover:underline">
+              {p.stores.name}
+            </Link>
+          </p>
+          <StoreReputation reputation={reputation} compact />
+        </div>
       )}
       <ul className="mt-4 space-y-3 text-sm">
         <li className="flex gap-2">
@@ -192,6 +206,12 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
               {p.categories ? ` | ${p.categories.name}` : ""}
             </p>
             <h1 className="mt-1 text-xl font-semibold leading-snug text-ink md:text-[22px]">{p.title}</h1>
+            {summary && (
+              <a href="#avaliacoes" className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted hover:text-brand">
+                <span className="text-ink">{ratingText(summary.avg)}</span> <Stars value={summary.avg} />
+                <span>({summary.count})</span>
+              </a>
+            )}
             <div className="mt-4">
               {p.compare_at_cents && off ? <p className="text-sm text-muted line-through">{formatBRL(p.compare_at_cents)}</p> : null}
               <p className="flex flex-wrap items-center gap-3">
@@ -278,6 +298,9 @@ async function Product({ params, searchParams }: { params: Promise<{ id: string 
 
         {p.status === "active" && !p.is_showcase && (
           <ProductQuestions productId={p.id} questions={questions} canAsk={!own} loggedIn={!!user} />
+        )}
+        {!p.is_showcase && (
+          <ProductReviews summary={summary} reviews={reviews} />
         )}
       </div>
     </div>

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { StoreReputation } from "@/components/reviews/store-reputation";
+import { getStoreReputations } from "@/lib/reviews/queries";
 import { Suspense } from "react";
 import { Store } from "lucide-react";
 import { EmptyState, Pagination, ProductGrid } from "@/components/market";
@@ -20,7 +22,10 @@ async function StorePage({ params, searchParams }: { params: Promise<{ slug: str
   const [{ slug }, sp] = await Promise.all([params, searchParams]);
   const store = await getStoreBySlug(slug);
   if (!store) notFound();
-  const result = await listProducts({ storeId: store.id, page: Number(sp.pagina) || 1 });
+  const [result, reputations] = await Promise.all([
+    listProducts({ storeId: store.id, page: Number(sp.pagina) || 1 }),
+    getStoreReputations([store.id]),
+  ]);
   const since = new Date(store.created_at).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 
   return (
@@ -29,12 +34,15 @@ async function StorePage({ params, searchParams }: { params: Promise<{ slug: str
         <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand">
           <Store className="h-7 w-7" aria-hidden="true" />
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h1 className="font-display text-2xl font-bold tracking-tight text-navy">{store.name}</h1>
           <p className="text-sm text-muted">
             Na Zexi desde {since} · {result.total} {result.total === 1 ? "produto" : "produtos"}
           </p>
           {store.description && <p className="mt-2 text-sm text-ink">{store.description}</p>}
+          <div className="mt-3 max-w-md">
+            <StoreReputation reputation={reputations.get(store.id)} />
+          </div>
         </div>
       </header>
       {result.items.length ? (

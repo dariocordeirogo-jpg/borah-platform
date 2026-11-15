@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CalendarClock, Gavel, ImageOff, Radio, Users } from "lucide-react";
+import { CalendarClock, Gavel, ImageOff, Radio, Star, Users } from "lucide-react";
 import type { ReactNode } from "react";
 import { ShelfTrack } from "@/components/shelf-track";
 import { formatBRL } from "@/lib/format";
@@ -94,6 +94,8 @@ export type ListingCardProps = {
   className?: string;
   /** Ação rápida sobre a foto (ex.: adicionar ao carrinho); fica acima do link do card */
   action?: ReactNode;
+  /** Nota dos compradores (estrelas abaixo do título) */
+  rating?: { avg: number; count: number } | null;
 };
 
 /** Card de vitrine (produto ou leilão). O card inteiro é o link. */
@@ -111,6 +113,7 @@ export function ListingCard({
   priority,
   className,
   action,
+  rating,
 }: ListingCardProps) {
   const off = discountPercent(priceCents, compareAtCents);
   return (
@@ -132,6 +135,13 @@ export function ListingCard({
             {title}
           </Link>
         </h3>
+        {rating ? (
+          <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted" aria-label={`Nota ${rating.avg.toLocaleString("pt-BR")} de 5, ${rating.count} avaliações`}>
+            <Star className="h-3 w-3 fill-brand text-brand" aria-hidden="true" />
+            <span className="text-ink">{rating.avg.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+            <span>({rating.count})</span>
+          </p>
+        ) : null}
         <div className="mt-1">
           {priceLabel && <p className="text-[10px] font-semibold uppercase tracking-wide text-muted sm:text-[11px]">{priceLabel}</p>}
           {off && compareAtCents ? (

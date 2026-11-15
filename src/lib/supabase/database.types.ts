@@ -705,6 +705,32 @@ export type Database = {
         Update: Record<string, never>;
         Relationships: [];
       };
+      product_reviews: {
+        Row: {
+          id: number;
+          product_id: string;
+          store_id: string;
+          order_id: string;
+          buyer_id: string;
+          buyer_alias: string;
+          rating: number;
+          comment: string | null;
+          hidden: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      product_ratings: {
+        Row: { product_id: string; rating_avg: number; rating_count: number; stars: number[] };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [
+          { foreignKeyName: "product_ratings_product_id_fkey"; columns: ["product_id"]; isOneToOne: true; referencedRelation: "products"; referencedColumns: ["id"] },
+        ];
+      };
       product_questions: {
         Row: {
           id: number;
@@ -750,6 +776,20 @@ export type Database = {
       ask_question: { Args: { _product_id: string; _body: string }; Returns: number };
       answer_question: { Args: { _question_id: number; _answer: string }; Returns: undefined };
       hide_question: { Args: { _question_id: number }; Returns: undefined };
+      review_product: { Args: { _order_id: string; _product_id: string; _rating: number; _comment: string | null }; Returns: undefined };
+      hide_review: { Args: { _review_id: number }; Returns: undefined };
+      store_reputation: {
+        Args: { _store_ids: string[] };
+        Returns: {
+          store_id: string;
+          sales: number;
+          on_time_rate: number | null;
+          answer_rate: number | null;
+          rating_avg: number | null;
+          rating_count: number;
+          level: number | null;
+        }[];
+      };
       create_auction: {
         Args: {
           _product_id: string;

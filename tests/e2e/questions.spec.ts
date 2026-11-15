@@ -86,3 +86,19 @@ test.describe("Perguntas e respostas", () => {
     await expect(list).toContainText("Serve sim! O 58 é o tamanho M.");
   });
 });
+
+test.describe("Avaliações e reputação", () => {
+  test.beforeEach(({}, info) => test.skip(info.project.name !== "desktop", "roda uma vez (desktop)"));
+
+  test("produto sem avaliações mostra o convite e a loja mostra a reputação", async ({ page }) => {
+    await page.goto("/market");
+    await page.getByRole("article").first().getByRole("link").first().click();
+    await expect(page).toHaveURL(/\/produto\/[0-9a-f-]{36}/);
+    const reviews = page.getByRole("region", { name: "Opiniões do produto" });
+    await expect(reviews).toBeVisible();
+    await expect(page.getByTestId("reputacao-loja").first()).toContainText(/Loja nova|reputação/);
+    await page.getByRole("link", { name: "Ver mais da loja" }).click();
+    await expect(page).toHaveURL(/\/loja\//);
+    await expect(page.getByTestId("reputacao-loja")).toContainText(/vendas|Ainda sem vendas/);
+  });
+});
