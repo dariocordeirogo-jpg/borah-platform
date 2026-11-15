@@ -46,7 +46,7 @@ export async function DepartmentCards() {
   const cards: { title: string; href: string; items: ProductCardData[] }[] = departments
     .map((d, i) => ({ title: d.title, href: `/market?categoria=${d.slug}`, items: byDept[i].items }))
     .filter((c) => c.items.length >= 2);
-  if (all.items.length >= 2) cards.push({ title: "Novidades no Market", href: "/market", items: all.items });
+  if (all.items.length >= 2) cards.push({ title: "Novidades na Zexi", href: "/market", items: all.items });
   if (!cards.length) return null;
   return (
     <div data-testid="departamentos" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

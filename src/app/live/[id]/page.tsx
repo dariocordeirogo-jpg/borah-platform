@@ -86,7 +86,7 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
           {live.status === "live" && <ViewerCount liveId={live.id} track />}
           {live.description && <p className="mt-1 text-sm text-muted">{live.description}</p>}
           <Link href={`/denunciar?tipo=live&id=${live.id}&next=/live/${live.id}`} className="mt-1 inline-block text-xs text-muted hover:text-brand hover:underline">
-            Denunciar esta live
+            Denunciar esta transmissão
           </Link>
           {live.status === "scheduled" && (
             <p className="mt-2 text-sm text-navy">
@@ -105,7 +105,7 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
               ) : null}
               <div className="min-w-0">
                 <p className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-brand">
-                  <Gavel className="h-4 w-4" aria-hidden="true" /> LEILÃO AO VIVO
+                  <Gavel className="h-4 w-4" aria-hidden="true" /> Leilão ao vivo
                 </p>
                 <p className="font-semibold leading-snug text-navy">{lot.auction.title}</p>
                 <p className="sr-only" data-testid="leilao-live-preco">
@@ -143,7 +143,7 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
         )}
         {pinned && !activeAuction && (
           <section aria-label="Produto em destaque">
-            <p className="mb-2 text-xs font-bold tracking-wider text-brand">EM DESTAQUE AGORA</p>
+            <p className="mb-2 text-xs font-bold tracking-wider text-brand">Em destaque agora</p>
             <ProductRow p={pinned} highlight liveId={live.id} />
           </section>
         )}
@@ -155,8 +155,8 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
         />
         {live.status === "live" && socials.length > 0 && <SocialFeed liveId={live.id} initial={socialEvents} platforms={socials} />}
         {products.length > 0 && (
-          <section aria-label="Produtos da live" className="rounded-[var(--radius-card)] border border-line bg-white">
-            <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-navy">Produtos da live</h2>
+          <section aria-label="Produtos da transmissão" className="rounded-[var(--radius-card)] border border-line bg-white">
+            <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-navy">Produtos da transmissão</h2>
             <div className="divide-y divide-line">
               {products.map((p) => (
                 <ProductRow key={p.id} p={p} liveId={live.id} />

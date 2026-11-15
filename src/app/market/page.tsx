@@ -10,8 +10,8 @@ import { SmartSearch } from "@/components/ai/smart-search";
 import { aiConfigured } from "@/lib/ai/claude";
 
 export const metadata: Metadata = {
-  title: "Marketplace",
-  description: "ZEXI MARKET: compre de lojas brasileiras com preço fixo, carrinho e entrega.",
+  title: "Compras",
+  description: "Zexi Compras: compre de lojas brasileiras com preço fixo, carrinho e entrega.",
   alternates: { canonical: "/market" },
 };
 
@@ -89,7 +89,7 @@ async function Catalog({ searchParams }: { searchParams: SP }) {
         <form action="/market" role="search" className="mb-4">
           {categoria && <input type="hidden" name="categoria" value={categoria} />}
           <label htmlFor="busca-market" className="sr-only">
-            Buscar no Market
+            Buscar produtos
           </label>
           <div className="flex h-11 items-center rounded-full border border-line bg-white pl-4 focus-within:border-navy-2">
             <input
@@ -97,7 +97,7 @@ async function Catalog({ searchParams }: { searchParams: SP }) {
               name="q"
               defaultValue={q}
               type="search"
-              placeholder="Buscar no Market"
+              placeholder="Buscar produtos"
               className="h-full min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted"
             />
             <button type="submit" aria-label="Buscar" className="mr-1 flex h-9 w-9 items-center justify-center rounded-full bg-brand text-white hover:bg-brand-dark">
@@ -106,7 +106,7 @@ async function Catalog({ searchParams }: { searchParams: SP }) {
           </div>
         </form>
         {aiConfigured() && <SmartSearch />}
-        <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-brand">Categorias</h2>
+        <h2 className="mb-2 text-xs font-bold text-brand">Categorias</h2>
         <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-col md:gap-0.5 md:px-0">
           <li>
             <Link
@@ -183,7 +183,7 @@ async function Catalog({ searchParams }: { searchParams: SP }) {
           </>
         ) : (
           <EmptyState
-            title={q || categoria ? "Nada encontrado" : "O Market está começando"}
+            title={q || categoria ? "Nada encontrado" : "A loja da Zexi está começando"}
             action={
               q || categoria ? (
                 <ButtonLink href="/market" variant="outline">
@@ -208,7 +208,7 @@ export default function Page({ searchParams }: PageProps<"/market">) {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 md:py-8">
       <p className="mb-4 inline-flex items-center gap-1.5 text-xs font-bold text-brand">
-        <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" /> ZEXI MARKET
+        <ShoppingBag className="h-3.5 w-3.5" aria-hidden="true" /> Zexi Compras
       </p>
       <Suspense fallback={<div className="h-96 animate-pulse rounded-[var(--radius-card)] bg-surface" />}>
         <Catalog searchParams={searchParams as SP} />

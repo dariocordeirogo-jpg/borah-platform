@@ -17,8 +17,8 @@ export default function Page() {
         <H2>1. O que é a Zexi</H2>
         <p>
           A Zexi (zexi.com.br) é uma plataforma de intermediação que conecta compradores e lojas em três
-          modalidades: marketplace (ZEXI MARKET), vendas em transmissões ao vivo (ZEXI LIVE) e leilões
-          digitais (ZEXI LEILÕES). Quem vende é a loja; a Zexi intermedeia.
+          modalidades: marketplace (Zexi Compras), vendas em transmissões ao vivo (Zexi Ao Vivo) e leilões
+          digitais (Zexi Leilões). Quem vende é a loja; a Zexi intermedeia.
         </p>
 
         <H2>2. Conta</H2>
@@ -31,7 +31,7 @@ export default function Page() {
         <ul className="list-disc space-y-1 pl-5">
           <li>Preço, estoque e total do pedido são confirmados pelo sistema no momento do pedido, não pelo navegador.</li>
           <li>
-            Pagamentos são processados por provedor autorizado (ZEXI PAY, via Stripe), com repasse direto à loja. A
+            Pagamentos são processados por provedor autorizado (Pagamento Zexi, via Stripe), com repasse direto à loja. A
             Zexi retém apenas a sua taxa de intermediação e não mantém saldo em custódia.
           </li>
           <li>Direito de arrependimento em compras a distância (art. 49 do CDC) e regras do Decreto 7.962/2013.</li>
@@ -55,10 +55,10 @@ export default function Page() {
           <li>Descrições geradas com IA são sugestões: a loja revisa e responde pelo texto publicado.</li>
         </ul>
 
-        <H2>6. Vídeos, lives e chat</H2>
+        <H2>6. Vídeos, transmissões e chat</H2>
         <ul className="list-disc space-y-1 pl-5">
           <li>Proibido conteúdo ofensivo, discriminatório, sexual, violento, spam e pedido de pagamento fora da plataforma.</li>
-          <li>Qualquer pessoa pode denunciar. A equipe pode ocultar mensagens, remover vídeos, encerrar lives, bloquear produtos e suspender lojas; toda ação fica registrada com o motivo.</li>
+          <li>Qualquer pessoa pode denunciar. A equipe pode ocultar mensagens, remover vídeos, encerrar transmissões, bloquear produtos e suspender lojas; toda ação fica registrada com o motivo.</li>
         </ul>
 
         <H2>7. Programa de indicação (afiliados)</H2>

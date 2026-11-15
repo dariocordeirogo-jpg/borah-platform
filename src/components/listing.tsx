@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 export type ListingBadge = "live" | "auction" | "scheduled" | "ended" | null;
 
 const badgeStyle: Record<Exclude<ListingBadge, null>, { cls: string; icon: typeof Radio; text: string }> = {
-  live: { cls: "bg-brand text-white", icon: Radio, text: "AO VIVO" },
+  live: { cls: "bg-brand text-white", icon: Radio, text: "Ao vivo" },
   auction: { cls: "bg-white text-navy ring-1 ring-line", icon: Gavel, text: "Leilão" },
   scheduled: { cls: "bg-white text-navy ring-1 ring-line", icon: CalendarClock, text: "Em breve" },
   ended: { cls: "bg-surface-2 text-muted", icon: Gavel, text: "Encerrado" },
@@ -143,10 +143,10 @@ export function ListingCard({
           </p>
         ) : null}
         <div className="mt-1">
-          {priceLabel && <p className="text-[10px] font-semibold uppercase tracking-wide text-muted sm:text-[11px]">{priceLabel}</p>}
+          {priceLabel && <p className="text-[10px] font-semibold text-muted sm:text-[11px]">{priceLabel}</p>}
           {off && compareAtCents ? (
             <p className="flex flex-wrap items-center gap-1 text-xs leading-4">
-              <span className="rounded bg-brand px-1 py-px text-[11px] font-bold text-white">{off}% OFF</span>
+              <span className="rounded bg-brand px-1 py-px text-[11px] font-bold text-white">−{off}%</span>
               <span className="text-muted line-through">{formatBRL(compareAtCents)}</span>
             </p>
           ) : null}

@@ -19,8 +19,8 @@ async function Queue({ searchParams }: { searchParams: Promise<SP> }) {
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
       {sp.ok && <Notice tone="success">Feito. A ação ficou registrada na auditoria.</Notice>}
 
-      <section className="rounded-[var(--radius-card)] border border-line bg-white" aria-label="Lives">
-        <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-navy">Lives no ar e programadas</h2>
+      <section className="rounded-[var(--radius-card)] border border-line bg-white" aria-label="Transmissões">
+        <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-navy">Transmissões no ar e programadas</h2>
         {!lives.length && <p className="p-4 text-sm text-muted">Nenhuma.</p>}
         <ul className="divide-y divide-line">
           {lives.map((l) => (
@@ -29,7 +29,7 @@ async function Queue({ searchParams }: { searchParams: Promise<SP> }) {
                 <Link href={`/live/${l.id}`} className="font-semibold text-navy hover:underline">{l.title}</Link>{" "}
                 <span className="text-muted">· {l.stores?.name} · {liveStatusLabel[l.status]}</span>
               </p>
-              <ReasonForm action={endLiveAdmin} id={l.id} label={l.status === "live" ? "Encerrar live" : "Cancelar live"} />
+              <ReasonForm action={endLiveAdmin} id={l.id} label={l.status === "live" ? "Encerrar transmissão" : "Cancelar transmissão"} />
             </li>
           ))}
         </ul>

@@ -88,7 +88,7 @@ function AddressBlock({ addresses, value, onChange }: { addresses: CheckoutAddre
         <div className="flex items-start gap-3 rounded-xl border border-brand bg-brand-soft/30 p-3">
           <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand" aria-hidden="true" />
           <div className="min-w-0 flex-1 text-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Entregar em</p>
+            <p className="text-xs font-semibold text-muted">Entregar em</p>
             <p className="font-semibold text-navy">
               {selected.street}, {selected.number}
               {selected.complement ? ` – ${selected.complement}` : ""}

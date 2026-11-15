@@ -16,11 +16,11 @@ export const site = {
   production: (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "") === "https://www.zexi.com.br",
 } as const;
 
-/** Módulos da plataforma (nomes oficiais). */
+/** Módulos da plataforma (nomes oficiais, em português e sem caixa alta). */
 export const modules = {
-  market: { name: "ZEXI MARKET", short: "Market", href: "/market" },
-  live: { name: "ZEXI LIVE", short: "Ao vivo", href: "/ao-vivo" },
-  auctions: { name: "ZEXI LEILÕES", short: "Leilões", href: "/leiloes" },
-  seller: { name: "ZEXI SELLER", short: "Vender", href: "/vender" },
-  pay: { name: "ZEXI PAY", short: "Pagamentos", href: null },
+  market: { name: "Zexi Compras", short: "Compras", href: "/market" },
+  live: { name: "Zexi Ao Vivo", short: "Ao vivo", href: "/ao-vivo" },
+  auctions: { name: "Zexi Leilões", short: "Leilões", href: "/leiloes" },
+  seller: { name: "Zexi Vendedor", short: "Vender", href: "/vender" },
+  pay: { name: "Pagamento Zexi", short: "Pagamentos", href: null },
 } as const;

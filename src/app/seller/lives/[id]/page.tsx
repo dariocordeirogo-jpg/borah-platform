@@ -19,7 +19,7 @@ import { muxConfigured } from "@/lib/live/mux";
 import { requireStore } from "@/lib/market/seller-guard";
 import { setLiveSocial } from "@/lib/social/actions";
 
-export const metadata: Metadata = { title: "Estúdio da live" };
+export const metadata: Metadata = { title: "Estúdio da transmissão" };
 type SP = { erro?: string; nova?: string };
 
 const input = "h-10 w-full rounded-xl border border-line bg-white px-3 text-sm";
@@ -44,7 +44,7 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
   return (
     <div className="space-y-4">
       <LiveRefresh liveId={live.id} />
-      {sp.nova && <Notice tone="success">Live programada! Ela já aparece em “Próximas lives”.</Notice>}
+      {sp.nova && <Notice tone="success">Transmissão programada! Ela já aparece em “Próximas transmissões”.</Notice>}
       {sp.erro && <Notice tone="error">{sp.erro}</Notice>}
 
       <section className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-card)] border border-line bg-white p-5">
@@ -62,14 +62,14 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
           {live.status === "scheduled" && (
             <form action={startLive}>
               <input type="hidden" name="liveId" value={live.id} />
-              <Button type="submit">Começar live</Button>
+              <Button type="submit">Começar transmissão</Button>
             </form>
           )}
           {(live.status === "scheduled" || isLive) && (
             <form action={endLive}>
               <input type="hidden" name="liveId" value={live.id} />
               <Button type="submit" variant="outline">
-                {isLive ? "Encerrar live" : "Cancelar live"}
+                {isLive ? "Encerrar transmissão" : "Cancelar transmissão"}
               </Button>
             </form>
           )}
@@ -77,12 +77,12 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
       </section>
 
       <section
-        aria-label="Vendas da live"
+        aria-label="Vendas da transmissão"
         data-testid="vendas-live"
         className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-[var(--radius-card)] border border-line bg-white px-5 py-4"
       >
         <span className="inline-flex items-center gap-2 text-sm font-semibold text-navy">
-          <TrendingUp className="h-4 w-4 text-brand" aria-hidden="true" /> Vendas desta live
+          <TrendingUp className="h-4 w-4 text-brand" aria-hidden="true" /> Vendas desta transmissão
         </span>
         <span className="text-sm text-muted">
           <strong className="text-navy">{formatBRL(sales.totalCents)}</strong> em {sales.paid} {sales.paid === 1 ? "pedido pago" : "pedidos pagos"}
@@ -98,7 +98,7 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
       )}
 
       <div className="grid grid-cols-1 gap-4 [&>*]:min-w-0 lg:grid-cols-[1fr_360px]">
-        <section className="rounded-[var(--radius-card)] border border-line bg-white" aria-label="Produtos da live">
+        <section className="rounded-[var(--radius-card)] border border-line bg-white" aria-label="Produtos da transmissão">
           <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-navy">Produtos</h2>
           <ul className="divide-y divide-line">
             {products.map((p) => {
@@ -124,7 +124,7 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
                   </div>
                   {isLive && (
                     <div className="space-y-2">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-muted">Como vender agora</p>
+                      <p className="text-xs font-semibold text-muted">Como vender agora</p>
                       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                         <form action={pinProduct}>
                           <input type="hidden" name="liveId" value={live.id} />
@@ -224,7 +224,7 @@ function SocialPanel({ liveId, tiktok, instagram }: { liveId: string; tiktok: st
       <h2 className="font-semibold text-navy">Também ao vivo no TikTok e no Instagram</h2>
       <p className="text-muted">
         Faça a live ao mesmo tempo no seu perfil e informe o @ aqui. Quem vinculou a conta na Zexi pode comentar{" "}
-        <strong>LANCE 150</strong> ou <strong>EU QUERO</strong>: o lance e o carrinho seguem as mesmas regras do site, e
+        <strong>lance 150</strong> ou <strong>eu quero</strong>: o lance e o carrinho seguem as mesmas regras do site, e
         os comentários aparecem na sala da Zexi enquanto a live estiver no ar (depois são apagados).
       </p>
       <form action={setLiveSocial} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
@@ -263,7 +263,7 @@ function StreamPanel({
         <>
           <p className="text-muted">
             Status: <strong className="text-navy" data-testid="status-transmissao">{streamStatusLabel[stream.status]}</strong>. Quando o
-            vídeo estiver chegando, toque em “Começar live”.
+            vídeo estiver chegando, toque em “Começar transmissão”.
           </p>
           <dl className="grid gap-2 sm:grid-cols-[140px_1fr]">
             <dt className="font-semibold text-navy">Servidor</dt>
