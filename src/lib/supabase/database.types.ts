@@ -649,6 +649,8 @@ export type Database = {
           pinned_product_id: string | null;
           stream_signal: "active" | "idle" | null;
           stream_signal_at: string | null;
+          tiktok_username: string | null;
+          instagram_username: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -670,6 +672,35 @@ export type Database = {
       };
       live_messages: {
         Row: { id: number; live_id: string; user_id: string; alias: string; body: string; hidden: boolean; created_at: string };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      social_links: {
+        Row: { user_id: string; platform: "tiktok" | "instagram"; username: string; linked_at: string };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      social_link_codes: {
+        Row: { code: string; user_id: string; created_at: string; expires_at: string; used_at: string | null };
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      live_social_events: {
+        Row: {
+          id: number;
+          live_id: string;
+          platform: "tiktok" | "instagram";
+          msg_id: string;
+          username: string;
+          nickname: string;
+          body: string;
+          kind: "comment" | "link" | "bid" | "want";
+          result: string | null;
+          created_at: string;
+        };
         Insert: Record<string, never>;
         Update: Record<string, never>;
         Relationships: [];
@@ -799,6 +830,11 @@ export type Database = {
       create_live: { Args: { _title: string; _description: string | null; _scheduled_at: string; _product_ids: string[] }; Returns: string };
       set_live_playback: { Args: { _live_id: string; _url: string | null }; Returns: undefined };
       start_live: { Args: { _live_id: string }; Returns: undefined };
+      start_social_link: { Args: Record<string, never>; Returns: string };
+      unlink_social: { Args: { _platform: string }; Returns: undefined };
+      set_live_social: { Args: { _live_id: string; _platform: string; _username: string }; Returns: undefined };
+      social_bridge_targets: { Args: { _payload: string; _signature: string }; Returns: Json };
+      social_bridge_comment: { Args: { _payload: string; _signature: string }; Returns: Json };
       end_live: { Args: { _live_id: string }; Returns: undefined };
       pin_live_product: { Args: { _live_id: string; _product_id: string | null }; Returns: undefined };
       start_live_auction: {

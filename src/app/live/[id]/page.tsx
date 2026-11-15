@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { Gavel, ShoppingBag } from "lucide-react";
 import { BidPanel } from "@/components/auctions/bid-panel";
 import { LiveChat } from "@/components/live/chat";
+import { SocialFeed } from "@/components/social/social-feed";
 import { LivePlayer } from "@/components/live/player";
 import { ViewerCount } from "@/components/live/viewer-count";
 import { LiveRefresh } from "@/components/live/live-refresh";
@@ -15,6 +16,7 @@ import { formatBRL } from "@/lib/format";
 import { liveStatusLabel } from "@/lib/live/format";
 import { getAuction } from "@/lib/auctions/queries";
 import { getLive, type LiveProduct } from "@/lib/live/queries";
+import { getLiveSocialEvents } from "@/lib/social/queries";
 import { addToCart } from "@/lib/market/actions";
 
 export const metadata: Metadata = { title: "Live" };
@@ -60,6 +62,8 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
   const activeAuction = auction && auction.status === "active" ? auction : null;
   // Leilão aberto na live: lance aqui mesmo, sem sair da transmissão (mesmo painel e regras da página do leilão)
   const lot = activeAuction ? await getAuction(activeAuction.id) : null;
+  const socials = [live.tiktok_username && "tiktok", live.instagram_username && "instagram"].filter(Boolean) as ("tiktok" | "instagram")[];
+  const socialEvents = live.status === "live" && socials.length ? await getLiveSocialEvents(live.id) : [];
 
   return (
     <div className="grid grid-cols-1 gap-5 [&>*]:min-w-0 lg:grid-cols-[1fr_360px]">
@@ -149,6 +153,7 @@ async function Room({ params }: { params: Promise<{ id: string }> }) {
           canSend={live.status === "live"}
           loggedIn={Boolean(user)}
         />
+        {live.status === "live" && socials.length > 0 && <SocialFeed liveId={live.id} initial={socialEvents} platforms={socials} />}
         {products.length > 0 && (
           <section aria-label="Produtos da live" className="rounded-[var(--radius-card)] border border-line bg-white">
             <h2 className="border-b border-line px-4 py-3 text-sm font-semibold text-navy">Produtos da live</h2>

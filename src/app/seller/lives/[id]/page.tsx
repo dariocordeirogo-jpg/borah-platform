@@ -17,6 +17,7 @@ import { cloudflareConfigured } from "@/lib/live/cloudflare";
 import { getLive, getLiveSales, getStudioStream, type StudioStream } from "@/lib/live/queries";
 import { muxConfigured } from "@/lib/live/mux";
 import { requireStore } from "@/lib/market/seller-guard";
+import { setLiveSocial } from "@/lib/social/actions";
 
 export const metadata: Metadata = { title: "Estúdio da live" };
 type SP = { erro?: string; nova?: string };
@@ -92,6 +93,9 @@ async function Studio({ params, searchParams }: { params: Promise<{ id: string }
       </section>
 
       {(live.status === "scheduled" || isLive) && <StreamPanel liveId={live.id} playbackUrl={live.playback_url} stream={stream} options={{ mux: muxConfigured(), browser: cloudflareConfigured() }} />}
+      {(live.status === "scheduled" || isLive) && (
+        <SocialPanel liveId={live.id} tiktok={live.tiktok_username} instagram={live.instagram_username} />
+      )}
 
       <div className="grid grid-cols-1 gap-4 [&>*]:min-w-0 lg:grid-cols-[1fr_360px]">
         <section className="rounded-[var(--radius-card)] border border-line bg-white" aria-label="Produtos da live">
@@ -210,6 +214,34 @@ function ManualPlayback({ liveId, playbackUrl }: { liveId: string; playbackUrl: 
         Salvar
       </Button>
     </form>
+  );
+}
+
+/** Live também no TikTok/Instagram: comentários de quem vinculou a conta viram lance ou carrinho aqui. */
+function SocialPanel({ liveId, tiktok, instagram }: { liveId: string; tiktok: string | null; instagram: string | null }) {
+  return (
+    <section className="space-y-3 rounded-[var(--radius-card)] border border-line bg-white p-5 text-sm" data-testid="redes-live">
+      <h2 className="font-semibold text-navy">Também ao vivo no TikTok e no Instagram</h2>
+      <p className="text-muted">
+        Faça a live ao mesmo tempo no seu perfil e informe o @ aqui. Quem vinculou a conta na Zexi pode comentar{" "}
+        <strong>LANCE 150</strong> ou <strong>EU QUERO</strong>: o lance e o carrinho seguem as mesmas regras do site, e
+        os comentários aparecem na sala da Zexi enquanto a live estiver no ar (depois são apagados).
+      </p>
+      <form action={setLiveSocial} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+        <input type="hidden" name="liveId" value={liveId} />
+        <label className="space-y-1">
+          <span className="text-xs font-semibold text-navy">@ no TikTok</span>
+          <input name="tiktok" defaultValue={tiktok ?? ""} placeholder="@sualoja" aria-label="@ no TikTok" className={input} />
+        </label>
+        <label className="space-y-1">
+          <span className="text-xs font-semibold text-navy">@ no Instagram</span>
+          <input name="instagram" defaultValue={instagram ?? ""} placeholder="@sualoja" aria-label="@ no Instagram" className={input} />
+        </label>
+        <Button type="submit" variant="secondary">
+          Salvar perfis
+        </Button>
+      </form>
+    </section>
   );
 }
 

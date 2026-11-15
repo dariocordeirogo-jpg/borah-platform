@@ -99,11 +99,19 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     await expect(studio.getByTestId("transmissao")).toContainText("em configuração");
     await expect(studio.getByTestId("transmissao")).not.toContainText("rtmps://");
     await studio.getByLabel("Link de reprodução HLS").fill("http://inseguro.com/live.m3u8");
-    await studio.getByRole("button", { name: "Salvar" }).click();
+    await studio.getByRole("button", { name: "Salvar", exact: true }).click();
     await expect(studio.getByRole("alert").filter({ hasText: "link HLS" })).toBeVisible();
     await studio.getByLabel("Link de reprodução HLS").fill("https://stream.livelance.test/e2e/live.m3u8");
-    await studio.getByRole("button", { name: "Salvar" }).click();
+    await studio.getByRole("button", { name: "Salvar", exact: true }).click();
     await expect(studio.getByLabel("Link de reprodução HLS")).toHaveValue("https://stream.livelance.test/e2e/live.m3u8");
+
+    // Também ao vivo no TikTok: @ inválido é recusado; o válido fica salvo (normalizado)
+    await studio.getByLabel("@ no TikTok").fill("loja com espaço");
+    await studio.getByRole("button", { name: "Salvar perfis" }).click();
+    await expect(studio.getByRole("alert").filter({ hasText: "@ do perfil" })).toBeVisible();
+    await studio.getByLabel("@ no TikTok").fill("@Loja.E2E");
+    await studio.getByRole("button", { name: "Salvar perfis" }).click();
+    await expect(studio.getByLabel("@ no TikTok")).toHaveValue("loja.e2e");
   });
 
   test("público vê o destaque e conversa no chat; a loja modera em tempo real", async ({ browser }) => {
@@ -112,6 +120,8 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     await expect(highlight).toContainText(bag);
     await expect(highlight.getByRole("button", { name: "Comprar agora" })).toBeVisible();
     await expect(viewer.getByText("AO VIVO", { exact: true })).toBeVisible();
+    // Live ligada ao TikTok: quem assiste vê o espaço dos comentários de lá e como participar
+    await expect(viewer.getByTestId("espelho-redes")).toContainText("Ao vivo também no TikTok");
     // Quem assiste entra na contagem; o estúdio da loja só observa
     await expect(studio.getByTestId("espectadores")).toHaveText(/\b1 assistindo/, { timeout: 15_000 });
     await expect(viewer.getByTestId("espectadores")).toHaveText(/\b1 assistindo/);
@@ -165,10 +175,20 @@ test.describe("ZEXI LIVE: da programação ao leilão relâmpago", () => {
     await expect(box.getByRole("link", { name: "Ver detalhes do lote e histórico" })).toHaveAttribute("href", /\/leilao\/[0-9a-f-]{36}$/);
   });
 
+  test("comprador gera o código para vincular o @ do TikTok/Instagram", async () => {
+    const page = await viewer.context().newPage();
+    await page.goto("/conta/redes");
+    await expect(page.getByTestId("vinculo-tiktok")).toContainText("TikTok");
+    await page.getByRole("button", { name: "Gerar código de vínculo" }).click();
+    await expect(page.getByTestId("codigo-vinculo")).toHaveText(/^ZX[0-9]{6}$/);
+    await page.close();
+  });
+
   test("loja encerra e a sala fecha para o público", async () => {
     await studio.getByRole("button", { name: "Encerrar live" }).click();
     await expect(studio.getByTestId("estado-live")).toHaveText("Encerrada");
     await expect(viewer.getByTestId("live-player-status")).toHaveText("Esta live terminou.", { timeout: 15_000 });
     await expect(viewer.getByText("O chat abre quando a live estiver no ar.")).toBeVisible();
+    await expect(viewer.getByTestId("espelho-redes")).toHaveCount(0);
   });
 });

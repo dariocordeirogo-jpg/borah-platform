@@ -49,6 +49,44 @@ Configuração: token da Cloudflare com permissão **Account → Stream → Edit
 `CLOUDFLARE_ACCOUNT_ID` (só no servidor). `GET /api/health` mostra `integrations.liveBrowser: true`.
 Teste: `supabase/tests/live_navegador.sql` e `tests/unit/cloudflare-stream.test.ts`.
 
+## Ponte com TikTok e Instagram
+
+A loja faz a live ao mesmo tempo no próprio perfil e informa o @ no estúdio ("Também ao vivo no TikTok e no
+Instagram"). Quem assiste lá pode comentar:
+
+- `ZX123456` (código gerado em **Minha conta → TikTok e Instagram**, `/conta/redes`): vincula o @ à conta Zexi.
+  Só quem controla o @ consegue comentar com ele; o código vale 30 min e uma vez.
+- `LANCE 150` (ou `lance R$ 1.200,50`): lance no leilão aberto da live, pelo mesmo motor do site
+  (`private.place_bid_as`; `place_bid` do site chama o mesmo motor): CPF verificado, incremento mínimo,
+  anti-sniping, bloqueios, sem lance duplicado.
+- `EU QUERO`: põe o produto em destaque no carrinho (marcado com a live); preço e estoque são conferidos de novo
+  no checkout. Bloqueado enquanto há leilão na live.
+
+Comentário de @ não vinculado só aparece no espelho com o aviso para vincular. Pagamento é sempre na Zexi.
+
+**Nada fica gravado:** o espelho dos comentários (`live_social_events`) só é visível com a live no ar e é
+apagado quando ela termina. A transmissão também não é gravada (Mux sem gravação; pelo navegador a entrada da
+Cloudflare é apagada no fim).
+
+Como funciona por baixo:
+
+- O conector `workers/social-bridge` (Node, fora da Vercel, ex.: Railway) pergunta ao banco quais lives estão
+  no ar com @ (`social_bridge_targets`) e repassa cada comentário (`social_bridge_comment`). Toda chamada é
+  assinada com HMAC-SHA256 do segredo do Vault `social_bridge_secret`, com horário (até 5 min). Sem assinatura
+  válida, nada passa.
+- TikTok: `tiktok-live-connector` 2.5.0 (não oficial; lê o chat público da live, com assinatura pela Euler
+  Stream). Se o TikTok mudar algo, só a ponte para; o site segue normal.
+- Instagram: o banco já aceita `platform = 'instagram'`; falta a entrada dos comentários pelo webhook oficial
+  da Meta (`live_comments`), que exige um app aprovado na Meta.
+
+Configuração (dono):
+
+1. Gerar um segredo de 32+ caracteres e salvar no Vault do Supabase como `social_bridge_secret`.
+2. Subir `workers/social-bridge` com `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SOCIAL_BRIDGE_SECRET` (o mesmo
+   segredo) e, se quiser mais conexões, `EULER_API_KEY`.
+
+Testes: `supabase/tests/ponte_social.sql` e `tests/unit/social-bridge.test.ts`; passos no `tests/e2e/live.spec.ts`.
+
 ## Segurança
 
 - Tabela `private.live_streams` sem acesso pela API; leitura e escrita só por `attach_live_stream`,
