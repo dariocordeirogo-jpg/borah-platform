@@ -1,0 +1,10 @@
+{
+  "name": "zexi-social-bridge",
+  "private": true,
+  "type": "module",
+  "description": "Conector dos comentários das lives do TikTok com a Zexi (lances e carrinho pelo chat)",
+  "main": "index.mjs",
+  "scripts": { "start": "node index.mjs" },
+  "engines": { "node": ">=20" },
+  "dependencies": { "tiktok-live-connector": "2.5.0" }
+}

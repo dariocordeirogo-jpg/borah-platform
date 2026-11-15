@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
-import { BadgeCheck, Gavel, LogOut, Megaphone, Receipt, ShieldAlert, ShieldCheck, Store } from "lucide-react";
+import { BadgeCheck, Gavel, Link2, LogOut, Megaphone, Receipt, ShieldAlert, ShieldCheck, Store } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions";
 import { Button } from "@/components/ui/button";
 import { getMyVerification } from "@/lib/auctions/queries";
@@ -76,6 +76,7 @@ async function Account() {
             ? { icon: Store, title: "Minha loja", text: "Painel ZEXI SELLER", href: "/seller" }
             : { icon: Store, title: "Abrir minha loja", text: "Venda na Zexi", href: "/vender" },
           { icon: Gavel, title: "Meus lances", text: "Leilões em que você participa", href: "/conta/lances" },
+          { icon: Link2, title: "TikTok e Instagram", text: "Dê lance e compre comentando na live", href: "/conta/redes" },
           ...(isStaff(user.roles) ? [{ icon: ShieldCheck, title: "Painel da equipe", text: "Denúncias, moderação e números", href: "/admin" }] : []),
           { icon: Megaphone, title: "Minhas indicações", text: "Indique e ganhe comissão", href: user.roles.includes("affiliate") ? "/conta/indicacoes" : "/indique" },
         ].map((c) =>
